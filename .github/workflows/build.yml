@@ -9,6 +9,8 @@ on:
         type: boolean
         default: false
   push:
+  schedule:
+    - cron: '15 1 * * *'
 
 jobs:
   build:
