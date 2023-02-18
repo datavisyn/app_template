@@ -1,10 +1,14 @@
 import * as React from 'react';
 import { mount } from 'cypress/react';
-import { App } from '../../src/App';
+import { VisynApp, VisynAppProvider } from 'visyn_core';
 
 describe('Health check for Cypress component test', () => {
   it('should mount App', () => {
-    mount(<App />);
-    cy.get('div').should('include.text', 'Content');
+    mount(
+      <VisynAppProvider appName="app_template">
+        <VisynApp loginMenu={null}>Hello app_template!</VisynApp>
+      </VisynAppProvider>,
+    );
+    cy.get('div').should('include.text', 'Hello app_template!');
   });
 });

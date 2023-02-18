@@ -49,7 +49,7 @@
     "webpack:prod": "visyn_scripts build --mode production --env workspace_mode=single"
   },
   "dependencies": {
-    "tdp_core": "git+ssh://git@github.com:datavisyn/tdp_core#develop",
+    "visyn_core": "git+ssh://git@github.com:datavisyn/visyn_core#develop",
     "visyn_scripts": "git+ssh://git@github.com/datavisyn/visyn_scripts#develop"
   },
   "devDependencies": {
@@ -59,7 +59,8 @@
     "@types/react": "^16.9.23",
     "@types/react-dom": "^16.9.5",
     "react": "^16.13.0",
-    "react-dom": "^16.13.0"
+    "react-dom": "^16.13.0",
+    "visyn_scripts": "git+ssh://git@github.com/datavisyn/visyn_scripts#visyn_core"
   },
   "visyn": {
     "entries": {
