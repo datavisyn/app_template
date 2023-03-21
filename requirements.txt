@@ -1,1 +1,1 @@
-visyn_core@git+https://github.com/datavisyn/visyn_core.git@develop#egg=visyn_core
+visyn_core@git+https://github.com/datavisyn/visyn_core.git@babb0fe60fda4f4bfd9dc3f81a9a4a30358c7b93#egg=visyn_core

@@ -1,13 +1,14 @@
 import * as ReactDOM from 'react-dom';
 import * as React from 'react';
 import { MantineProvider } from '@mantine/core';
-import { VisynApp, VisynAppProvider } from 'visyn_core/app';
+import { VisynAppProvider } from 'visyn_core/app';
+import { App } from './App';
 
 ReactDOM.render(
   <React.StrictMode>
     <MantineProvider withGlobalStyles withNormalizeCSS>
       <VisynAppProvider appName="app_template">
-        <VisynApp loginMenu={null}>Hello app_template!</VisynApp>
+        <App />
       </VisynAppProvider>
     </MantineProvider>
   </React.StrictMode>,
