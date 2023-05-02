@@ -1,9 +1,9 @@
-import * as ReactDOM from 'react-dom';
 import * as React from 'react';
+import { createRoot } from 'react-dom/client';
 import { MantineProvider } from '@mantine/core';
 import { VisynApp, VisynAppProvider } from 'visyn_core/app';
 
-ReactDOM.render(
+createRoot(document.getElementById('root')).render(
   <React.StrictMode>
     <MantineProvider withGlobalStyles withNormalizeCSS>
       <VisynAppProvider appName="App Template">
@@ -11,5 +11,4 @@ ReactDOM.render(
       </VisynAppProvider>
     </MantineProvider>
   </React.StrictMode>,
-  document.getElementById('root'),
 );
