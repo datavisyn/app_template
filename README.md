@@ -94,6 +94,20 @@ MATCH (complexInteractorN:GraphInteractor)-[complexInteractorR:interactor]-(comp
 RETURN complexInteractorN, complexInteractorR, complexParticipantN, complexParticipantR, complex
 ```
 
+## Network expansion
+The paper https://www.nature.com/articles/s41588-023-01327-9 describes the expansion of protein interaction networks using GWAS-linked
+genes as seeds. The expansion is run per trait/disease and uses googles pagerank algorithm followed by iterative clustering using the walktrap algorithm.
+
+For the source code of network expansion see the function `astro` in the R script `./r_scripts/Script_1_SEED.R`.
+
+**TODO**
+- [ ] Finish porting the function `astro` from R to python (initial in file `nwe.py`)
+- [ ] Apply the python version of network expansion to real data (see notebook `nwe.ipynb`)
+- [ ] Find out how the input data for the `astro` function was retrieved
+  - we could possibly query the OTAR interactome DB to get that data
+
+Data needed for the python implementation of network expansion could be found at https://drive.google.com/file/d/1LGBhrtz6_W57HNoh_xGkUf9fd6PCaAdE/view?usp=sharing. After downloading extract the content inside the backend folder.
+
 ### Installation
 
 It is recommended to create a virtual environment to avoid cluttering the global installation directory.

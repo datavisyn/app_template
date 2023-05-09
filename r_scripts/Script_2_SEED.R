@@ -22,13 +22,13 @@ anotation<-function(node.list,genes,disease){
 
 ################################################################################
 
-string=		readRDS("~/workspaces/Network_expansion/tables_expansion/Combined_STRINGv11_OTAR281119_FILTER.rds")
-EFO_DOI=as.matrix(read.delim("~/workspaces/Network_expansion/tables_expansion/EFO_DOI_long_matrix.csv",sep=","))
+string=		readRDS("./tables_expansion/Combined_STRINGv11_OTAR281119_FILTER.rds")
+EFO_DOI=as.matrix(read.delim("./tables_expansion/EFO_DOI_long_matrix.csv",sep=","))
 
 EFO_DOI=cbind(EFO_DOI,NA,NA)
 colnames(EFO_DOI)[(ncol(EFO_DOI)-1):ncol(EFO_DOI)]=c("Zscore_nodes","Zscore_TP")
 
-setwd("~/workspaces/Network_expansion/tables_expansion/RDS_astro")
+setwd("./tables_expansion/RDS_astro")
 
 
 path=list.files(pattern= ".rds")
@@ -36,7 +36,7 @@ path=gsub(".rds","",path)
 path=gsub("nodes.","",path)
 path=path[path%in%EFO_DOI[,"EFO"]]
 
-path=cbind(path,paste(	"~/workspaces/Network_expansion/tables_expansion/RDS_astro/nodes.",path,".rds",sep=""))
+path=cbind(path,paste(	"./tables_expansion/RDS_astro/nodes.",path,".rds",sep=""))
 colnames(path)=c("EFO","path")
 
 ################################################################################
@@ -46,7 +46,7 @@ i <- as.numeric(commandArgs(trailingOnly = TRUE))
 ####Loopeando cooo
 ################################################################################
 
-setwd("~/workspaces/Network_expansion/tables_expansion/ROCs")
+setwd("./tables_expansion/ROCs")
 
 # i <- 2
 all=readRDS(path[i,"path"])
@@ -178,6 +178,6 @@ for (j in 1:nrow(results.AUCs)){
     
   }}
 
-x=readRDS(paste("~/workspaces/Network_expansion/tables_expansion/ROCs/",path[i,"EFO"],".rds",sep=""))
+x=readRDS(paste("./tables_expansion/ROCs/",path[i,"EFO"],".rds",sep=""))
 
-saveRDS(results.AUCs,paste("~/workspaces/Network_expansion/tables_expansion/ROCs/",path[i,"EFO"],".rds",sep=""))
+saveRDS(results.AUCs,paste("./tables_expansion/ROCs/",path[i,"EFO"],".rds",sep=""))

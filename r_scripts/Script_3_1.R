@@ -5,9 +5,9 @@
 ##Correlations & distances are calculated both with and without normalization
 ##In the paper we only use results that are NOT norm
 
-setwd("~/workspaces/Network_expansion/tables_expansion/RDS_astro/")
+setwd("./tables_expansion/RDS_astro/")
 
-path=paste(	"~/workspaces/Network_expansion/tables_expansion/RDS_astro/",list.files(pattern= ".rds"),sep="")
+path=paste(	"./tables_expansion/RDS_astro/",list.files(pattern= ".rds"),sep="")
 
 gwas_all=matrix(0,18410,length(path))
 
@@ -98,8 +98,8 @@ corr.traits.zsco=cbind(corr.traits.zsco,corr[,"cor"])
 
 colnames(corr.traits.zsco)[ncol(corr.traits.zsco)]="corr.spearman"
 
-saveRDS(corr.traits.zsco,"~/workspaces/Network_expansion/tables_expansion/corr.traits.zsco.rds")
-saveRDS(corr.traits.norm,"~/workspaces/Network_expansion/tables_expansion/corr.traits.norm.rds")
+saveRDS(corr.traits.zsco,"./tables_expansion/corr.traits.zsco.rds")
+saveRDS(corr.traits.norm,"./tables_expansion/corr.traits.norm.rds")
 
 #############################
 
@@ -120,8 +120,8 @@ dist.Zsco=data.frame(	t(combn(colnames(Zscore),2)),
 
 names(dist.Zsco) <- c("i","j","euclidean","manhattan","canberra")
 
-saveRDS(dist.Zsco,"~/workspaces/Network_expansion/tables_expansion/dist.Zsco.rds")
-saveRDS(dist.norm,"~/workspaces/Network_expansion/tables_expansion/dist.norm.rds")
+saveRDS(dist.Zsco,"./tables_expansion/dist.Zsco.rds")
+saveRDS(dist.norm,"./tables_expansion/dist.norm.rds")
 
 #####Cosine distances
 
@@ -160,7 +160,7 @@ cos.Zsco=data.frame(	i = rownames(cos.Zsco)[row(cos.Zsco)[ut]],
                      j = rownames(cos.Zsco)[col(cos.Zsco)[ut]],
                      cos.dist=t(cos.Zsco)[ut])
 
-saveRDS(cos.Zsco,"~/workspaces/Network_expansion/tables_expansion/cos.Zsco.rds")
-saveRDS(cos.norm,"~/workspaces/Network_expansion/tables_expansion/cos.norm.rds")
+saveRDS(cos.Zsco,"./tables_expansion/cos.Zsco.rds")
+saveRDS(cos.norm,"./tables_expansion/cos.norm.rds")
 
 

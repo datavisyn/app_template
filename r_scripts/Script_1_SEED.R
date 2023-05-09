@@ -271,9 +271,9 @@ astro<-function(node.gwas,edge.string,all.nodes){
 ####Load the requested files 
 
 
-all.gene.gwas=	readRDS("~/workspaces/Network_expansion/tables_expansion/all.gene.gwas_filter_GP.rds")
-all.node.gwas=	readRDS("~/workspaces/Network_expansion/tables_expansion/all_node_gwas_FILTER.rds")
-string=		readRDS("~/workspaces/Network_expansion/tables_expansion/Combined_STRINGv11_OTAR281119_FILTER.rds")
+all.gene.gwas=	readRDS("./tables_expansion/all.gene.gwas_filter_GP.rds")
+all.node.gwas=	readRDS("./tables_expansion/all_node_gwas_FILTER.rds")
+string=		readRDS("./tables_expansion/Combined_STRINGv11_OTAR281119_FILTER.rds")
 
 ########
 
@@ -386,7 +386,7 @@ if(length(clusters)>5){
 
 
 
-path=paste(	"~/workspaces/Network_expansion/tables_expansion/RDS_astro/",
+path=paste(	"./tables_expansion/RDS_astro/",
             "nodes.",
             names(dis[i]),
             ".rds",	sep="")
