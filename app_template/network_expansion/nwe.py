@@ -10,7 +10,7 @@ def annotation(node_list, genes, diseases):
     return node_list
 
 
-def astro(node_gwas: pd.DataFrame, edge_string: pd.DataFrame, all_nodes: pd.DataFrame):
+def astro(node_gwas: pd.DataFrame, edge_string: pd.DataFrame, all_nodes: bool) -> Graph:
     net = Graph.DataFrame(edges=edge_string, vertices=node_gwas, directed=False, use_vids=False)
     net = net.simplify(loops=True, multiple=True, combine_edges="max")
 

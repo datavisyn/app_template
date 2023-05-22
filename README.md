@@ -105,6 +105,7 @@ For the source code of network expansion see the function `astro` in the R scrip
 - [ ] Apply the python version of network expansion to real data (see notebook `nwe.ipynb`)
 - [ ] Find out how the input data for the `astro` function was retrieved
   - we could possibly query the OTAR interactome DB to get that data
+  - https://platform-docs.opentargets.org/target/molecular-interactions
 
 Data needed for the python implementation of network expansion could be found at https://drive.google.com/file/d/1LGBhrtz6_W57HNoh_xGkUf9fd6PCaAdE/view?usp=sharing. After downloading extract the content inside the backend folder.
 
