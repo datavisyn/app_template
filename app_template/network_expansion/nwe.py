@@ -1,5 +1,5 @@
-from igraph import Graph
 import pandas as pd
+from igraph import Graph
 
 
 def annotation(node_list, genes, diseases):

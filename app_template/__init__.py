@@ -7,9 +7,9 @@ from .settings import AppSettings
 class VisynPlugin(AVisynPlugin):
     def init_app(self, app: FastAPI):
         # Register anything related the the FastAPI here, i.e. routers, middlewares, events, etc.
-        from .example_router import example_router
+        from .graph_router import graph_router
 
-        app.include_router(example_router, prefix="/api/app")
+        app.include_router(graph_router, prefix="/api/app")
 
     def register(self, registry: RegHelper):
         pass

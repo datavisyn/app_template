@@ -31,6 +31,7 @@
     "all": "yarn run lint:fix && yarn run test && yarn run build && yarn run dist",
     "build": "yarn run clean && yarn run compile && yarn run copy",
     "clean": "visyn_scripts clean build dist lib",
+    "codegen:openapi": "npx @rtk-query/codegen-openapi ./src/codegen.ts",
     "compile:watch": "visyn_scripts compile --watch",
     "compile": "visyn_scripts compile",
     "copy": "visyn_scripts copy",
@@ -49,19 +50,16 @@
     "webpack:prod": "visyn_scripts build --mode production --env workspace_mode=single"
   },
   "dependencies": {
-    "visyn_core": "git+ssh://git@github.com:datavisyn/visyn_core#develop",
-    "visyn_scripts": "git+ssh://git@github.com/datavisyn/visyn_scripts#develop"
+    "@mantine/core": "^5.5.5",
+    "@mantine/hooks": "^5.5.5",
+    "@reduxjs/toolkit": "^1.8.2",
+    "react-redux": "^8.0.2",
+    "visyn_core": "2.0.0",
+    "visyn_scripts": "4.0.0"
   },
   "devDependencies": {
+    "@rtk-query/codegen-openapi": "^1.0.0",
     "cypress": "^12.0.1"
-  },
-  "resolutions": {
-    "@types/react": "^16.9.23",
-    "@types/react-dom": "^16.9.5",
-    "react": "^16.13.0",
-    "react-dom": "^16.13.0",
-    "visyn_core": "1.1.1",
-    "visyn_scripts": "3.0.1"
   },
   "visyn": {
     "entries": {
