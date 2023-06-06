@@ -20,4 +20,5 @@ def gene2drugs(gene: str | None = None, limit: int = 1000) -> list[DiseaseRespon
     df = graph_data[graph_data["disease"].str.contains("CHEBI")]
     if gene:
         df = graph_data[graph_data["gene"]==gene]
+        df = df.drop_duplicates(subset=["disease"])
     return df.head(limit).to_dict(orient="records")  # type: ignore

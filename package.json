@@ -53,6 +53,7 @@
     "@mantine/core": "^5.5.5",
     "@mantine/hooks": "^5.5.5",
     "@reduxjs/toolkit": "^1.8.2",
+    "cytoscape": "^3.25.0",
     "dagre": "^0.8.5",
     "react-redux": "^8.0.2",
     "reactflow": "^11.7.2",

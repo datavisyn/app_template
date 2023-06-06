@@ -1,18 +1,19 @@
-import * as React from 'react';
+import React, { useEffect, useRef } from 'react';
 import dagre from 'dagre';
 import { useAutocomplete,useGene2Drugs, useGraph } from './store/store';
 import { ReactFlow, Background, Controls, MiniMap } from 'reactflow';
 import 'reactflow/dist/style.css';
+import cytoscape from 'cytoscape';
 
 const nodeWidth = 172;
 const nodeHeight = 36;
 
 const dagreGraph = new dagre.graphlib.Graph();
-  dagreGraph.setDefaultEdgeLabel(() => ({}));
+dagreGraph.setDefaultEdgeLabel(() => ({}));
 
-  const getLayoutedElements = (nodes, edges) => {
+const getLayoutedElements = (nodes, edges) => {
 
-    dagreGraph.setGraph({ rankdir: 'LR' })
+    dagreGraph.setGraph({ rankdir: 'TB',align: 'UL' })
 
     nodes?.forEach((node) => {
       dagreGraph.setNode(node.id, { width: nodeWidth, height: nodeHeight });
@@ -42,9 +43,28 @@ const dagreGraph = new dagre.graphlib.Graph();
     });
 
     return { nodes, edges };
-  };
+};
 
-  type DrugGraphProps={
+
+
+const convertGraphToCytoscape = (elements) => {
+  const cytoscapeElements = elements.map((element) => {
+    const { id, type, position, data } = element;
+    const { label } = data;
+
+    return {
+      data: { id, label },
+      position: { x: position.x, y: position.y },
+      group: 'nodes',
+      classes: type === 'default' ? 'default-node' : 'custom-node', // Add custom classes if needed
+    };
+  });
+
+  return cytoscapeElements;
+};
+
+
+type DrugGraphProps={
     geneID:string
 }
 
@@ -82,7 +102,6 @@ export function DrugGraph(props:DrugGraphProps) {
     source: props.geneID,
     target: edge.disease
   }))
-  console.log(edges);
 
   const { nodes: layoutedNodes, edges: layoutedEdges } = getLayoutedElements(
     nodes,
@@ -92,10 +111,11 @@ export function DrugGraph(props:DrugGraphProps) {
 
   return (
     <div style={{ height: '100%' }}>
-      <ReactFlow nodes={layoutedNodes} edges={layoutedEdges}> 
+      <ReactFlow nodes={layoutedNodes} edges={layoutedEdges} > 
         <Background />
         <Controls />
       </ReactFlow>
     </div>
   );
 }
+
