@@ -3,10 +3,10 @@ import { emptySplitApi as api } from './appBaseApi';
 const injectedRtkApi = api.injectEndpoints({
   endpoints: (build) => ({
     autocompleteApiAppAutocompleteGet: build.query<AutocompleteApiAppAutocompleteGetApiResponse, AutocompleteApiAppAutocompleteGetApiArg>({
-      query: (queryArg) => ({ url: `/api/app/autocomplete`, params: { search: queryArg.search, limit: queryArg.limit } }),
+      query: (queryArg) => ({ url: `http://127.0.0.1:9000/api/app/autocomplete`, params: { search: queryArg.search, limit: queryArg.limit } }),
     }),
     graphApiAppGraphGet: build.query<GraphApiAppGraphGetApiResponse, GraphApiAppGraphGetApiArg>({
-      query: (queryArg) => ({ url: `/api/app/graph`, params: { gene: queryArg.gene, limit: queryArg.limit } }),
+      query: (queryArg) => ({ url: `http://127.0.0.1:9000/api/app/graph`, params: { gene: queryArg.gene, limit: queryArg.limit } }),
     }),
   }),
   overrideExisting: false,
