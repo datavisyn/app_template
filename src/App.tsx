@@ -1,7 +1,7 @@
 import { Autocomplete, Loader } from '@mantine/core';
 import * as React from 'react';
 import { useAutocomplete, useGraph } from './store/store';
-import { DrugGraph } from './DrugGraph';
+import DrugGraph from './DrugGraph';
 
 export function App() {
   const [search, setSearch] = React.useState('');
