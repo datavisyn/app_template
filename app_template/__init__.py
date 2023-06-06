@@ -13,7 +13,6 @@ class VisynPlugin(AVisynPlugin):
         # Register anything related the the FastAPI here, i.e. routers, middlewares, events, etc.
         
   
-
         app.add_middleware(
             CORSMiddleware,
             allow_origins=["*"],
