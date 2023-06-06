@@ -9,7 +9,7 @@ _log = logging.getLogger(__name__)
 graph_router = APIRouter(tags=["Graph"])
 
 graph_data = pd.read_csv(Path(__file__).parent / "data/STRINGv11_OTAR281119_FILTER_combined.csv.gz", compression="gzip")
-disease_data = pd.read_csv(Path(__file__).parent / "data/gwas_gene-diseases.csv.gz", compression="gzip")
+trait_data = pd.read_csv(Path(__file__).parent / "data/gwas_gene-diseases.csv.gz", compression="gzip")
 
 
 
@@ -37,19 +37,9 @@ def graph(gene: str | None = None, limit: int = 1000) -> list[GraphResponse]:
     return df.head(limit).to_dict(orient="records")  # type: ignore
 
 
-@graph_router.get("/disease2genes")
-def disease2genes(disease: str | None = None, limit: int = 1000) -> list[GeneResponse]:
-    df = disease_data
+@graph_router.get("/trait2genes")
+def trait2genes(disease: str | None = None, limit: int = 1000) -> list[GeneResponse]:
+    df = trait_data
     if disease:
-        df = disease_data[disease_data["disease"] == disease]
-    df = df[disease_data["disease"].str.startswith("CHEBI_") == False]
-    return df.head(limit).to_dict(orient="records")  # type: ignore
-
-
-@graph_router.get("/drug2genes")
-def drug2genes(drug: str | None = None, limit: int = 1000) -> list[GeneResponse]:
-    df = disease_data
-    if drug:
-        df = disease_data[disease_data["disease"] == drug]
-    df = df[disease_data["disease"].str.startswith("CHEBI_")]
+        df = trait_data[trait_data["disease"] == disease]
     return df.head(limit).to_dict(orient="records")  # type: ignore
