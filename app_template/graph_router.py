@@ -9,7 +9,7 @@ _log = logging.getLogger(__name__)
 graph_router = APIRouter(tags=["Graph"])
 
 graph_data = pd.read_csv(Path(__file__).parent / "data/STRINGv11_OTAR281119_FILTER_combined.csv.gz", compression="gzip")
-
+disease_data = pd.read_csv(Path(__file__).parent / "data/gwas_gene-diseases.csv.gz", compression="gzip")
 
 @graph_router.get("/autocomplete")
 def autocomplete(search: str, limit: int | None = 10) -> list[str]:
@@ -21,10 +21,26 @@ class GraphResponse(BaseModel):
     ENSG_B: str
     combined_score: float
 
+class DiseaseResponse(BaseModel):
+    gene: str
+    padj: float
+    disease: str
+    # name: str
+
 
 @graph_router.get("/graph")
 def graph(gene: str | None = None, limit: int = 1000) -> list[GraphResponse]:
     df = graph_data
     if gene:
         df = graph_data[graph_data["ENSG_A"] == gene]
+    return df.head(limit).to_dict(orient="records")  # type: ignore
+
+@graph_router.get("/gene2diseases")
+def gene2diseases(gene: str | None = None, limit: int = 1000) -> list[DiseaseResponse]:
+    df = disease_data
+    if gene:
+        df = disease_data[(disease_data["gene"] == gene) &  (disease_data["disease"].str.contains("CHEBI") == False) ]
+        df = df.sort_values(['disease','padj'], ascending=[True, False])
+        df = df.drop_duplicates(subset=['gene','disease'], keep='first')
+
     return df.head(limit).to_dict(orient="records")  # type: ignore
