@@ -23,10 +23,8 @@ class VisynPlugin(AVisynPlugin):
         )
         
         from .graph_router import graph_router
-        from .gene2drugs import gene2drugs_router
         
         app.include_router(graph_router, prefix="/api/app")
-        app.include_router(gene2drugs_router, prefix="/api/app")
         
 
 

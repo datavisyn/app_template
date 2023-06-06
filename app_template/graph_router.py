@@ -13,7 +13,8 @@ trait_data = pd.read_csv(Path(__file__).parent / "data/gwas_gene-diseases.csv.gz
 
 @graph_router.get("/autocomplete")
 def autocomplete(search: str, limit: int | None = 10) -> list[str]:
-    return [s for s in graph_data["ENSG_A"].unique().tolist() if search.lower() in s.lower()][:limit]
+    full_data = graph_data["ENSG_A"].unique().tolist() + trait_data["disease"].unique().tolist()
+    return [s for s in full_data if search.lower() in s.lower()][:limit]
 
 
 class GraphResponse(BaseModel):
