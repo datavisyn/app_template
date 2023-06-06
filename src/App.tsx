@@ -1,6 +1,7 @@
 import { Autocomplete, Loader } from '@mantine/core';
 import * as React from 'react';
 import { useAutocomplete, useGraph } from './store/store';
+import DrugGraph from './DrugGraph';
 
 export function App() {
   const [search, setSearch] = React.useState('');
@@ -49,7 +50,8 @@ export function App() {
   });
 
   return (
-    <>
+    <DrugGraph/>
+    /*<>
       <Autocomplete
         label="Search for genes"
         placeholder="ENSG..."
@@ -63,6 +65,6 @@ export function App() {
           {d.ENSG_A} - {d.ENSG_B}
         </div>
       ))}
-    </>
+    </>*/
   );
 }
