@@ -3,7 +3,6 @@ import dagre from 'dagre';
 import { useAutocomplete,useGene2Drugs, useGene2Genes } from './store/store';
 import { ReactFlow, Background, Controls, MiniMap } from 'reactflow';
 import 'reactflow/dist/style.css';
-import cytoscape from 'cytoscape';
 
 const nodeWidth = 172;
 const nodeHeight = 36;
@@ -43,24 +42,6 @@ const getLayoutedElements = (nodes, edges) => {
     });
 
     return { nodes, edges };
-};
-
-
-
-const convertGraphToCytoscape = (elements) => {
-  const cytoscapeElements = elements.map((element) => {
-    const { id, type, position, data } = element;
-    const { label } = data;
-
-    return {
-      data: { id, label },
-      position: { x: position.x, y: position.y },
-      group: 'nodes',
-      classes: type === 'default' ? 'default-node' : 'custom-node', // Add custom classes if needed
-    };
-  });
-
-  return cytoscapeElements;
 };
 
 

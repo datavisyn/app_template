@@ -60,13 +60,14 @@ export function App() {
         data={autocompleteData || []}
         rightSection={isFetching ? <Loader size="sm" /> : null}
       />
-      {graph?.map((d) => (
+      {/* {graph?.map((d) => (
         <div key={`${d.ENSG_A}-${d.ENSG_B}`}>
           {d.ENSG_A} - {d.ENSG_B}
         </div>
-      ))}
+      ))} */}
       {/* <DrugGraph geneID='ENSG00000030110'/> */}
-      {/* <GeneGraph geneID='ENSG00000030110' /> */}
-    </>
+
+      <GeneGraph genes={graph} />    
+      </>
   );
 }
