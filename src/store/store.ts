@@ -8,7 +8,7 @@ export const appApi = generatedAppApi.enhanceEndpoints({
   },
 });
 
-export const { useGraphApiAppGraphGetQuery: useGraph,
+export const { useGene2GenesApiAppGene2GenesGetQuery: useGene2Genes,
    useAutocompleteApiAppAutocompleteGetQuery: useAutocomplete,
    useGene2DrugsApiAppGene2DrugsGetQuery: useGene2Drugs
    } = appApi;
