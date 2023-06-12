@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 import dagre from 'dagre';
-import { useAutocomplete,useGene2Drugs, useGraph } from './store/store';
+import { useAutocomplete,useGene2Drugs, useGene2Genes } from './store/store';
 import { ReactFlow, Background, Controls, MiniMap } from 'reactflow';
 import 'reactflow/dist/style.css';
 import cytoscape from 'cytoscape';
