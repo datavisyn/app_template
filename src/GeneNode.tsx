@@ -1,14 +1,16 @@
 import React from 'react';
-import {Node, NodeProps} from 'reactflow';
+import {Handle, Node, NodeProps, Position} from 'reactflow';
 
-type NodeData = {
-  "name":string
-};
 
-type GeneNode = Node<NodeData>;
+const style= { border: "1px solid #777", padding: 20, borderRadius:100 }
 
-function GeneNode({ data }: NodeProps<NodeData>) {
-  return <div>{data.name}</div>;
+
+function GeneNode({ data }: NodeProps) {
+  return <>
+  <Handle type="target" position={Position.Top} style={{ visibility: 'hidden' }}/>
+  <div style={style}>{data?.label}</div>
+  <Handle type="source" position={Position.Bottom} style={{ visibility: 'hidden' }}/>
+  </>
 }
 
 export default GeneNode
