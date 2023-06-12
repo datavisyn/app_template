@@ -1,7 +1,8 @@
 import { Autocomplete, Loader } from '@mantine/core';
 import * as React from 'react';
 import { useAutocomplete, useGene2Genes } from './store/store';
-import {DrugGraph} from './DrugGraph';
+import { DrugGraph } from './DrugGraph';
+import { GeneGraph } from './GeneGraph';
 
 export function App() {
   const [search, setSearch] = React.useState('');
@@ -65,6 +66,7 @@ export function App() {
         </div>
       ))}
       {/* <DrugGraph geneID='ENSG00000030110'/> */}
+      {/* <GeneGraph geneID='ENSG00000030110' /> */}
     </>
   );
 }
