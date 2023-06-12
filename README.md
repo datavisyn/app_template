@@ -115,7 +115,8 @@ It is recommended to create a virtual environment to avoid cluttering the global
 
 ```bash
 python -m venv .venv  # create a new virtual environment
-source .venv/bin/activate  # active it
+source .venv/bin/activate  # active it  (for Linux)
+.\.venv\Scripts\Activate.ps1  # active it  (for Windows)
 make develop  # install all dependencies
 ```
 
