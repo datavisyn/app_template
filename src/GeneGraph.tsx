@@ -5,7 +5,7 @@ import { ReactFlow, Background, Controls, MiniMap } from 'reactflow';
 import 'reactflow/dist/style.css';
 import cytoscape from 'cytoscape';
 import GeneNode from './GeneNode';
-import { GraphResponse } from './store/generatedAppApi';
+import { Gene2GenesApiAppGene2GenesGetApiResponse, GraphResponse } from './store/generatedAppApi';
 
 
 const nodeWidth = 172;
@@ -48,40 +48,36 @@ const getLayoutedElements = (nodes, edges) => {
     return { nodes, edges };
 };
 
-
-
-let x1 = 0;
-let y1 = 0;
-
-
-
 type GeneGraphProps={
-    geneID:string
+    genes: Gene2GenesApiAppGene2GenesGetApiResponse
 }
 
-
-
-
-export function GeneGraph(props:GeneGraphProps) {
-
-    const { data: graph } = useGene2Genes({
-        gene: props.geneID || undefined,
-        limit: 1000,
-      });
-    
-    
+export function GeneGraph(props: GeneGraphProps) {
+     
       // add nodes
-      const nodes = graph?.map(node => ({
+      const nodes = props.genes?.map(node => ({
         id: node.ENSG_B,
         position: {
             x: Math.random() * 700,
             y: Math.random() * 700,},
         data: {label: node.ENSG_B_name}
       }))
+
+
+    //   if(props.genes != undefined){
+    //     nodes.concat([({
+    //         id: props.genes[0]["ENSG_A"],
+    //         position: {
+    //             x: Math.random() * 700,
+    //             y: Math.random() * 700,},
+    //         data: {label: props.genes[0]["ENSG_A_name"]}
+    //       })])
+    //   }
+
     
     
       // TODO originNodeId = parameter of function
-      const edges = graph?.map(edge => ({
+      const edges = props.genes?.map(edge => ({
         id: edge.ENSG_A + "-" + edge.ENSG_B,
         source: edge.ENSG_A,
         target: edge.ENSG_B
