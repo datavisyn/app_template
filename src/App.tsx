@@ -1,6 +1,7 @@
 import { Autocomplete, Loader } from '@mantine/core';
 import * as React from 'react';
 import { useAutocomplete, useGraph } from './store/store';
+import {DrugGraph} from './DrugGraph';
 
 export function App() {
   const [search, setSearch] = React.useState('');
@@ -43,14 +44,14 @@ export function App() {
   // This is more complicated to setup, but makes using the API much easier. It essentially generates hooks for you via `yarn run codegen:openapi`.
   // This will generate a new `store/generatedAppApi.ts` file with the hooks and types.
   // Then, in the `store/store.ts`, you can reexport the hooks as they usually get long names like `useGet...`.
-  const { data: graph } = useGraph({
-    gene: search || undefined,
-    limit: 1000,
-  });
+  // const { data: graph } = useGraph({
+  //   gene: search || undefined,
+  //   limit: 1000,
+  // });
 
   return (
     <>
-      <Autocomplete
+      {/* <Autocomplete
         label="Search for genes"
         placeholder="ENSG..."
         value={search}
@@ -62,7 +63,8 @@ export function App() {
         <div key={`${d.ENSG_A}-${d.ENSG_B}`}>
           {d.ENSG_A} - {d.ENSG_B}
         </div>
-      ))}
+      ))} */}
+      <DrugGraph geneID='ENSG00000030110'/>
     </>
   );
 }

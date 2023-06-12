@@ -8,7 +8,10 @@ export const appApi = generatedAppApi.enhanceEndpoints({
   },
 });
 
-export const { useGraphApiAppGraphGetQuery: useGraph, useAutocompleteApiAppAutocompleteGetQuery: useAutocomplete } = appApi;
+export const { useGraphApiAppGraphGetQuery: useGraph,
+   useAutocompleteApiAppAutocompleteGetQuery: useAutocomplete,
+   useGene2DrugsApiAppGene2DrugsGetQuery: useGene2Drugs
+   } = appApi;
 
 export const store = configureStore({
   reducer: {
