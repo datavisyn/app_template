@@ -1,8 +1,8 @@
 import React, { useEffect, useRef } from 'react';
-import dagre from 'dagre';
 import { useAutocomplete,useGene2Drugs, useGraph } from './store/store';
-import { ReactFlow, Background, Controls, MiniMap, Node } from 'reactflow';
+import { ReactFlow, Background, Controls, MiniMap, Node, Edge } from 'reactflow';
 import 'reactflow/dist/style.css';
+import { at } from 'lodash';
 
 type DrugGraphProps={
   geneID:string
@@ -81,15 +81,21 @@ export function DrugGraph(props:DrugGraphProps) {
   // add nodes
   const nodes = graph?.map(node => ({
     id: node.disease,
-    position: {x: 0, y: 0},
-    data: {label: node.disease}
+    position: {x: Math.random(), y: Math.random()},
+    data: {
+            label: node.disease,
+            score: node.padj
+          }
   }))
 
-  // add origin of ndoes
+  // add origin of nodes
   nodes?.unshift(
     { id: props.geneID,
       position: {x: 0, y: 0},
-      data: {label: props.geneID}
+      data: {
+              label: props.geneID,
+              score: graph[0]?.padj
+            }
     }
   )
 
