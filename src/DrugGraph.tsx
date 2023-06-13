@@ -1,8 +1,7 @@
-import React, { useEffect, useRef } from 'react';
-import { useAutocomplete,useGene2Drugs, useGraph } from './store/store';
-import { ReactFlow, Background, Controls, MiniMap, Node, Edge } from 'reactflow';
+import React from 'react';
+import { useGene2Drugs } from './store/store';
+import { ReactFlow, Background, Controls, MiniMap, Node } from 'reactflow';
 import 'reactflow/dist/style.css';
-import { at } from 'lodash';
 
 type DrugGraphProps={
   geneID:string
