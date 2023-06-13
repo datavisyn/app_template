@@ -14,5 +14,4 @@ createRoot(document.getElementById('root')).render(
         </VisynApp>
       </VisynAppProvider>
     </Provider>
-  </React.StrictMode>,
-);
+import { VisynApp, VisynAppProvider } from 'visyn_core/app';
