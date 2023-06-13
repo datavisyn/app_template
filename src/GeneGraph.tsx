@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import dagre from 'dagre';
 import { useAutocomplete, useGene2Drugs, useGene2Genes } from './store/store';
 import { ReactFlow, Background, Controls, MiniMap, useNodesState, useEdgesState } from 'reactflow';
@@ -88,6 +88,11 @@ export function GeneGraph(props: GeneGraphProps) {
         edges
     );
 
+    useEffect(() => {
+      setNodes(layoutedNodes);
+      setEdges(layoutedEdges);
+    }, [props.genes]);
+
     const [nodesForFlow, setNodes, onNodesChange] = useNodesState(layoutedNodes);
     const [edgesForFlow, setEdges, onEdgesChange] = useEdgesState(layoutedEdges);
 
@@ -100,4 +105,12 @@ export function GeneGraph(props: GeneGraphProps) {
         </div>
     );
 }
+
+function useCallback(arg0: (nodes: any) => void, arg1: undefined[]) {
+  throw new Error('Function not implemented.');
+}
+
+// function useMemo(arg0: () => void) {
+//   throw new Error('Function not implemented.');
+// }
 
