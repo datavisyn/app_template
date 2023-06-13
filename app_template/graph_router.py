@@ -39,6 +39,7 @@ def gene2genes(gene: str | None = None, limit: int = 1000) -> list[GraphResponse
     df = graph_data
     if gene:
         df = graph_data[graph_data["ENSG_A"] == gene]
+        df = df[df["ENSG_B"] != gene]
     if df.size > 0: 
         df = setGeneNamesFromGeneDf(df)
     return df.head(limit).to_dict(orient="records")  # type: ignore
