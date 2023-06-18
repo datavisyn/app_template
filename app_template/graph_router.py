@@ -19,13 +19,12 @@ def autocomplete(search: str, limit: int | None = 10) -> list[str]:
     return [s for s in full_data if search.lower() in s.lower()][:limit]
 
 
-class GraphResponse(BaseModel):
+class GeneResponse(BaseModel):
     ENSG_A: str
     ENSG_B: str
     combined_score: float
     ENSG_A_name: str
     ENSG_B_name: str
-
 
 class TraitResponse(BaseModel):
     gene: str
@@ -35,7 +34,7 @@ class TraitResponse(BaseModel):
 
 
 @graph_router.get("/gene2genes")
-def gene2genes(gene: str | None = None, limit: int = 1000) -> list[GraphResponse]:
+def gene2genes(gene: str | None = None, limit: int = 1000) -> list[GeneResponse]:
     df = graph_data
     if gene:
         df = graph_data[graph_data["ENSG_A"] == gene]
@@ -67,6 +66,15 @@ def trait2genes(disease: str | None = None, limit: int = 1000) -> list[TraitResp
         df = setGeneNamesFromTraitDf(df)
     return df.head(limit).to_dict(orient="records")  # type: ignore
 
+@graph_router.get("/gene")
+def singleGene(gene: str) -> list[GeneResponse]:
+    # create dummy node by taking an entry and changing ids to the passed gene id 
+    df = graph_data
+    df = df.head(1)
+    df.at[0,"ENSG_A"] = gene
+    df.at[0,"ENSG_B"] = gene
+    df = setGeneNamesFromGeneDf(df)
+    return df.to_dict(orient="records") # type: ignore
 
 def gene2trait(df: pd.DataFrame, gene: str | None = None, limit: int = 1000) -> list[TraitResponse]:
     if gene:

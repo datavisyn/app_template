@@ -16,6 +16,9 @@ const injectedRtkApi = api.injectEndpoints({
     trait2GenesApiAppTrait2GenesGet: build.query<Trait2GenesApiAppTrait2GenesGetApiResponse, Trait2GenesApiAppTrait2GenesGetApiArg>({
       query: (queryArg) => ({ url: `http://127.0.0.1:9000/api/app/trait2genes`, params: { disease: queryArg.disease, limit: queryArg.limit } }),
     }),
+    singleGeneApiAppGeneGet: build.query<SingleGeneApiAppGeneGetApiResponse, SingleGeneApiAppGeneGetApiArg>({
+      query: (queryArg) => ({ url: `http://127.0.0.1:9000/api/app/gene`, params: { gene: queryArg.gene } }),
+    }),
   }),
   overrideExisting: false,
 });
@@ -25,7 +28,7 @@ export type AutocompleteApiAppAutocompleteGetApiArg = {
   search: string;
   limit?: number;
 };
-export type Gene2GenesApiAppGene2GenesGetApiResponse = /** status 200 Successful Response */ GraphResponse[];
+export type Gene2GenesApiAppGene2GenesGetApiResponse = /** status 200 Successful Response */ GeneResponse[];
 export type Gene2GenesApiAppGene2GenesGetApiArg = {
   gene?: string;
   limit?: number;
@@ -45,6 +48,10 @@ export type Trait2GenesApiAppTrait2GenesGetApiArg = {
   disease?: string;
   limit?: number;
 };
+export type SingleGeneApiAppGeneGetApiResponse = /** status 200 Successful Response */ GeneResponse[];
+export type SingleGeneApiAppGeneGetApiArg = {
+  gene: string;
+};
 export type ValidationError = {
   loc: (string | number)[];
   msg: string;
@@ -53,7 +60,7 @@ export type ValidationError = {
 export type HttpValidationError = {
   detail?: ValidationError[];
 };
-export type GraphResponse = {
+export type GeneResponse = {
   ENSG_A: string;
   ENSG_B: string;
   combined_score: number;
@@ -77,4 +84,6 @@ export const {
   useLazyGene2DrugsApiAppGene2DrugsGetQuery,
   useTrait2GenesApiAppTrait2GenesGetQuery,
   useLazyTrait2GenesApiAppTrait2GenesGetQuery,
+  useSingleGeneApiAppGeneGetQuery,
+  useLazySingleGeneApiAppGeneGetQuery,
 } = injectedRtkApi;
