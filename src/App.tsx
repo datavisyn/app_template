@@ -67,7 +67,7 @@ export function App() {
       ))} */}
       {/* <DrugGraph geneID='ENSG00000030110'/> */}
 
-      <GeneGraph genes={graph} />
+      <GeneGraph geneID={search} />
     </>
   );
 }

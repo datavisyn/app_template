@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 import dagre from 'dagre';
-import { useAutocomplete, useGene2Drugs, useGene2Genes } from './store/store';
+import { useAutocomplete, useGene2Drugs, useGene2Genes, useSingeGene } from './store/store';
 import { ReactFlow, Background, Controls, MiniMap, useNodesState, useEdgesState } from 'reactflow';
 import 'reactflow/dist/style.css';
 import GeneNode from './GeneNode';
@@ -52,62 +52,71 @@ const getLayoutedElements = (nodes, edges) => {
 };
 
 type GeneGraphProps = {
-    genes: Gene2GenesApiAppGene2GenesGetApiResponse
+    geneID: string
 }
 
 export function GeneGraph(props: GeneGraphProps) {
-    // add nodes
-    const nodes = props.genes?.map(node => ({
-        id: node.ENSG_B,
-        position: {
-            x: Math.random() * 700,
-            y: Math.random() * 700,
-        },
-        data: { label: node.ENSG_B_name }
-    }))
+    //check if geneID set
 
-    //   if(props.genes != undefined){
-    //     nodes.concat([({
-    //         id: props.genes[0]["ENSG_A"],
-    //         position: {
-    //             x: Math.random() * 700,
-    //             y: Math.random() * 700,},
-    //         data: {label: props.genes[0]["ENSG_A_name"]}
-    //       })])
-    //   }
+    if (props.geneID.length !== 0) {
+        //continue if gene with that id exists
+        const { data: firstNode } = useSingeGene({ gene: props.geneID });
 
-    // TODO originNodeId = parameter of function
-    const edges = props.genes?.map(edge => ({
-        id: edge.ENSG_A + "-" + edge.ENSG_B,
-        source: edge.ENSG_A,
-        target: edge.ENSG_B
-    }))
+        const { data: graph } = useGene2Genes({
+            gene: props.geneID || undefined,
+            limit: 1000,
+        });
 
-    const { nodes: layoutedNodes, edges: layoutedEdges } = getLayoutedElements(
-        nodes,
-        edges
-    );
+        const allNodes = graph?.concat(firstNode)
 
-    useEffect(() => {
-      setNodes(layoutedNodes);
-      setEdges(layoutedEdges);
-    }, [props.genes]);
+        // add nodes
+        const nodes = allNodes?.map(node => ({
+            id: node.ENSG_B,
+            position: {
+                x: Math.random() * 700,
+                y: Math.random() * 700,
+            },
+            data: {
+                label:
+                    node.ENSG_A === firstNode?.at(0).ENSG_A ? node.ENSG_B_name : node.ENSG_A_name
+            }
+        }))
 
-    const [nodesForFlow, setNodes, onNodesChange] = useNodesState(layoutedNodes);
-    const [edgesForFlow, setEdges, onEdgesChange] = useEdgesState(layoutedEdges);
+        const edges = allNodes?.map(edge => ({
+            id: edge.ENSG_A + "-" + edge.ENSG_B,
+            source: edge.ENSG_A,
+            target: edge.ENSG_B
+        }))
 
-    return (
-        <div style={{ height: '100%' }}>
-            <ReactFlow nodes={nodesForFlow} edges={edgesForFlow} nodeTypes={nodeTypes} onNodesChange={onNodesChange} onEdgesChange={onEdgesChange}>
-                <Background />
-                <Controls />
-            </ReactFlow>
-        </div>
-    );
+        const { nodes: layoutedNodes, edges: layoutedEdges } = getLayoutedElements(
+            nodes,
+            edges
+        );
+
+        const [nodesForFlow, setNodes, onNodesChange] = useNodesState(layoutedNodes);
+        const [edgesForFlow, setEdges, onEdgesChange] = useEdgesState(layoutedEdges);
+
+        useEffect(() => {
+            setNodes(layoutedNodes);
+            setEdges(layoutedEdges);
+        }, [props.geneID]);
+
+
+        return (
+            <div style={{ height: '100%' }}>
+                <ReactFlow nodes={nodesForFlow} edges={edgesForFlow} nodeTypes={nodeTypes} onNodesChange={onNodesChange} onEdgesChange={onEdgesChange}>
+                    <Background />
+                    <Controls />
+                </ReactFlow>
+            </div>
+        );
+    }
+    return <div></div>
+
 }
 
 function useCallback(arg0: (nodes: any) => void, arg1: undefined[]) {
-  throw new Error('Function not implemented.');
+    throw new Error('Function not implemented.');
 }
 
 // function useMemo(arg0: () => void) {
