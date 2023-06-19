@@ -70,7 +70,7 @@ export function GeneGraph(props: GeneGraphProps) {
         });
 
         useMemo(()=>{
-            // console.log("usememo called");
+            console.log("usememo called");
             var allNodes = graph;
             if(firstNode){
             allNodes = allNodes?.concat(firstNode);
