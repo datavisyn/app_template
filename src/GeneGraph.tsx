@@ -119,6 +119,7 @@ export function GeneGraph(props: GeneGraphProps) {
                 <ReactFlow nodes={nodes} edges={edges} nodeTypes={nodeTypes}>
                     <Background />
                     <Controls />
+                    <MiniMap />
                 </ReactFlow>
             </div>
         );
