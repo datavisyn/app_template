@@ -56,9 +56,11 @@ type GeneGraphProps = {
 }
 
 export function GeneGraph(props: GeneGraphProps) {
-    //check if geneID set
+    
+    const[nodes ,setNodes] = useState([]);
+    const[edges ,setEdges] = useState([]);
 
-    if (props.geneID.length !== 0) {
+    
         //continue if gene with that id exists
         const { data: firstNode } = useSingleGene({ gene: props.geneID });
 
@@ -67,51 +69,60 @@ export function GeneGraph(props: GeneGraphProps) {
             limit: 1000,
         });
 
-        const allNodes = graph?.concat(firstNode)
-
-        // add nodes
-        const nodes = allNodes?.map(node => ({
-            id: node.ENSG_B,
-            position: {
-                x: Math.random() * 700,
-                y: Math.random() * 700,
-            },
-            data: {
-                label:
-                    node.ENSG_A === firstNode?.at(0).ENSG_A ? node.ENSG_B_name : node.ENSG_A_name
+        useMemo(()=>{
+            // console.log("usememo called");
+            var allNodes = graph;
+            if(firstNode){
+            allNodes = allNodes?.concat(firstNode);
             }
-        }))
 
-        const edges = allNodes?.map(edge => ({
-            id: edge.ENSG_A + "-" + edge.ENSG_B,
-            source: edge.ENSG_A,
-            target: edge.ENSG_B
-        }))
+            // add nodes
+            setNodes(allNodes?.map(node => {return {
+                id: node.ENSG_B,
+                position: {
+                    x: Math.random() * 700,
+                    y: Math.random() * 700,
+                },
+                data: {
+                    label:
+                        node.ENSG_A === firstNode?.at(0).ENSG_A ? node.ENSG_B_name : node.ENSG_A_name
+                }
+            }}))
+    
+            setEdges(allNodes?.map(edge => ({
+                id: edge.ENSG_A + "-" + edge.ENSG_B,
+                source: edge.ENSG_A,
+                target: edge.ENSG_B
+            })))
+        },[graph]);
+
+
+
+        
 
         const { nodes: layoutedNodes, edges: layoutedEdges } = getLayoutedElements(
             nodes,
             edges
         );
 
-        const [nodesForFlow, setNodes, onNodesChange] = useNodesState(layoutedNodes);
-        const [edgesForFlow, setEdges, onEdgesChange] = useEdgesState(layoutedEdges);
+        // const [nodesForFlow, setNodes, onNodesChange] = useNodesState(layoutedNodes);
+        // const [edgesForFlow, setEdges, onEdgesChange] = useEdgesState(layoutedEdges);
 
-        useEffect(() => {
-            setNodes(layoutedNodes);
-            setEdges(layoutedEdges);
-        }, [props.geneID]);
+        // useEffect(() => {
+        //     setNodes(layoutedNodes);
+        //     setEdges(layoutedEdges);
+        // }, [props.geneID]);
 
 
         return (
-            <div style={{ height: '100%' }}>
-                <ReactFlow nodes={nodesForFlow} edges={edgesForFlow} nodeTypes={nodeTypes} onNodesChange={onNodesChange} onEdgesChange={onEdgesChange}>
+            <div style={{ height: '90%' }}>
+                <ReactFlow nodes={nodes} edges={edges} nodeTypes={nodeTypes}>
                     <Background />
                     <Controls />
                 </ReactFlow>
             </div>
         );
-    }
-    return <div></div>
+    
 
 }
 
