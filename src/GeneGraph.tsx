@@ -57,8 +57,8 @@ type GeneGraphProps = {
 
 export function GeneGraph(props: GeneGraphProps) {
     
-    const[nodes ,setNodes] = useNodesState([]);
-    const[edges ,setEdges] = useEdgesState([]);
+    const[nodes ,setNodes,onNodesChange] = useNodesState([]);
+    const[edges ,setEdges,onEdgesChange] = useEdgesState([]);
 
     
         //continue if gene with that id exists
@@ -75,7 +75,7 @@ export function GeneGraph(props: GeneGraphProps) {
             
 
             // add nodes
-            setNodes(allNodes?.map(node => {console.log("nodemap")
+            setNodes(allNodes?.map(node => {
             return {
                 id: node.ENSG_B,
                 position: {
@@ -115,7 +115,7 @@ export function GeneGraph(props: GeneGraphProps) {
 
         return (
             <div style={{ height: '90%' }}>
-                <ReactFlow nodes={nodes} edges={edges} nodeTypes={nodeTypes}>
+                <ReactFlow nodes={nodes} edges={edges} nodeTypes={nodeTypes}  onNodesChange={onNodesChange} onEdgesChange={onEdgesChange}>
                     <Background />
                     <Controls />
                     <MiniMap />
