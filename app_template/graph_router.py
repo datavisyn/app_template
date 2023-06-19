@@ -229,7 +229,7 @@ def setGeneNamesFromGeneDf(df: pd.DataFrame):
 def getGeneName(ensg: str):
     entry = gene_data[gene_data["ENSG"] == ensg]
     if entry.empty:
-        return ""
+        return "Gene not found"
     return entry.iloc[0, 2]
 
 
