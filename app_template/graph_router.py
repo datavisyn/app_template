@@ -164,6 +164,7 @@ def gene2genes(gene: str | None = None, limit: int = 1000) -> list[GeneResponse]
     if gene:
         df = df[(df["ENSG_A"] == gene) & (df["ENSG_B"] != gene)]
     if not df.empty:
+        df = removeDuplicates(df)
         df = setGeneNamesFromGeneDf(df)
     return df.head(limit).to_dict(orient="records")  # type: ignore
 
