@@ -11,7 +11,7 @@ export const appApi = generatedAppApi.enhanceEndpoints({
 export const { useGene2GenesApiAppGene2GenesGetQuery: useGene2Genes,
    useAutocompleteApiAppAutocompleteGetQuery: useAutocomplete,
    useGene2DrugsApiAppGene2DrugsGetQuery: useGene2Drugs,
-   useSingleGeneApiAppGeneGetQuery: useSingeGene,
+   useSingleGeneApiAppGeneGetQuery: useSingleGene,
    } = appApi;
 
 export const store = configureStore({
