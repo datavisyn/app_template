@@ -79,7 +79,7 @@ export function GeneGraph(props: GeneGraphProps) {
             return {
                 id: node.ENSG_B,
                 position: {
-                    x: Math.random() * 700,
+                    x: Math.random() * 2000,
                     y: Math.random() * 700,
                 },
                 data: {
