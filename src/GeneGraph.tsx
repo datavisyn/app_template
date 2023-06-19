@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 import dagre from 'dagre';
-import { useAutocomplete, useGene2Drugs, useGene2Genes, useSingeGene } from './store/store';
+import { useAutocomplete, useGene2Drugs, useGene2Genes, useSingleGene } from './store/store';
 import { ReactFlow, Background, Controls, MiniMap, useNodesState, useEdgesState } from 'reactflow';
 import 'reactflow/dist/style.css';
 import GeneNode from './GeneNode';
@@ -60,7 +60,7 @@ export function GeneGraph(props: GeneGraphProps) {
 
     if (props.geneID.length !== 0) {
         //continue if gene with that id exists
-        const { data: firstNode } = useSingeGene({ gene: props.geneID });
+        const { data: firstNode } = useSingleGene({ gene: props.geneID });
 
         const { data: graph } = useGene2Genes({
             gene: props.geneID || undefined,
