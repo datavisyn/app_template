@@ -106,6 +106,10 @@ def setGeneNamesFromGeneDf(df: pd.DataFrame):
     return df
 
 def getGeneName(ensg: str):
+    entry = gene_data[gene_data["ENSG"] == ensg].values
+    if entry.size == 0:    
+        return ""
+
     return gene_data[gene_data["ENSG"] == ensg].values[0][2]
 
 def setFromGeneName(df: pd.DataFrame, isTraitResponse = False):
