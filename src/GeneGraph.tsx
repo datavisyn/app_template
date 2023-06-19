@@ -6,7 +6,7 @@ import 'reactflow/dist/style.css';
 import GeneNode from './GeneNode';
 import DrugNode from './DrugNode';
 import DiseaseNode from './DiseaseNode';
-import { Gene2GenesApiAppGene2GenesGetApiResponse } from './store/generatedAppApi';
+
 
 
 const nodeWidth = 172;
@@ -57,8 +57,8 @@ type GeneGraphProps = {
 
 export function GeneGraph(props: GeneGraphProps) {
     
-    const[nodes ,setNodes] = useState([]);
-    const[edges ,setEdges] = useState([]);
+    const[nodes ,setNodes] = useNodesState([]);
+    const[edges ,setEdges] = useEdgesState([]);
 
     
         //continue if gene with that id exists
@@ -69,15 +69,14 @@ export function GeneGraph(props: GeneGraphProps) {
             limit: 1000,
         });
 
-        useMemo(()=>{
-            console.log("usememo called");
-            var allNodes = graph;
-            if(firstNode){
-            allNodes = allNodes?.concat(firstNode);
-            }
+        useEffect(()=>{
+
+            const allNodes = graph?.concat(firstNode);
+            
 
             // add nodes
-            setNodes(allNodes?.map(node => {return {
+            setNodes(allNodes?.map(node => {console.log("nodemap")
+            return {
                 id: node.ENSG_B,
                 position: {
                     x: Math.random() * 700,
@@ -100,10 +99,10 @@ export function GeneGraph(props: GeneGraphProps) {
 
         
 
-        const { nodes: layoutedNodes, edges: layoutedEdges } = getLayoutedElements(
-            nodes,
-            edges
-        );
+        // const { nodes: layoutedNodes, edges: layoutedEdges } = getLayoutedElements(
+        //     nodes,
+        //     edges
+        // );
 
         // const [nodesForFlow, setNodes, onNodesChange] = useNodesState(layoutedNodes);
         // const [edgesForFlow, setEdges, onEdgesChange] = useEdgesState(layoutedEdges);
@@ -119,6 +118,7 @@ export function GeneGraph(props: GeneGraphProps) {
                 <ReactFlow nodes={nodes} edges={edges} nodeTypes={nodeTypes}>
                     <Background />
                     <Controls />
+                    <MiniMap/>
                 </ReactFlow>
             </div>
         );
