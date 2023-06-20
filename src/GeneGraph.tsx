@@ -1,136 +1,114 @@
-import React, { useState, useEffect, useRef, useMemo } from 'react';
-import dagre from 'dagre';
+import React, { useState, useEffect, useMemo } from 'react';
+
 import { useAutocomplete, useGene2Drugs, useGene2Genes, useSingleGene } from './store/store';
-import { ReactFlow, Background, Controls, MiniMap, useNodesState, useEdgesState } from 'reactflow';
+import { ReactFlow, Background, Controls, MiniMap, useNodesState, useEdgesState, Handle } from 'reactflow';
 import 'reactflow/dist/style.css';
 import GeneNode from './GeneNode';
 import DrugNode from './DrugNode';
 import DiseaseNode from './DiseaseNode';
 
-
-
-const nodeWidth = 172;
-const nodeHeight = 36;
-
+// Node types for the graph
 const nodeTypes = { diseaseNode: DiseaseNode, geneNode: GeneNode, drugNode: DrugNode };
+const maxNodesPerCircle = 20;
 
-const dagreGraph = new dagre.graphlib.Graph();
-dagreGraph.setDefaultEdgeLabel(() => ({}));
-
-const getLayoutedElements = (nodes, edges) => {
-
-    dagreGraph.setGraph({ rankdir: 'TB', align: 'UL' })
-
-    nodes?.forEach((node) => {
-        dagreGraph.setNode(node.id, { width: nodeWidth, height: nodeHeight });
-    });
-
-    edges?.forEach((edge) => {
-        dagreGraph.setEdge(edge.source, edge.target);
-    });
-
-    dagre?.layout(dagreGraph);
-
-    nodes?.forEach((node) => {
-
-        const nodeWithPosition = dagreGraph.node(node.id);
-
-        node.targetPosition = 'top';
-        node.sourcePosition = 'bottom';
-
-        // We are shifting the dagre node position (anchor=center center) to the top left
-        // so it matches the React Flow node anchor point (top left).
-        node.position = {
-            x: nodeWithPosition.x - nodeWidth / 2,
-            y: nodeWithPosition.y - nodeHeight / 2,
-        };
-
-        return node;
-    });
-
-    return { nodes, edges };
+// Function to get the center of the screen
+const getScreenCenterCoordinates = () => {
+  const { innerWidth, innerHeight } = window;
+  const centerX = Math.floor(innerWidth / 2);
+  const centerY = Math.floor(innerHeight / 2);
+  // log coordinates to console
+  console.log(centerX, centerY);
+  return { x: centerX, y: centerY };
 };
 
+// Funktion zur Konvertierung von Polarkoordinaten in kartesische Koordinaten
+const polarToCartesian = (angle, radius, center) => {
+  const x = center.x + radius * Math.cos(angle);
+  const y = center.y + radius * Math.sin(angle);
+  return { x, y };
+};
+
+// Props for the GeneGraph component
 type GeneGraphProps = {
-    geneID: string
-}
+  geneID: string;
+};
 
+// GeneGraph component
 export function GeneGraph(props: GeneGraphProps) {
-    
-    const[nodes ,setNodes,onNodesChange] = useNodesState([]);
-    const[edges ,setEdges,onEdgesChange] = useEdgesState([]);
+  // State for the nodes and edges
+  const [nodes, setNodes, onNodesChange] = useNodesState([]);
+  const [edges, setEdges, onEdgesChange] = useEdgesState([]);
 
-    
-        //continue if gene with that id exists
-        const { data: firstNode } = useSingleGene({ gene: props.geneID });
+  // continue if gene with that id exists
+  const { data: firstNode } = useSingleGene({ gene: props.geneID });
 
-        const { data: graph } = useGene2Genes({
-            gene: props.geneID || undefined,
-            limit: 1000,
-        });
+  // get all genes that are connected to the first node
+  const { data: graph } = useGene2Genes({
+    gene: props.geneID || undefined,
+    limit: 1000,
+  });
 
-        useEffect(()=>{
+  useEffect(() => {
+    if (!graph || !firstNode) return;
 
-            const allNodes = graph?.concat(firstNode);
-            
+    // add first node to graph
+    const allNodes = graph.concat(firstNode);
+    const firstNodeId = firstNode[0]?.ENSG_B;
+    const nodesCircleAmount = allNodes.length < maxNodesPerCircle ? allNodes.length - 1: maxNodesPerCircle;
+    const angleStep = (2 * Math.PI) / nodesCircleAmount;
+    const center = getScreenCenterCoordinates();
+    let radius = 250;
 
-            // add nodes
-            setNodes(allNodes?.map(node => {
-            return {
-                id: node.ENSG_B,
-                position: {
-                    x: Math.random() * 2000,
-                    y: Math.random() * 700,
-                },
-                data: {
-                    label:
-                        node.ENSG_A === firstNode?.at(0).ENSG_A ? node.ENSG_B_name : node.ENSG_A_name
-                }
-            }}))
-    
-            setEdges(allNodes?.map(edge => ({
-                id: edge.ENSG_A + "-" + edge.ENSG_B,
-                source: edge.ENSG_A,
-                target: edge.ENSG_B
-            })))
-        },[graph]);
+    setNodes(
+      allNodes.map((node, index) => {
+        if (node.ENSG_B === firstNodeId) {
+          return {
+            id: node.ENSG_B,
+            position: center,
+            selected: true,
+            data: {
+              label: node.ENSG_A === firstNode[0]?.ENSG_A ? node.ENSG_B_name : node.ENSG_A_name,
+            },
+          };
+        } else {
+          if (index % maxNodesPerCircle === 0) {
+            radius += 200;
+          }
+          const angle = (index - 1) * angleStep;
+          const position = polarToCartesian(angle, radius, center);
+          return {
+            id: node.ENSG_B,
+            position: position,
+            data: {
+              label: node.ENSG_A === firstNode[0]?.ENSG_A ? node.ENSG_B_name : node.ENSG_A_name,
+            },
+          };
+        }
+      })
+    );
 
+    setEdges(
+      allNodes.map((edge) => ({
+        id: edge.ENSG_A + '-' + edge.ENSG_B,
+        source: edge.ENSG_A,
+        target: edge.ENSG_B,
+      }))
+    );
+  }, [graph]);
 
-
-        
-
-        // const { nodes: layoutedNodes, edges: layoutedEdges } = getLayoutedElements(
-        //     nodes,
-        //     edges
-        // );
-
-        // const [nodesForFlow, setNodes, onNodesChange] = useNodesState(layoutedNodes);
-        // const [edgesForFlow, setEdges, onEdgesChange] = useEdgesState(layoutedEdges);
-
-        // useEffect(() => {
-        //     setNodes(layoutedNodes);
-        //     setEdges(layoutedEdges);
-        // }, [props.geneID]);
-
-
-        return (
-            <div style={{ height: '90%' }}>
-                <ReactFlow nodes={nodes} edges={edges} nodeTypes={nodeTypes}  onNodesChange={onNodesChange} onEdgesChange={onEdgesChange}>
-                    <Background />
-                    <Controls />
-                    <MiniMap />
-                </ReactFlow>
-            </div>
-        );
-    
-
+  return (
+    <div style={{ height: '90%' }}>
+      <ReactFlow
+        nodes={nodes}
+        edges={edges}
+        nodeTypes={nodeTypes}
+        onNodesChange={onNodesChange}
+        onEdgesChange={onEdgesChange}
+      >
+        <Background />
+        <Controls />
+        <MiniMap />
+      </ReactFlow>
+    </div>
+  );
 }
-
-function useCallback(arg0: (nodes: any) => void, arg1: undefined[]) {
-    throw new Error('Function not implemented.');
-}
-
-// function useMemo(arg0: () => void) {
-//   throw new Error('Function not implemented.');
-// }
-
