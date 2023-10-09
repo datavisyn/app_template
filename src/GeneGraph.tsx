@@ -8,7 +8,9 @@ import DrugNode from './DrugNode';
 import DiseaseNode from './DiseaseNode';
 
 // Node types for the graph
-const nodeTypes = { diseaseNode: DiseaseNode, geneNode: GeneNode, drugNode: DrugNode };
+// const nodeTypes = { diseaseNode: DiseaseNode, geneNode: GeneNode, drugNode: DrugNode };
+
+import { nodeTypes } from "./NodeTypes"
 const maxNodesPerCircle = 20;
 
 // Function to get the center of the screen
@@ -66,6 +68,7 @@ export function GeneGraph(props: GeneGraphProps) {
             id: node.ENSG_B,
             position: center,
             selected: true,
+            type: "gene",
             data: {
               label: node.ENSG_A === firstNode[0]?.ENSG_A ? node.ENSG_B_name : node.ENSG_A_name,
             },
@@ -79,6 +82,7 @@ export function GeneGraph(props: GeneGraphProps) {
           return {
             id: node.ENSG_B,
             position: position,
+            type: "gene",
             data: {
               label: node.ENSG_A === firstNode[0]?.ENSG_A ? node.ENSG_B_name : node.ENSG_A_name,
             },
