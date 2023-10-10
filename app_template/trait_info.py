@@ -3,6 +3,7 @@ from fastapi import FastAPI
 from io import BytesIO
 import subprocess
 import json
+import re
 
 app = FastAPI()
 
@@ -20,10 +21,17 @@ def get_EFO_name(efo_id):
     if response.status_code == 200:
         data = response.json()
 
-        disease_name = data["_embedded"]["terms"][0]["label"]
-        return (disease_name)
+        # Extract name and description
+        term = data["_embedded"]["terms"][0]
+        disease_name = term["label"]
+        description = term.get("description", "Description not available")
+
+        return {
+            "name": disease_name,
+            "description": description
+        }
     else:
-        return ("not found")
+        return {"error": "not found"}
 
 def get_CHEBI_name(chebi_id):
     url = f"https://www.ebi.ac.uk/webservices/chebi/2.0/test/getCompleteEntity?chebiId={chebi_id}"
@@ -32,12 +40,22 @@ def get_CHEBI_name(chebi_id):
     if response.status_code == 200:
         data = response.text
 
-        start_index = data.find("<chebiAsciiName>") + len("<chebiAsciiName>")
-        end_index = data.find("</chebiAsciiName>")
-        drug_name = data[start_index:end_index]
-        return (drug_name)
+        # Extract the name
+        start_name = data.find("<chebiAsciiName>") + len("<chebiAsciiName>")
+        end_name = data.find("</chebiAsciiName>")
+        drug_name = data[start_name:end_name]
+
+        # Extract the description
+        data_match = re.search(r'<data>(.*?)</data>', data, re.DOTALL)
+        description = data_match.group(1).strip() if data_match else "Description not available"
+
+        return {
+            "name": drug_name,
+            "description": description
+        }
     else:
-        return ("not found")
+        return {"error": "not found"}
+
 
 def get_MONDO_name(mondo_id):
     url = f"https://api.monarchinitiative.org/api/bioentity/disease/{mondo_id}"
@@ -46,10 +64,17 @@ def get_MONDO_name(mondo_id):
     if response.status_code == 200:
         data = response.json()
 
-        disease_name = data["label"]
-        return (disease_name)
+        disease_name = data.get("label", "Name not available")
+
+        # Check if a description is available
+        description = data.get("description", "Description not available")
+
+        return {
+            "name": disease_name,
+            "description": description
+        }
     else:
-        return ("not found")
+        return {"error": "not found"}
 
 def get_HP_name(hpo_id):
     url = f"https://hpo.jax.org/api/hpo/term/{hpo_id}"
@@ -58,10 +83,17 @@ def get_HP_name(hpo_id):
     if response.status_code == 200:
         data = response.json()
 
-        disease_name = data["details"]["name"]
-        return (disease_name)
+        disease_name = data.get("details", {}).get("name", "Name not available")
+
+        # Check if a description is available
+        description = data.get("details", {}).get("definition", "Definition not available")
+
+        return {
+            "name": disease_name,
+            "description": description
+        }
     else:
-        return ("not found")
+        return {"error": "not found"}
 
 def get_GO_name(go_id):
     url = f"https://api.geneontology.org/api/ontology/term/{go_id}"
@@ -70,10 +102,17 @@ def get_GO_name(go_id):
     if response.status_code == 200:
         data = response.json()
 
-        disease_name = data["label"]
-        return (disease_name)
+        disease_name = data.get("label", "Name not available")
+
+        # Check if a description is available
+        description = data.get("definition", "Definition not available")
+
+        return {
+            "name": disease_name,
+            "description": description
+        }
     else:
-        return ("not found")
+        return {"error": "not found"}
 
 def get_NCIT_name(ncit_id):
     url = f"https://www.ebi.ac.uk/ols/api/terms?id={ncit_id}"
@@ -83,16 +122,23 @@ def get_NCIT_name(ncit_id):
         data = response.json()
 
         disease_name = data["_embedded"]["terms"][0]["label"]
-        return (disease_name)
+
+        # Check if a description is available
+        description = data["_embedded"]["terms"][0].get("description", "Description not available")
+
+        return {
+            "name": disease_name,
+            "description": description
+        }
     else:
-        return ("not found")
+        return {"error": "not found"}
 
 def get_ORPHANET_name(orphanet_id):
     api_key = "val"
     orphanet_id = orphanet_id.replace("Orphanet:", "")
 
-    # Define the CURL command
-    curl_command = [
+    # Define the CURL commands for name and description
+    name_curl_command = [
         "curl",
         "-X", "GET",
         f"https://api.orphacode.org/EN/ClinicalEntity/orphacode/{orphanet_id}/Name",
@@ -100,23 +146,43 @@ def get_ORPHANET_name(orphanet_id):
         "-H", f"apiKey: {api_key}"
     ]
 
-    try:
-        result = subprocess.run(curl_command, capture_output=True, text=True, check=True)
+    description_curl_command = [
+        "curl",
+        "-X", "GET",
+        f"https://api.orphacode.org/EN/ClinicalEntity/orphacode/{orphanet_id}/Definition",
+        "-H", "accept: application/json",
+        "-H", f"apiKey: {api_key}"
+    ]
 
-        data = result.stdout.strip()
-        if data:
-            response_json = json.loads(data)
-            name = response_json.get("Preferred term")
-            if name:
-                return name
-            else:
-                return "not found"
+    try:
+        # Make a request to get the name
+        result_name = subprocess.run(name_curl_command, capture_output=True, text=True, check=True)
+        name_data = result_name.stdout.strip()
+        
+        # Make a request to get the description
+        result_description = subprocess.run(description_curl_command, capture_output=True, text=True, check=True)
+        description_data = result_description.stdout.strip()
+
+        if name_data:
+            name_json = json.loads(name_data)
+            name = name_json.get("Preferred term", "Name not found")
         else:
-            return "not found"
+            name = "Name not found"
+        
+        if description_data:
+            description_json = json.loads(description_data)
+            description = description_json.get("Definition", "Description not found")
+        else:
+            description = "Description not found"
+
+        return {
+            "name": name,
+            "description": description
+        }
     except subprocess.CalledProcessError as e:
-        return f"Error: {e.stderr}"
+        return {"error": f"Error: {e.stderr}"}
     except Exception as e:
-        return f"An error occurred: {str(e)}"
+        return {"error": f"An error occurred: {str(e)}"}
 
 def fix_name(id):
     return id.replace('_', ':')
