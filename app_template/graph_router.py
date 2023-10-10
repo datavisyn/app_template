@@ -127,6 +127,7 @@ from pathlib import Path
 import pandas as pd
 from fastapi import APIRouter
 from pydantic import BaseModel
+from trait_info import get_diseaseOrDrug_name
 
 _log = logging.getLogger(__name__)
 graph_router = APIRouter(tags=["Graph"])
@@ -241,3 +242,10 @@ def setFromGeneName(df: pd.DataFrame, isTraitResponse=False):
     else:
         df["ENSG_A_name"] = getGeneName(ensg)
     return df
+
+#additional trait (disease/drug) information
+
+@graph_router.get("/traitinfo/{trait_id}")
+def get_trait_name(trait_id: str):
+    name = get_diseaseOrDrug_name(trait_id)
+    return {"name": name}

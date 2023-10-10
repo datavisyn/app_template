@@ -19,6 +19,7 @@ const injectedRtkApi = api.injectEndpoints({
     singleGeneApiAppGeneGet: build.query<SingleGeneApiAppGeneGetApiResponse, SingleGeneApiAppGeneGetApiArg>({
       query: (queryArg) => ({ url: `http://127.0.0.1:9000/api/app/gene`, params: { gene: queryArg.gene } }),
     }),
+    
   }),
   overrideExisting: false,
 });
