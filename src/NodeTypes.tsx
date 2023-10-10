@@ -1,37 +1,46 @@
-import React from "react"
+import React, {useState} from "react"
 import { Handle, Position } from "reactflow"
+
+// this is the default custom node
+const DefaultCustomNode = ({ data, backgroundColor }) => {
+
+    // state for hovering effect
+    const [isHovered, setIsHovered] = useState(false);
+
+    // style applied for every node
+    const nodeStyle = {
+        backgroundColor,
+        color: "black",
+        padding: "14px",
+        borderRadius: "8px",
+        boxShadow: isHovered ? "0 2px 6px rgba(0, 0, 0, 0.2)" : "none",
+        transition: "box-shadow 0.3s ease",
+    };
+
+    return (
+        <>
+            <div style={nodeStyle} onMouseEnter={() => setIsHovered(true)} onMouseLeave={() => setIsHovered(false)}>
+                <Handle type="target" position={Position.Top} style={{visibility: "hidden"}} />
+                <div>{data?.label}</div>
+                <Handle type="source" position={Position.Bottom} style={{visibility: "hidden"}} />
+            </div>
+        </>
+    );
+}
 
 // this node is used for genes
 const GeneNode = ({ data }) => {
-    return (
-        <div style={{ backgroundColor: "#800080", padding: "14px", borderRadius: "50px" }}>
-            <Handle type="target" position={Position.Top} style={{visibility: 'hidden'}}/>
-            <div>{data?.label}</div>
-            <Handle type="source" position={Position.Bottom} style={{visibility: 'hidden'}}/>
-        </div>
-    )
+    return <DefaultCustomNode data={data} backgroundColor={"#8BB4D9"} />
 }
 
-// this node is used for disease
+// this node is used for diseases
 const DiseaseNode = ({ data }) => {
-    return (
-        <div style={{ backgroundColor: "#ff9800", padding: "14px", borderRadius: "50px" }}>
-            <Handle type="target" position={Position.Top} style={{visibility: 'hidden'}}/>
-            <div>{data?.label}</div>
-            <Handle type="source" position={Position.Bottom} style={{visibility: 'hidden'}}/>
-        </div>
-    )
+    return <DefaultCustomNode data={data} backgroundColor={"#D5E5F2"} /> 
 }
 
 // this node is used for drugs
 const DrugNode = ({ data }) => {
-    return (
-        <div style={{ backgroundColor: "#0074e4", padding: "14px", borderRadius: "50px" }}>
-            <Handle type="target" position={Position.Top} style={{visibility: 'hidden'}}/>
-            <div>{data?.label}</div>
-            <Handle type="source" position={Position.Bottom} style={{visibility: 'hidden'}}/>
-        </div>
-    )
+    return <DefaultCustomNode data={data} backgroundColor={"#91BDD9"} />
 }
 
 export const nodeTypes = {
