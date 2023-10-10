@@ -12,8 +12,8 @@ const GeneNode = ({ data }) => {
     )
 }
 
-// this node is used for traits
-const TraitNode = ({ data }) => {
+// this node is used for disease
+const DiseaseNode = ({ data }) => {
     return (
         <div style={{ backgroundColor: "#ff9800", padding: "14px", borderRadius: "50px" }}>
             <Handle type="target" position={Position.Top} style={{visibility: 'hidden'}}/>
@@ -36,6 +36,6 @@ const DrugNode = ({ data }) => {
 
 export const nodeTypes = {
     gene: GeneNode,
-    trait: TraitNode,
+    disease: DiseaseNode,
     drug: DrugNode
 };
