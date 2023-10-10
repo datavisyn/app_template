@@ -5,12 +5,12 @@ import subprocess
 import json
 import re
 
-app = FastAPI()
+#app = FastAPI()
 
-@app.get('/api/app/get_diseaseOrDrug_name')
-def get_name(id: str):
-    name = get_diseaseOrDrug_name(id)
-    return {'name': name}
+#@app.get('/api/app/get_diseaseOrDrug_name')
+#def get_name(id: str):
+#    name = get_diseaseOrDrug_name(id)
+#    return {'name': name}
 
 # use function 'get_diseaseOrDrug_name(id)'
 
@@ -21,7 +21,7 @@ def get_EFO_name(efo_id):
     if response.status_code == 200:
         data = response.json()
 
-        # Extract name and description
+        # extract name and description
         term = data["_embedded"]["terms"][0]
         disease_name = term["label"]
         description = term.get("description", "Description not available")
@@ -40,12 +40,12 @@ def get_CHEBI_name(chebi_id):
     if response.status_code == 200:
         data = response.text
 
-        # Extract the name
+        # extract the name
         start_name = data.find("<chebiAsciiName>") + len("<chebiAsciiName>")
         end_name = data.find("</chebiAsciiName>")
         drug_name = data[start_name:end_name]
 
-        # Extract the description
+        # extract the description
         data_match = re.search(r'<data>(.*?)</data>', data, re.DOTALL)
         description = data_match.group(1).strip() if data_match else "Description not available"
 
@@ -64,9 +64,10 @@ def get_MONDO_name(mondo_id):
     if response.status_code == 200:
         data = response.json()
 
+        # extract the name if available
         disease_name = data.get("label", "Name not available")
 
-        # Check if a description is available
+        # check if a description is available
         description = data.get("description", "Description not available")
 
         return {
@@ -83,9 +84,10 @@ def get_HP_name(hpo_id):
     if response.status_code == 200:
         data = response.json()
 
+        # extract the name if available
         disease_name = data.get("details", {}).get("name", "Name not available")
 
-        # Check if a description is available
+        # check if a description is available
         description = data.get("details", {}).get("definition", "Definition not available")
 
         return {
@@ -102,9 +104,10 @@ def get_GO_name(go_id):
     if response.status_code == 200:
         data = response.json()
 
+        # extract the name if available
         disease_name = data.get("label", "Name not available")
 
-        # Check if a description is available
+        # check if a description is available
         description = data.get("definition", "Definition not available")
 
         return {
@@ -121,9 +124,10 @@ def get_NCIT_name(ncit_id):
     if response.status_code == 200:
         data = response.json()
 
+        # extract the name if available
         disease_name = data["_embedded"]["terms"][0]["label"]
 
-        # Check if a description is available
+        # check if a description is available
         description = data["_embedded"]["terms"][0].get("description", "Description not available")
 
         return {
@@ -137,7 +141,7 @@ def get_ORPHANET_name(orphanet_id):
     api_key = "val"
     orphanet_id = orphanet_id.replace("Orphanet:", "")
 
-    # Define the CURL commands for name and description
+    # define the CURL command for name
     name_curl_command = [
         "curl",
         "-X", "GET",
@@ -146,6 +150,7 @@ def get_ORPHANET_name(orphanet_id):
         "-H", f"apiKey: {api_key}"
     ]
 
+    # define the CURL command for name
     description_curl_command = [
         "curl",
         "-X", "GET",
@@ -155,11 +160,11 @@ def get_ORPHANET_name(orphanet_id):
     ]
 
     try:
-        # Make a request to get the name
+        # make a request to get the name
         result_name = subprocess.run(name_curl_command, capture_output=True, text=True, check=True)
         name_data = result_name.stdout.strip()
         
-        # Make a request to get the description
+        # make a request to get the description
         result_description = subprocess.run(description_curl_command, capture_output=True, text=True, check=True)
         description_data = result_description.stdout.strip()
 
@@ -208,6 +213,7 @@ def get_diseaseOrDrug_name(id):
         pass
     
 # tests
+
 #print(get_diseaseOrDrug_name("EFO_0000094"))
 #print(get_diseaseOrDrug_name("CHEBI_44185"))
 #print(get_diseaseOrDrug_name("MONDO_0000334"))

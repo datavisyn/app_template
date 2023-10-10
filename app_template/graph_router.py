@@ -243,15 +243,16 @@ def setFromGeneName(df: pd.DataFrame, isTraitResponse=False):
         df["ENSG_A_name"] = getGeneName(ensg)
     return df
 
-#additional trait (disease/drug) information
+# additional trait (disease/drug) information
 
 @graph_router.get("/traitinfo/{trait_id}")
 def get_trait_info(trait_id: str):
-    name_info = get_diseaseOrDrug_name(trait_id)  # Call the function to get name and description
-    name = name_info["name"]  # Extract the name from the result
-    description = name_info["description"]  # Extract the description from the result
+    name_info = get_diseaseOrDrug_name(trait_id)
+    # extraction of name and result
+    name = name_info["name"]
+    description = name_info["description"]
 
-    # Create a response JSON with both name and description
+    # create a response JSON with both name and description
     response = {
         "name": name,
         "description": description
