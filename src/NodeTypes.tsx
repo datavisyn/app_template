@@ -31,17 +31,17 @@ const DefaultCustomNode = ({ data, backgroundColor }) => {
 
 // this node is used for genes
 const GeneNode = ({ data }) => {
-    return <DefaultCustomNode data={data} backgroundColor={"#8BB4D9"} />
+    return <DefaultCustomNode data={data} backgroundColor={"red"} />
 }
 
 // this node is used for diseases
 const DiseaseNode = ({ data }) => {
-    return <DefaultCustomNode data={data} backgroundColor={"#D5E5F2"} /> 
+    return <DefaultCustomNode data={data} backgroundColor={"blue"} /> 
 }
 
 // this node is used for drugs
 const DrugNode = ({ data }) => {
-    return <DefaultCustomNode data={data} backgroundColor={"#91BDD9"} />
+    return <DefaultCustomNode data={data} backgroundColor={"orange"} />
 }
 
 // these node types can be used in the graph
