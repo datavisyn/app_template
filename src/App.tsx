@@ -13,26 +13,26 @@ export function App() {
     limit: 1000,
   });
 
-  const [geneName, setGeneName] = useState('');
+  const [geneInfo, setGeneInfo] = useState({});
   const [showGeneInfo, setShowGeneInfo] = useState(false);
 
-  const fetchGeneName = useCallback(() => {
+  const fetchGeneInfo = useCallback(() => {
     if (search) {
       fetch(`http://localhost:9000/api/app/geneinfo/${search}`)
         .then((response) => response.json())
         .then((data) => {
-          setGeneName(data);
+          setGeneInfo(data);
         })
         .catch((error) => {
           console.error(error);
-          setGeneName('Gene not found');
+          setGeneInfo({ 'Gene Name': 'Gene not found' });
         });
     }
   }, [search]);
 
   useEffect(() => {
-    fetchGeneName();
-  }, [fetchGeneName]);
+    fetchGeneInfo();
+  }, [fetchGeneInfo]);
 
   const handleShowGeneInfo = () => {
     setShowGeneInfo(true);
@@ -55,11 +55,15 @@ export function App() {
         <>
           <GeneGraph geneID={search} />
 
-          {/* Display the gene name */}
+          {/* Display the gene info */}
           <div>
-            {geneName && (
+            {geneInfo && (
               <div>
-                <strong>Gene Name:</strong> {geneName}
+                <strong>Gene Name:</strong> {geneInfo['Gene Name']}
+                <br />
+                <strong>Transcript Product:</strong> {geneInfo['Transcript Product']}
+                <br />
+                <strong>Chromosome Location:</strong> {geneInfo['Chromosome Location']}
               </div>
             )}
           </div>
