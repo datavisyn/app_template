@@ -55,7 +55,6 @@ disease_data = trait_data[~trait_data["id"].str.contains("CHEBI")].copy()
 
 nodes = pd.concat([gene_data, disease_data, drug_data], axis=0, ignore_index=True)
 
-
 @graph_router.get("/autocomplete")
 def autocomplete(search: str, limit: int | None = 10) -> list[str]:
     full_data = (
