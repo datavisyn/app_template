@@ -54,14 +54,14 @@ def gene2all(gene: str | None = None, limit: int = 1000):
         df = df[(df["ENSG_A"] == gene) & (df["ENSG_B"] != gene)].copy()
         df.rename(columns={"ENSG_A": "source", "ENSG_B": "target"}, inplace=True)
         df = df.drop("combined_score", axis=1)
-        d = df.head(limit).to_dict(orient="records")
+        d = df.head(1).to_dict(orient="records")
 
         # get traits
         df = trait_data
         df = df[(df["gene"] == gene)]
         df.rename(columns={"gene": "source", "disease": "target"}, inplace=True)
         df = df.drop("padj", axis=1)
-        t = df.head(limit).to_dict(orient="records")
+        t = df.head(1).to_dict(orient="records")
 
         for ele in t:
             d.append(ele)
@@ -89,10 +89,16 @@ def gene2all(gene: str | None = None, limit: int = 1000):
         for node in tup_n:
             n = allNodes[allNodes["id"] == node]
             nDict = n.to_dict(orient="records")
-            #nDict[0]["position"]={'x': 1,'y': 1}
             nDict[0]["position"]={'x': positions[node][0],'y': positions[node][1]}
-            nodes.append(nDict)
+            nodes.append(nDict[0])
             
-        return nodes;
+        
+        rValue = dict()
+        rValue["nodes"] = nodes
+        rValue["edges"] = d
+        
+        return rValue
+    
+    
 
-gene2all("ENSG00000121410")
+print(gene2all("ENSG00000113302"))
