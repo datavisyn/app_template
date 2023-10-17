@@ -1,4 +1,4 @@
-import { Autocomplete, Loader } from '@mantine/core';
+import { Autocomplete, Loader, Button } from '@mantine/core';
 import React, { useState, useEffect, useCallback } from 'react';
 import { useAutocomplete, useGene2Genes } from './store/store';
 import { DrugGraph } from './DrugGraph';
@@ -14,9 +14,9 @@ export function App() {
   });
 
   const [geneName, setGeneName] = useState('');
+  const [showGeneInfo, setShowGeneInfo] = useState(false);
 
-  // Make an API request to get the gene name
-  useEffect(() => {
+  const fetchGeneName = useCallback(() => {
     if (search) {
       fetch(`http://localhost:9000/api/app/geneinfo/${search}`)
         .then((response) => response.json())
@@ -30,6 +30,14 @@ export function App() {
     }
   }, [search]);
 
+  useEffect(() => {
+    fetchGeneName();
+  }, [fetchGeneName]);
+
+  const handleShowGeneInfo = () => {
+    setShowGeneInfo(true);
+  };
+
   return (
     <>
       <Autocomplete
@@ -41,16 +49,22 @@ export function App() {
         rightSection={isFetching ? <Loader size="sm" /> : null}
       />
 
-      <GeneGraph geneID={search} />
+      <Button onClick={handleShowGeneInfo}>Show gene info</Button>
 
-      {/* Display the gene name */}
-      <div>
-        {geneName && (
+      {showGeneInfo && (
+        <>
+          <GeneGraph geneID={search} />
+
+          {/* Display the gene name */}
           <div>
-            <strong>Gene Name:</strong> {geneName}
+            {geneName && (
+              <div>
+                <strong>Gene Name:</strong> {geneName}
+              </div>
+            )}
           </div>
-        )}
-      </div>
+        </>
+      )}
     </>
   );
 }
