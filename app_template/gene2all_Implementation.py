@@ -1,5 +1,6 @@
 from pathlib import Path
 import pandas as pd
+import networkx as nx
 
 
 BASE_PATH = Path(__file__).parent
@@ -35,10 +36,22 @@ def gene2all(gene: str | None = None, limit: int = 1000):
         for ele in t:
             d.append(ele)
 
+        tup_e = []
+        tup_n = []
+        
         # add id column
         for ele in d:
             ele["id"] = ele["source"] + "-" + ele["target"]
-            print(ele)
+            if ele["source"] not in tup_n:
+                tup_n.append(ele["source"])
+            if ele["target"] not in tup_n:
+                tup_n.append(ele["target"])
+                
+            tup_e.append((ele["source"],ele["target"]))
 
+        G = nx.Graph()
+        G.add_nodes_from(tup_n)
+        G.add_edges_from(tup_e)
+        print(nx.spring_layout(G))
 
 gene2all("ENSG00000030110")
