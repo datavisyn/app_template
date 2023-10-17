@@ -12,7 +12,7 @@ graph_router = APIRouter(tags=["Graph"])
 BASE_PATH = Path(__file__).parent
 gene_names = pd.read_csv(BASE_PATH / "data/gwas_nodes.csv.gz", compression="gzip")
 
-
+#might not be needed if we get the name from gene_list.json / gene_descriptions.json
 def setGeneNamesFromGeneDf(df: pd.DataFrame, isTraitResponse=False):
     ensg = df.iloc[0, 0]
     if isTraitResponse:
@@ -24,13 +24,12 @@ def setGeneNamesFromGeneDf(df: pd.DataFrame, isTraitResponse=False):
     df["ENSG_B_name"] = df["ENSG_B"].apply(getGeneName)
     return df
 
-
+#might not be needed if we get the name from gene_list.json / gene_descriptions.json
 def getGeneName(ensg: str):
     entry = gene_names[gene_names["ENSG"] == ensg]
     if entry.empty:
         return "Gene not found"
     return entry.iloc[0, 2]
-
 
 graph_data = setGeneNamesFromGeneDf(
     pd.read_csv(
@@ -38,6 +37,7 @@ graph_data = setGeneNamesFromGeneDf(
         compression="gzip",
     )
 )
+graph_data = pd.read_json('data/gene_list.json')
 trait_data = (
     pd.read_csv(BASE_PATH / "data/gwas_gene-diseases.csv.gz", compression="gzip")
     .sort_values(["disease", "padj"], ascending=[True, False])
@@ -45,6 +45,7 @@ trait_data = (
 )
 trait_data["gene_name"] = trait_data["gene"].apply(getGeneName)
 
+#TODO get trait names via API calls
 drug_data = trait_data[trait_data["disease"].str.contains("CHEBI")]
 disease_data = trait_data[~trait_data["disease"].str.contains("CHEBI")]
 
@@ -78,7 +79,7 @@ class TraitResponse(BaseModel):
     gene_name: str
 
 
-class EdgeType:
+class Edge:
     id: str
     source: str
     target: str
@@ -95,16 +96,20 @@ class NodeType(Enum):
     DRUG = 3
 
 
-class NodeType:
+class Node:
     id: str
     position: PositionType
-    data: object
+    # data: object
+    symbol: str
+    name: str
+    summary: str
+    synonyms: [str]
     type: NodeType
 
 
 class Gene2AllResponse(BaseModel):
-    nodes: list[NodeType]
-    edges: list[EdgeType]
+    nodes: list[Node]
+    edges: list[Edge]
 
 
 @graph_router.get("/gene2genes")
