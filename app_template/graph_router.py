@@ -38,19 +38,22 @@ def setGeneNamesFromGeneDf(df: pd.DataFrame, isTraitResponse=False):
 
 gene_list = pd.read_json('app_template/data/gene_list.json').drop(columns=['hgncId','hgncSymbol'], axis=1).rename(columns={'ensemblid':'id'})
 gene_details = pd.read_json('app_template/data/gene_descriptions.json').drop(columns=['fullname'], axis=1).rename(columns={'entrezGeneId': 'entrezId'})
-graph_data = pd.merge(gene_list, gene_details, on="entrezId")
-graph_data["type"] = NodeType.GENE
+gene_data = pd.merge(gene_list, gene_details, on='entrezId')
+gene_data['type'] = NodeType.GENE
 
 trait_data = (
     pd.read_csv(BASE_PATH / "data/gwas_gene-diseases.csv.gz", compression="gzip")
-    .sort_values(["disease", "padj"], ascending=[True, False])
-    .drop_duplicates(subset=["gene", "disease"], keep="first")
+    .drop(columns=['gene', 'padj'])
+    .rename(columns={'disease':'id'})
 )
-trait_data["gene_name"] = trait_data["gene"].apply(getGeneName)
+trait_data['type'] = NodeType.DISEASE
 
 #TODO get trait names via API calls
-drug_data = trait_data[trait_data["disease"].str.contains("CHEBI")]
-disease_data = trait_data[~trait_data["disease"].str.contains("CHEBI")]
+drug_data = trait_data[trait_data["id"].str.contains("CHEBI")].copy()
+drug_data['type'] = NodeType.DRUG
+disease_data = trait_data[~trait_data["id"].str.contains("CHEBI")].copy()
+
+nodes = pd.concat([gene_data, disease_data, drug_data], axis=0, ignore_index=True)
 
 
 @graph_router.get("/autocomplete")
