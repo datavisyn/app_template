@@ -15,7 +15,7 @@ def get_gene_name(ensg_id):
 
         if response.status_code == 200:
             data = response.json()
-            # description = full name
+            # description -> full name
             gene_full_name = data.get("description")
             return gene_full_name
         else:
@@ -53,13 +53,13 @@ def get_gene_info(ensg_id):
     except requests.exceptions.RequestException as e:
         return f"Error: {str(e)}"
 
-ensg_id = "ENSG00000000005"
-gene_info = get_gene_info(ensg_id)
-print(gene_info)
+# ensg_id = "ENSG00000000005"
+# gene_info = get_gene_info(ensg_id)
+# print(gene_info)
 
-ensg_id = "ENSG00000185418"
-gene_info = get_gene_info(ensg_id)
-print(gene_info)
+# ensg_id = "ENSG00000185418"
+# gene_info = get_gene_info(ensg_id)
+# print(gene_info)
 
 # Example usage:
 # ensg_id = "ENSG00000000003"

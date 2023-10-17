@@ -16,6 +16,7 @@ export function App() {
   const [geneInfo, setGeneInfo] = useState({});
   const [showGeneInfo, setShowGeneInfo] = useState(false);
 
+  /* retrieve information for gene */
   const fetchGeneInfo = useCallback(() => {
     if (search) {
       fetch(`http://localhost:9000/api/app/geneinfo/${search}`)
