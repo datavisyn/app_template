@@ -2,6 +2,7 @@ import logging
 from pathlib import Path
 
 import pandas as pd
+import glob
 from fastapi import APIRouter
 from enum import Enum
 from pydantic import BaseModel
@@ -12,17 +13,10 @@ graph_router = APIRouter(tags=["Graph"])
 BASE_PATH = Path(__file__).parent
 gene_names = pd.read_csv(BASE_PATH / "data/gwas_nodes.csv.gz", compression="gzip")
 
-#might not be needed if we get the name from gene_list.json / gene_descriptions.json
-def setGeneNamesFromGeneDf(df: pd.DataFrame, isTraitResponse=False):
-    ensg = df.iloc[0, 0]
-    if isTraitResponse:
-        df["gene_name"] = getGeneName(ensg)
-    else:       
-        df["ENSG_A_name"] = getGeneName(ensg)
-
-
-    df["ENSG_B_name"] = df["ENSG_B"].apply(getGeneName)
-    return df
+class NodeType(Enum):
+    GENE = 1
+    DISEASE = 2
+    DRUG = 3
 
 #might not be needed if we get the name from gene_list.json / gene_descriptions.json
 def getGeneName(ensg: str):
@@ -31,13 +25,22 @@ def getGeneName(ensg: str):
         return "Gene not found"
     return entry.iloc[0, 2]
 
-graph_data = setGeneNamesFromGeneDf(
-    pd.read_csv(
-        BASE_PATH / "data/STRINGv11_OTAR281119_FILTER_combined.csv.gz",
-        compression="gzip",
-    )
-)
-graph_data = pd.read_json('data/gene_list.json')
+#might not be needed if we get the name from gene_list.json / gene_descriptions.json
+def setGeneNamesFromGeneDf(df: pd.DataFrame, isTraitResponse=False):
+    ensg = df.iloc[0, 0]
+    # if isTraitResponse:
+    #     df["gene_name"] = getGeneName(ensg)
+    # else:       
+    #     df["ENSG_A_name"] = getGeneName(ensg)
+
+    df["ENSG_B_name"] = df["ENSG_B"].apply(getGeneName)
+    return df
+
+gene_list = pd.read_json('app_template/data/gene_list.json').drop(columns=['hgncId','hgncSymbol'], axis=1).rename(columns={'ensemblid':'ensemblId'})
+gene_details = pd.read_json('app_template/data/gene_descriptions.json').drop(columns=['fullname'], axis=1).rename(columns={'entrezGeneId': 'entrezId'})
+graph_data = pd.merge(gene_list, gene_details, on="entrezId")
+graph_data[type] = NodeType.GENE
+
 trait_data = (
     pd.read_csv(BASE_PATH / "data/gwas_gene-diseases.csv.gz", compression="gzip")
     .sort_values(["disease", "padj"], ascending=[True, False])
@@ -50,18 +53,12 @@ drug_data = trait_data[trait_data["disease"].str.contains("CHEBI")]
 disease_data = trait_data[~trait_data["disease"].str.contains("CHEBI")]
 
 
-
-
-
 @graph_router.get("/autocomplete")
 def autocomplete(search: str, limit: int | None = 10) -> list[str]:
     full_data = (
         pd.concat([graph_data["ENSG_A"], trait_data["disease"]]).unique().tolist()
     )
     return [s for s in full_data if search.lower() in s.lower()][:limit]
-
-
-
 
 
 class GeneResponse(BaseModel):
@@ -90,20 +87,18 @@ class PositionType:
     y: int
 
 
-class NodeType(Enum):
-    GENE = 1
-    DISEASE = 2
-    DRUG = 3
+
 
 
 class Node:
-    id: str
+    ensemblId: str
+    entrezId: int
     position: PositionType
     # data: object
     symbol: str
     name: str
     summary: str
-    synonyms: [str]
+    synonyms: list[str]
     type: NodeType
 
 
@@ -171,19 +166,14 @@ def removeDuplicates(df: pd.DataFrame):
     return df
 
 
-def getGeneName(ensg: str):
-    entry = gene_names[gene_names["ENSG"] == ensg]
-    if entry.empty:
-        return "Gene not found"
-    return entry.iloc[0, 2]
 
 
 def setFromGeneName(df: pd.DataFrame, isTraitResponse=False):
     ensg = df.iloc[0, 0]
-    if isTraitResponse:
-        df["gene_name"] = getGeneName(ensg)
-    else:
-        df["ENSG_A_name"] = getGeneName(ensg)
+    # if isTraitResponse:
+    #     df["gene_name"] = getGeneName(ensg)
+    # else:
+    #     df["ENSG_A_name"] = getGeneName(ensg)
     return df
 
 
