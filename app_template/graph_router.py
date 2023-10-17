@@ -36,10 +36,10 @@ def setGeneNamesFromGeneDf(df: pd.DataFrame, isTraitResponse=False):
     df["ENSG_B_name"] = df["ENSG_B"].apply(getGeneName)
     return df
 
-gene_list = pd.read_json('app_template/data/gene_list.json').drop(columns=['hgncId','hgncSymbol'], axis=1).rename(columns={'ensemblid':'ensemblId'})
+gene_list = pd.read_json('app_template/data/gene_list.json').drop(columns=['hgncId','hgncSymbol'], axis=1).rename(columns={'ensemblid':'id'})
 gene_details = pd.read_json('app_template/data/gene_descriptions.json').drop(columns=['fullname'], axis=1).rename(columns={'entrezGeneId': 'entrezId'})
 graph_data = pd.merge(gene_list, gene_details, on="entrezId")
-graph_data[type] = NodeType.GENE
+graph_data["type"] = NodeType.GENE
 
 trait_data = (
     pd.read_csv(BASE_PATH / "data/gwas_gene-diseases.csv.gz", compression="gzip")
@@ -86,19 +86,20 @@ class PositionType:
     x: int
     y: int
 
-
+class NodeInfo:
+    entrezId: int
+    label: str #symbol
+    name: str #fullname
+    summary: str
+    synonyms: list[str]
 
 
 
 class Node:
-    ensemblId: str
+    id: str
     entrezId: int
     position: PositionType
-    # data: object
-    symbol: str
-    name: str
-    summary: str
-    synonyms: list[str]
+    data: NodeInfo    
     type: NodeType
 
 
