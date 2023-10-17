@@ -1,5 +1,5 @@
 import { Autocomplete, Loader } from '@mantine/core';
-import React, { useState } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useAutocomplete, useGene2Genes } from './store/store';
 import { DrugGraph } from './DrugGraph';
 import { GeneGraph } from './GeneGraph';
@@ -13,6 +13,23 @@ export function App() {
     limit: 1000,
   });
 
+  const [geneName, setGeneName] = useState('');
+
+  // Make an API request to get the gene name
+  useEffect(() => {
+    if (search) {
+      fetch(`http://localhost:9000/api/app/geneinfo/${search}`)
+        .then((response) => response.json())
+        .then((data) => {
+          setGeneName(data);
+        })
+        .catch((error) => {
+          console.error(error);
+          setGeneName('Gene not found');
+        });
+    }
+  }, [search]);
+
   return (
     <>
       <Autocomplete
@@ -25,6 +42,15 @@ export function App() {
       />
 
       <GeneGraph geneID={search} />
+
+      {/* Display the gene name */}
+      <div>
+        {geneName && (
+          <div>
+            <strong>Gene Name:</strong> {geneName}
+          </div>
+        )}
+      </div>
     </>
   );
 }

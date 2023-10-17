@@ -128,6 +128,7 @@ import pandas as pd
 from fastapi import APIRouter
 from pydantic import BaseModel
 from trait_info import get_diseaseOrDrug_name
+from gene_info import get_gene_name
 
 _log = logging.getLogger(__name__)
 graph_router = APIRouter(tags=["Graph"])
@@ -259,3 +260,11 @@ def get_trait_info(trait_id: str):
     }
 
     return response
+
+
+# whole name for genes
+
+@graph_router.get("/geneinfo/{gene_id}") 
+def get_gene_info(gene_id: str):
+    name = get_gene_name(gene_id)
+    return name
