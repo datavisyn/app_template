@@ -88,7 +88,9 @@ export function GeneGraph(props: GeneGraphProps) {
     );
 
     setEdges(
-      allNodes.map((edge) => ({
+      allNodes
+      .filter(edge => edge.ENSG_A !== edge.ENSG_B)
+      .map((edge) => ({
         id: edge.ENSG_A + '-' + edge.ENSG_B,
         source: edge.ENSG_A,
         target: edge.ENSG_B,
