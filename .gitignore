@@ -27,6 +27,8 @@ node_modules/
 /src/**/*.map
 /tests/**/*.map 
 *.css
+*.csv
+requirements.txt
 
 # yarn
 .pnp.*
@@ -46,6 +48,3 @@ node_modules/
 
 # vscode
 settings.json
-
-
-requirements.txt
