@@ -221,3 +221,62 @@ def get_diseaseOrDrug_name(id):
 #print(get_diseaseOrDrug_name("GO_1901557"))
 #print(get_diseaseOrDrug_name("NCIT_C74532"))
 #print(get_diseaseOrDrug_name("Orphanet_130"))
+
+
+
+# tests
+# test with valid id
+# print("EFO")
+# print(get_diseaseOrDrug_name("EFO_0000094"), "\n")
+# print("CHEBI")
+# print(get_diseaseOrDrug_name("CHEBI_44185"), "\n")
+# print("MONDO")
+# print(get_diseaseOrDrug_name("MONDO_0000334"), "\n")
+# print("HP")
+# print(get_diseaseOrDrug_name("HP_0000023"),"\n")
+# print("GO")
+# print(get_diseaseOrDrug_name("GO_1901557"), "\n")
+# print("NCIT")
+# print(get_diseaseOrDrug_name("NCIT_C74532"), "\n")
+# print("Orphanet")
+# print(get_diseaseOrDrug_name("Orphanet_130"), "\n")
+
+# testing IDs beginning with API Name
+# does not work currently!!
+# not important, when we not use a open search
+
+# print("EFO")
+# print(get_diseaseOrDrug_name("EFO"), "\n")
+# print("CHEBI")
+# print(get_diseaseOrDrug_name("CHEBI"), "\n")
+# print("MONDO")
+# print(get_diseaseOrDrug_name("MONDO"), "\n")
+# print("HP")
+# print(get_diseaseOrDrug_name("HP"),"\n")
+# print("GO")
+# print(get_diseaseOrDrug_name("GO"), "\n")
+# print("NCIT")
+# print(get_diseaseOrDrug_name("NCIT"), "\n")
+# print("Orphanet")
+# print(get_diseaseOrDrug_name("Orphanet"), "\n")
+
+# testing invalid id
+# print("EFO")
+# print(get_diseaseOrDrug_name("2"), "\n")
+# print("CHEBI")
+# print(get_diseaseOrDrug_name("3"), "\n")
+# print("MONDO")
+# print(get_diseaseOrDrug_name("5"), "\n")
+# print("HP")
+# print(get_diseaseOrDrug_name("2"),"\n")
+# print("GO")
+# print(get_diseaseOrDrug_name("2"), "\n")
+# print("NCIT")
+# print(get_diseaseOrDrug_name("2"), "\n")
+# print("Orphanet")
+# print(get_diseaseOrDrug_name("5"), "\n")
+
+
+# test no internet connection
+# fails, not top priority to fix this, because website needs connection to internet
+# for the future change this, because if internet fails during using the webite -> problem
