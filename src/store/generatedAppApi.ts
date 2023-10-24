@@ -19,6 +19,9 @@ const injectedRtkApi = api.injectEndpoints({
     singleGeneApiAppGeneGet: build.query<SingleGeneApiAppGeneGetApiResponse, SingleGeneApiAppGeneGetApiArg>({
       query: (queryArg) => ({ url: `http://127.0.0.1:9000/api/app/gene`, params: { gene: queryArg.gene } }),
     }),
+    gene2AllApiAppGene2AllGet: build.query<Gene2AllApiAppGene2AllGetApiResponse, Gene2AllApiAppGene2AllGetApiArg>({
+      query: (queryArg) => ({ url: `http://127.0.0.1:9000/api/app/gene2all`, params: { gene: queryArg.gene, limit: queryArg.limit } }),
+    }),
   }),
   overrideExisting: false,
 });
@@ -52,6 +55,11 @@ export type SingleGeneApiAppGeneGetApiResponse = /** status 200 Successful Respo
 export type SingleGeneApiAppGeneGetApiArg = {
   gene: string;
 };
+export type Gene2AllApiAppGene2AllGetApiResponse = /** status 200 Successful Response */ Gene2AllResponse;
+export type Gene2AllApiAppGene2AllGetApiArg = {
+  gene?: string;
+  limit?: number;
+};
 export type ValidationError = {
   loc: (string | number)[];
   msg: string;
@@ -73,6 +81,29 @@ export type TraitResponse = {
   disease: string;
   gene_name: string;
 };
+export type PositionType = {
+  x: number;
+  y: number;
+};
+export type NodeType = 1 | 2 | 3;
+export type Node = {
+  id: string;
+  entrezId: number;
+  name: string;
+  summary: string;
+  synonyms: string[];
+  position: PositionType;
+  type: NodeType;
+};
+export type Edge = {
+  id: string;
+  source: string;
+  target: string;
+};
+export type Gene2AllResponse = {
+  nodes: Node[];
+  edges: Edge[];
+};
 export const {
   useAutocompleteApiAppAutocompleteGetQuery,
   useLazyAutocompleteApiAppAutocompleteGetQuery,
@@ -86,4 +117,6 @@ export const {
   useLazyTrait2GenesApiAppTrait2GenesGetQuery,
   useSingleGeneApiAppGeneGetQuery,
   useLazySingleGeneApiAppGeneGetQuery,
+  useGene2AllApiAppGene2AllGetQuery,
+  useLazyGene2AllApiAppGene2AllGetQuery,
 } = injectedRtkApi;

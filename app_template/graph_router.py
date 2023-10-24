@@ -2,11 +2,12 @@ import logging
 from pathlib import Path
 
 import networkx as nx
+import numpy as np
 import pandas as pd
 import glob
 from fastapi import APIRouter
 from enum import Enum
-from pydantic import BaseModel
+from pydantic import BaseModel, typing
 
 _log = logging.getLogger(__name__)
 graph_router = APIRouter(tags=["Graph"])
@@ -14,44 +15,56 @@ graph_router = APIRouter(tags=["Graph"])
 BASE_PATH = Path(__file__).parent
 gene_names = pd.read_csv(BASE_PATH / "data/gwas_nodes.csv.gz", compression="gzip")
 
+
 class NodeType(Enum):
     GENE = 1
     DISEASE = 2
     DRUG = 3
 
-#might not be needed if we get the name from gene_list.json / gene_descriptions.json
+
+# might not be needed if we get the name from gene_list.json / gene_descriptions.json
 def getGeneName(ensg: str):
     entry = gene_names[gene_names["ENSG"] == ensg]
     if entry.empty:
         return "Gene not found"
     return entry.iloc[0, 2]
 
-#might not be needed if we get the name from gene_list.json / gene_descriptions.json
+
+# might not be needed if we get the name from gene_list.json / gene_descriptions.json
 def setGeneNamesFromGeneDf(df: pd.DataFrame, isTraitResponse=False):
     ensg = df.iloc[0, 0]
     # if isTraitResponse:
     #     df["gene_name"] = getGeneName(ensg)
-    # else:       
+    # else:
     #     df["ENSG_A_name"] = getGeneName(ensg)
 
     df["ENSG_B_name"] = df["ENSG_B"].apply(getGeneName)
     return df
 
-gene_list = pd.read_json('app_template/data/gene_list.json').drop(columns=['hgncId','hgncSymbol'], axis=1).rename(columns={'ensemblid':'id'})
-gene_details = pd.read_json('app_template/data/gene_descriptions.json').drop(columns=['fullname'], axis=1).rename(columns={'entrezGeneId': 'entrezId'})
-gene_data = pd.merge(gene_list, gene_details, on='entrezId')
-gene_data['type'] = NodeType.GENE
+
+gene_list = (
+    pd.read_json("app_template/data/gene_list.json")
+    .drop(columns=["hgncId", "hgncSymbol"], axis=1)
+    .rename(columns={"ensemblid": "id"})
+)
+gene_details = (
+    pd.read_json("app_template/data/gene_descriptions.json")
+    .drop(columns=["fullname"], axis=1)
+    .rename(columns={"entrezGeneId": "entrezId"})
+)
+gene_data = pd.merge(gene_list, gene_details, on="entrezId")
+gene_data["type"] = NodeType.GENE
 
 trait_data = (
     pd.read_csv(BASE_PATH / "data/gwas_gene-diseases.csv.gz", compression="gzip")
-    .drop(columns=['gene', 'padj'])
-    .rename(columns={'disease':'id'})
+    .drop(columns=["gene", "padj"])
+    .rename(columns={"disease": "id"})
 )
-trait_data['type'] = NodeType.DISEASE
+trait_data["type"] = NodeType.DISEASE
 
-#TODO get trait names via API calls
+# TODO get trait names via API calls
 drug_data = trait_data[trait_data["id"].str.contains("CHEBI")].copy()
-drug_data['type'] = NodeType.DRUG
+drug_data["type"] = NodeType.DRUG
 disease_data = trait_data[~trait_data["id"].str.contains("CHEBI")].copy()
 
 nodes = pd.concat([gene_data, disease_data, drug_data], axis=0, ignore_index=True)
@@ -67,22 +80,33 @@ trait_data = pd.read_csv(
     BASE_PATH / "data/gwas_gene-diseases.csv.gz", compression="gzip"
 )
 
-gene_list = pd.read_json('app_template/data/gene_list.json').drop(columns=['hgncId','hgncSymbol'], axis=1).rename(columns={'ensemblid':'id'})
-gene_details = pd.read_json('app_template/data/gene_descriptions.json').drop(columns=['fullname'], axis=1).rename(columns={'entrezGeneId': 'entrezId'})
-gene_nodes = pd.merge(gene_list, gene_details, on='entrezId')
-gene_nodes['type'] = NodeType.GENE
+gene_list = (
+    pd.read_json("app_template/data/gene_list.json")
+    .drop(columns=["hgncId", "hgncSymbol"], axis=1)
+    .rename(columns={"ensemblid": "id"})
+)
+gene_details = (
+    pd.read_json("app_template/data/gene_descriptions.json")
+    .drop(columns=["fullname"], axis=1)
+    .rename(columns={"entrezGeneId": "entrezId"})
+)
+gene_nodes = pd.merge(gene_list, gene_details, on="entrezId")
+gene_nodes["type"] = NodeType.GENE
 
 trait_nodes = (
     pd.read_csv(BASE_PATH / "data/gwas_gene-diseases.csv.gz", compression="gzip")
-    .drop(columns=['gene', 'padj'])
-    .rename(columns={'disease':'id'})
+    .drop(columns=["gene", "padj"])
+    .rename(columns={"disease": "id"})
 )
-trait_nodes['type'] = NodeType.DISEASE
+trait_nodes["type"] = NodeType.DISEASE
 
-#TODO get trait names via API calls
+# TODO get trait names via API calls
 drug_nodes = trait_nodes[trait_nodes["id"].str.contains("CHEBI")].copy()
-drug_nodes['type'] = NodeType.DRUG
+drug_nodes["type"] = NodeType.DRUG
 disease_nodes = trait_nodes[~trait_nodes["id"].str.contains("CHEBI")].copy()
+drug_nodes["synonyms"] = np.empty((len(drug_nodes), 0)).tolist()
+disease_nodes["synonyms"] = np.empty((len(disease_nodes), 0)).tolist()
+
 
 allNodes = pd.concat([gene_nodes, disease_nodes, drug_nodes], axis=0, ignore_index=True)
 
@@ -120,20 +144,23 @@ class PositionType(BaseModel):
     x: float
     y: float
 
+
 class NodeInfo(BaseModel):
     entrezId: int
-    label: str #symbol
-    name: str #fullname
+    # label: str #symbol
+    name: str  # fullname
     summary: str
     synonyms: list[str]
 
 
-
 class Node(BaseModel):
     id: str
-    entrezId: int
-    position: PositionType
-    data: NodeInfo    
+    entrezId: str
+    # label: str #symbol
+    name: str  # fullname
+    summary: str
+    synonyms: list[str]
+    position: PositionType | None
     type: NodeType
 
 
@@ -143,13 +170,16 @@ class Gene2AllResponse(BaseModel):
 
 
 @graph_router.get("/gene2genes")
-def gene2genes(gene: str | None = None, limit: int = 1000) -> list[GeneResponse]:
-    df = graph_data
-    if gene:
-        df = df[(df["ENSG_A"] == gene) & (df["ENSG_B"] != gene)]
-    if not df.empty:
-        df = setGeneNamesFromGeneDf(df)
-    return df.head(limit).to_dict(orient="records")  # type: ignore
+def gene2genes(gene: str | None = None, limit: int = 1000) -> list[Node] | None:
+    # df = graph_data
+    # if gene:
+    #     df = df[(df["ENSG_A"] == gene) & (df["ENSG_B"] != gene)]
+    # if not df.empty:
+    #     df = setGeneNamesFromGeneDf(df)
+    # return df.head(limit).to_dict(orient="records")# type: ignore
+    n = allNodes[allNodes["id"] == gene]
+    nDict = n.to_dict(orient="records")
+    return nDict
 
 
 @graph_router.get("/gene2diseases")
@@ -201,8 +231,6 @@ def removeDuplicates(df: pd.DataFrame):
     return df
 
 
-
-
 def setFromGeneName(df: pd.DataFrame, isTraitResponse=False):
     ensg = df.iloc[0, 0]
     # if isTraitResponse:
@@ -211,8 +239,9 @@ def setFromGeneName(df: pd.DataFrame, isTraitResponse=False):
     #     df["ENSG_A_name"] = getGeneName(ensg)
     return df
 
+
 @graph_router.get("/gene2all")
-def gene2all(gene: str | None = None, limit: int = 1000)->Gene2AllResponse:
+def gene2all(gene: str | None = None, limit: int = 1000) -> Gene2AllResponse | None:
     # get gene2gene edges
     df = graph_data
     d = []
@@ -235,7 +264,7 @@ def gene2all(gene: str | None = None, limit: int = 1000)->Gene2AllResponse:
 
         tup_e = []
         tup_n = []
-        
+
         # add id column
         for ele in d:
             ele["id"] = ele["source"] + "-" + ele["target"]
@@ -243,27 +272,35 @@ def gene2all(gene: str | None = None, limit: int = 1000)->Gene2AllResponse:
                 tup_n.append(ele["source"])
             if ele["target"] not in tup_n:
                 tup_n.append(ele["target"])
-                
-            tup_e.append((ele["source"],ele["target"]))
+
+            tup_e.append((ele["source"], ele["target"]))
 
         G = nx.Graph()
         G.add_nodes_from(tup_n)
         G.add_edges_from(tup_e)
         positions = nx.spring_layout(G)
-        
+
         nodes = []
-        #TODO vlt gibts bei Dataframe was cooleres 
+        # TODO vlt gibts bei Dataframe was cooleres
         for node in tup_n:
             n = allNodes[allNodes["id"] == node]
             nDict = n.to_dict(orient="records")
-            nDict[0]["position"]={'x': positions[node][0],'y': positions[node][1]}
-            nodes.append(nDict[0])
-            
-        
+            if len(nDict) > 0:
+                nDict[0]["position"] = {
+                    "x": positions[node][0],
+                    "y": positions[node][1],
+                }
+                nodes.append(nDict[0])
+
         rValue = dict()
         rValue["nodes"] = nodes
-        rValue["edges"] = d
-        
-        return rValue 
 
+        # remove duplicate edges
+        removed_dup_edg = []
+        for edge in d:
+            if edge not in removed_dup_edg:
+                removed_dup_edg.append(edge)
 
+        rValue["edges"] = removed_dup_edg
+
+        return rValue
