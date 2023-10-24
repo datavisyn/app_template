@@ -3,12 +3,8 @@ import React, { useState, useEffect, useMemo } from 'react';
 import {useGene2All} from './store/store';
 import { ReactFlow, Background, Controls, MiniMap, useNodesState, useEdgesState, Handle } from 'reactflow';
 import 'reactflow/dist/style.css';
-import GeneNode from './GeneNode';
-import DrugNode from './DrugNode';
-import DiseaseNode from './DiseaseNode';
+import { nodeTypes } from "./NodeTypes"
 
-// Node types for the graph
-const nodeTypes = { diseaseNode: DiseaseNode, geneNode: GeneNode, drugNode: DrugNode };
 const maxNodesPerCircle = 20;
 
 // Function to get the center of the screen

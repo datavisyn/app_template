@@ -27,6 +27,8 @@ node_modules/
 /src/**/*.map
 /tests/**/*.map 
 *.css
+*.csv
+requirements.txt
 
 # yarn
 .pnp.*
