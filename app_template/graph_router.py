@@ -16,10 +16,6 @@ BASE_PATH = Path(__file__).parent
 gene_names = pd.read_csv(BASE_PATH / "data/gwas_nodes.csv.gz", compression="gzip")
 
 
-class NodeType(Enum):
-    GENE = 1
-    DISEASE = 2
-    DRUG = 3
 
 
 # might not be needed if we get the name from gene_list.json / gene_descriptions.json
@@ -53,18 +49,18 @@ gene_details = (
     .rename(columns={"entrezGeneId": "entrezId"})
 )
 gene_data = pd.merge(gene_list, gene_details, on="entrezId")
-gene_data["type"] = NodeType.GENE
+gene_data["type"] = "gene"
 
 trait_data = (
     pd.read_csv(BASE_PATH / "data/gwas_gene-diseases.csv.gz", compression="gzip")
     .drop(columns=["gene", "padj"])
     .rename(columns={"disease": "id"})
 )
-trait_data["type"] = NodeType.DISEASE
+trait_data["type"] = "disease"
 
 # TODO get trait names via API calls
 drug_data = trait_data[trait_data["id"].str.contains("CHEBI")].copy()
-drug_data["type"] = NodeType.DRUG
+drug_data["type"] = "drug"
 disease_data = trait_data[~trait_data["id"].str.contains("CHEBI")].copy()
 
 nodes = pd.concat([gene_data, disease_data, drug_data], axis=0, ignore_index=True)
@@ -91,18 +87,18 @@ gene_details = (
     .rename(columns={"entrezGeneId": "entrezId"})
 )
 gene_nodes = pd.merge(gene_list, gene_details, on="entrezId")
-gene_nodes["type"] = NodeType.GENE
+gene_nodes["type"] = "gene"
 
 trait_nodes = (
     pd.read_csv(BASE_PATH / "data/gwas_gene-diseases.csv.gz", compression="gzip")
     .drop(columns=["gene", "padj"])
     .rename(columns={"disease": "id"})
 )
-trait_nodes["type"] = NodeType.DISEASE
+trait_nodes["type"] = "disease"
 
 # TODO get trait names via API calls
 drug_nodes = trait_nodes[trait_nodes["id"].str.contains("CHEBI")].copy()
-drug_nodes["type"] = NodeType.DRUG
+drug_nodes["type"] = "drug"
 disease_nodes = trait_nodes[~trait_nodes["id"].str.contains("CHEBI")].copy()
 drug_nodes["synonyms"] = np.empty((len(drug_nodes), 0)).tolist()
 disease_nodes["synonyms"] = np.empty((len(disease_nodes), 0)).tolist()
@@ -156,12 +152,11 @@ class NodeInfo(BaseModel):
 class Node(BaseModel):
     id: str
     entrezId: str
-    # label: str #symbol
     name: str  # fullname
     summary: str
     synonyms: list[str]
     position: PositionType | None
-    type: NodeType
+    type: str
 
 
 class Gene2AllResponse(BaseModel):
