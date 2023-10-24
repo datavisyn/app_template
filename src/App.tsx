@@ -8,10 +8,6 @@ export function App() {
   const [search, setSearch] = useState('');
   const { data: autocompleteData, isFetching } = useAutocomplete({ search });
 
-  const { data: graph } = useGene2Genes({
-    gene: search || undefined,
-    limit: 1000,
-  });
 
   return (
     <>
