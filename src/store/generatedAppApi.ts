@@ -16,30 +16,6 @@ export type AutocompleteApiAppAutocompleteGetApiArg = {
   search: string;
   limit?: number;
 };
-export type Gene2GenesApiAppGene2GenesGetApiResponse = /** status 200 Successful Response */ GeneResponse[];
-export type Gene2GenesApiAppGene2GenesGetApiArg = {
-  gene?: string;
-  limit?: number;
-};
-export type Gene2DiseasesApiAppGene2DiseasesGetApiResponse = /** status 200 Successful Response */ TraitResponse[];
-export type Gene2DiseasesApiAppGene2DiseasesGetApiArg = {
-  gene?: string;
-  limit?: number;
-};
-export type Gene2DrugsApiAppGene2DrugsGetApiResponse = /** status 200 Successful Response */ TraitResponse[];
-export type Gene2DrugsApiAppGene2DrugsGetApiArg = {
-  gene?: string;
-  limit?: number;
-};
-export type Trait2GenesApiAppTrait2GenesGetApiResponse = /** status 200 Successful Response */ TraitResponse[];
-export type Trait2GenesApiAppTrait2GenesGetApiArg = {
-  disease?: string;
-  limit?: number;
-};
-export type SingleGeneApiAppGeneGetApiResponse = /** status 200 Successful Response */ GeneResponse[];
-export type SingleGeneApiAppGeneGetApiArg = {
-  gene: string;
-};
 export type Gene2AllApiAppGene2AllGetApiResponse = /** status 200 Successful Response */ Gene2AllResponse;
 export type Gene2AllApiAppGene2AllGetApiArg = {
   gene?: string;
@@ -53,32 +29,18 @@ export type ValidationError = {
 export type HttpValidationError = {
   detail?: ValidationError[];
 };
-export type GeneResponse = {
-  ENSG_A: string;
-  ENSG_B: string;
-  combined_score: number;
-  ENSG_A_name: string;
-  ENSG_B_name: string;
-};
-export type TraitResponse = {
-  gene: string;
-  padj: number;
-  disease: string;
-  gene_name: string;
-};
 export type PositionType = {
   x: number;
   y: number;
 };
-export type NodeType = 1 | 2 | 3;
 export type Node = {
   id: string;
-  entrezId: number;
+  entrezId: string;
   name: string;
   summary: string;
   synonyms: string[];
-  position: PositionType;
-  type: NodeType;
+  position?: PositionType;
+  type: string;
 };
 export type Edge = {
   id: string;
