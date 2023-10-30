@@ -1,17 +1,16 @@
 import logging
 from pathlib import Path
 
-import math
 import networkx as nx
 import numpy as np
 import pandas as pd
-import glob
 from fastapi import APIRouter
 from enum import Enum
 from pydantic import BaseModel, typing
 
 _log = logging.getLogger(__name__)
 graph_router = APIRouter(tags=["Graph"])
+
 
 class Edge(BaseModel):
     id: str
@@ -22,7 +21,6 @@ class Edge(BaseModel):
 class PositionType(BaseModel):
     x: float
     y: float
-
 
 
 class Node(BaseModel):
@@ -38,7 +36,6 @@ class Node(BaseModel):
 class Gene2AllResponse(BaseModel):
     nodes: list[Node]
     edges: list[Edge]
-
 
 
 def removeDuplicates(df: pd.DataFrame):
@@ -58,61 +55,76 @@ trait_data = pd.read_csv(
     BASE_PATH / "data/gwas_gene-diseases.csv.gz", compression="gzip"
 )
 
+# dropping not needed columns, renaming ensamble id to just id
 gene_list = (
     pd.read_json(BASE_PATH / "data/gene_list.json")
     .drop(columns=["hgncId", "hgncSymbol"], axis=1)
     .rename(columns={"ensemblid": "id"})
 )
 
+# removing entries with an empty id (ensemblid)
 gene_list = gene_list[gene_list["id"].notna()]
 gene_details = (
     pd.read_json(BASE_PATH / "data/gene_descriptions.json")
     .drop(columns=["fullname"], axis=1)
     .rename(columns={"entrezGeneId": "entrezId"})
 )
+# adding further gene details to gene id,
 gene_nodes = pd.merge(gene_list, gene_details, on="entrezId")
 gene_nodes["type"] = "gene"
-gene_nodes = gene_nodes.fillna('NaN')
+gene_nodes = gene_nodes.fillna("NaN")
 
-trait_nodes = (removeDuplicates(pd.read_csv(BASE_PATH / "data/gwas_gene-diseases.csv.gz", compression="gzip"))
+trait_nodes = (
+    removeDuplicates(
+        pd.read_csv(BASE_PATH / "data/gwas_gene-diseases.csv.gz", compression="gzip")
+    )
     .drop(columns=["gene", "padj"])
-    .rename(columns={"disease": "id"}))
+    .rename(columns={"disease": "id"})
+)
 
 trait_nodes["type"] = "disease"
-
+# traits don't have synonyms, but the column is needed for mergen them into allNodes later
+trait_nodes["synonyms"] = np.empty((len(trait_nodes), 0)).tolist()
 
 # TODO get trait names via API calls
+# .copy is needed to prevent "SettingwithCopyWarning
+# all drug ids start with CHEBI
 drug_nodes = trait_nodes[trait_nodes["id"].str.contains("CHEBI")].copy()
 drug_nodes["type"] = "drug"
+# all other entries (not starting with CHEBI) are diseases
 disease_nodes = trait_nodes[~trait_nodes["id"].str.contains("CHEBI")].copy()
-drug_nodes["synonyms"] = np.empty((len(drug_nodes), 0)).tolist()
-disease_nodes["synonyms"] = np.empty((len(disease_nodes), 0)).tolist()
 
+# combining different node types into one dataframe
 allNodes = pd.concat([gene_nodes, disease_nodes, drug_nodes], axis=0, ignore_index=True)
 
 
+# takes search string and checks if it is part of a nodes id or name
 @graph_router.get("/autocomplete")
 def autocomplete(search: str, limit: int | None = 10) -> list[str]:
-    #TODO implement nicer version (might look similar to the following line)
-    #df = allNodes[allNodes[(search in allNodes["id"]) | (search in allNodes["name"])| (search in allNodes["entrezId"])]]
+    # TODO implement nicer version (might look similar to the following line)
+    # df = allNodes[allNodes[(search in allNodes["id"]) | (search in allNodes["name"])| (search in allNodes["entrezId"])]]
 
     ids = allNodes["id"].values.tolist()
     names = allNodes["name"].values.tolist()
-    
+
     results = []
-    
+
+    # check if passed search parameter is part of a nodes id
     for ele in ids:
         if search.lower() in str(ele).lower():
             results.append(ele)
-    
+
+    # check if passed search parameter is part of a nodes name
     for ele in names:
-        if  search.lower() in str(ele).lower():
+        if search.lower() in str(ele).lower():
             results.append(str(ele))
-    
+
     return results[:limit]
+
 
 @graph_router.get("/gene2all")
 def gene2all(gene: str | None = None, limit: int = 1000) -> Gene2AllResponse | None:
+    # get gene2gene edges
     # get gene2gene edges
     df = graph_data
     d = []
@@ -146,6 +158,7 @@ def gene2all(gene: str | None = None, limit: int = 1000) -> Gene2AllResponse | N
 
             tup_e.append((ele["source"], ele["target"]))
 
+        # layouting using the networkx package
         G = nx.Graph()
         G.add_nodes_from(tup_n)
         G.add_edges_from(tup_e)
@@ -153,6 +166,7 @@ def gene2all(gene: str | None = None, limit: int = 1000) -> Gene2AllResponse | N
 
         nodes = []
         # TODO vlt gibts bei Dataframe was cooleres
+        # add positions to nodes
         for node in tup_n:
             n = allNodes[allNodes["id"] == node]
             nDict = n.to_dict(orient="records")
@@ -163,15 +177,10 @@ def gene2all(gene: str | None = None, limit: int = 1000) -> Gene2AllResponse | N
                 }
                 nodes.append(nDict[0])
 
-        rValue = dict()
-        rValue["nodes"] = nodes
-
-        # remove duplicate edges
+        # remove duplicate edges list comprehension
         removed_dup_edg = []
         for edge in d:
             if edge not in removed_dup_edg:
                 removed_dup_edg.append(edge)
 
-        rValue["edges"] = removed_dup_edg
-
-        return rValue
+        return Gene2AllResponse(nodes=nodes, edges=removed_dup_edg)

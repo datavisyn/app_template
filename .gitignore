@@ -48,3 +48,6 @@ requirements.txt
 
 # vscode
 settings.json
+
+#datafiles
+/app_template/data/*
