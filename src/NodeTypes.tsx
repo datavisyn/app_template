@@ -20,7 +20,7 @@ const DefaultCustomNode = ({ data, backgroundColor }) => {
         color: "black",
         padding: "14px",
         borderRadius: "8px",
-        boxShadow: isHovered ? "0 2px 6px rgba(0, 0, 0, 0.2)" : "none",
+        boxShadow: isHovered || isHighlighted ? "0 4px 8px rgba(0, 0, 0, 0.2)" : "none",
         transition: "box-shadow 0.3s ease transform 0.3 ease",
         transform: isHighlighted ? "scale(1.8)" : "scale(1)",
         display: isHidden ? "none" : "block"
@@ -40,17 +40,17 @@ const DefaultCustomNode = ({ data, backgroundColor }) => {
 
 // this node is used for genes
 const GeneNode = ({ data }) => {
-    return <DefaultCustomNode data={data} backgroundColor={"red"} />
+    return <DefaultCustomNode data={data} backgroundColor={"#4BB268"} />
 }
 
 // this node is used for diseases
 const DiseaseNode = ({ data }) => {
-    return <DefaultCustomNode data={data} backgroundColor={"blue"} />
+    return <DefaultCustomNode data={data} backgroundColor={"#FF964D"} /> 
 }
 
 // this node is used for drugs
 const DrugNode = ({ data }) => {
-    return <DefaultCustomNode data={data} backgroundColor={"orange"} />
+    return <DefaultCustomNode data={data} backgroundColor={"#B42865"} />
 }
 
 // these node types can be used in the graph

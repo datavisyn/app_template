@@ -1,10 +1,14 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, createContext, useContext, useReducer } from 'react';
 import { useAutocomplete, useGene2Drugs, useGene2Genes, useSingleGene } from './store/store';
-import { ReactFlow, Background, Controls, MiniMap, useNodesState, useEdgesState, Handle } from 'reactflow';
+import { ReactFlow, Background, Controls, MiniMap, useNodesState, useEdgesState, Handle, ReactFlowProvider } from 'reactflow';
 import 'reactflow/dist/style.css';
-import { nodeTypes } from "./NodeTypes"
+import { nodeTypes } from "./NodeTypes";
+
+// context for nodes state
 import SimpleFloatingEdge from './EdgeType';
 
+// context for nodes state
+export const GraphNodesContext = createContext(null);
 const maxNodesPerCircle = 20;
 
 const edgeTypes = {
@@ -35,6 +39,7 @@ type GeneGraphProps = {
 
 // GeneGraph component
 export function GeneGraph(props: GeneGraphProps) {
+
   // State for the nodes and edges
   const [nodes, setNodes, onNodesChange] = useNodesState([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
@@ -54,7 +59,7 @@ export function GeneGraph(props: GeneGraphProps) {
     // add first node to graph
     const allNodes = graph.concat(firstNode);
     const firstNodeId = firstNode[0]?.ENSG_B;
-    const nodesCircleAmount = allNodes.length < maxNodesPerCircle ? allNodes.length - 1: maxNodesPerCircle;
+    const nodesCircleAmount = allNodes.length < maxNodesPerCircle ? allNodes.length - 1 : maxNodesPerCircle;
     const angleStep = (2 * Math.PI) / nodesCircleAmount;
     const center = getScreenCenterCoordinates();
     let radius = 250;
@@ -69,6 +74,7 @@ export function GeneGraph(props: GeneGraphProps) {
             type: "gene",
             data: {
               label: node.ENSG_A === firstNode[0]?.ENSG_A ? node.ENSG_B_name : node.ENSG_A_name,
+              hidden: false
             },
           };
         } else {
@@ -91,32 +97,37 @@ export function GeneGraph(props: GeneGraphProps) {
 
     setEdges(
       allNodes
-      .filter(edge => edge.ENSG_A !== edge.ENSG_B)
-      .map((edge) => ({
-        id: edge.ENSG_A + '-' + edge.ENSG_B,
-        source: edge.ENSG_A,
-        target: edge.ENSG_B,
-        sourceHandle: 'c',
-        targetHandle: 'a',
-        type: 'floating',
-      }))
+        .filter(edge => edge.ENSG_A !== edge.ENSG_B)
+        .map((edge) => ({
+          id: edge.ENSG_A + '-' + edge.ENSG_B,
+          source: edge.ENSG_A,
+          target: edge.ENSG_B,
+          sourceHandle: 'c',
+          targetHandle: 'a',
+          type: 'floating',
+        }))
     );
   }, [graph]);
 
   return (
     <div style={{ height: '90%' }}>
-      <ReactFlow
-        nodes={nodes}
-        edges={edges}
-        nodeTypes={nodeTypes}
-        edgeTypes={edgeTypes}
-        onNodesChange={onNodesChange}
-        onEdgesChange={onEdgesChange}
-      >
-        <Background />
-        <Controls />
-        <MiniMap />
-      </ReactFlow>
+      <GraphNodesContext.Provider value={{ nodes: nodes, setNodes: setNodes }}>
+
+        <ReactFlow
+          nodes={nodes}
+          edges={edges}
+          nodeTypes={nodeTypes}
+          edgeTypes={edgeTypes}
+          onNodesChange={onNodesChange}
+          onEdgesChange={onEdgesChange}
+        >
+          <Background />
+          <Controls />
+          <MiniMap />
+
+        </ReactFlow>
+      </GraphNodesContext.Provider>
+
     </div>
   );
 }
