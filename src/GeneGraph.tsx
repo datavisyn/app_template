@@ -3,8 +3,13 @@ import { useAutocomplete, useGene2Drugs, useGene2Genes, useSingleGene } from './
 import { ReactFlow, Background, Controls, MiniMap, useNodesState, useEdgesState, Handle } from 'reactflow';
 import 'reactflow/dist/style.css';
 import { nodeTypes } from "./NodeTypes"
+import SimpleFloatingEdge from './EdgeType';
 
 const maxNodesPerCircle = 20;
+
+const edgeTypes = {
+  floating: SimpleFloatingEdge,
+};
 
 // Function to get the center of the screen
 const getScreenCenterCoordinates = () => {
@@ -91,6 +96,9 @@ export function GeneGraph(props: GeneGraphProps) {
         id: edge.ENSG_A + '-' + edge.ENSG_B,
         source: edge.ENSG_A,
         target: edge.ENSG_B,
+        sourceHandle: 'c',
+        targetHandle: 'a',
+        type: 'floating',
       }))
     );
   }, [graph]);
@@ -101,6 +109,7 @@ export function GeneGraph(props: GeneGraphProps) {
         nodes={nodes}
         edges={edges}
         nodeTypes={nodeTypes}
+        edgeTypes={edgeTypes}
         onNodesChange={onNodesChange}
         onEdgesChange={onEdgesChange}
       >
