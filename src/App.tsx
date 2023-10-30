@@ -1,7 +1,6 @@
 import { Autocomplete, Loader } from '@mantine/core';
 import React, { useState } from 'react';
-import { useAutocomplete, useGene2Genes } from './store/store';
-import { DrugGraph } from './DrugGraph';
+import { useAutocomplete } from './store/store';
 import { GeneGraph } from './GeneGraph';
 
 export function App() {
