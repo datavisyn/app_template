@@ -1,17 +1,12 @@
 import { Autocomplete, Loader } from '@mantine/core';
 import React, { useState } from 'react';
-import { useAutocomplete, useGene2Genes } from './store/store';
-import { DrugGraph } from './DrugGraph';
+import { useAutocomplete } from './store/store';
 import { GeneGraph } from './GeneGraph';
 
 export function App() {
   const [search, setSearch] = useState('');
   const { data: autocompleteData, isFetching } = useAutocomplete({ search });
 
-  const { data: graph } = useGene2Genes({
-    gene: search || undefined,
-    limit: 1000,
-  });
 
   return (
     <>
