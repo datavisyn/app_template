@@ -35,9 +35,6 @@ export function GeneGraph(props: GeneGraphProps) {
   const [nodes, setNodes, onNodesChange] = useNodesState([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
 
-  // continue if gene with that id exists
-  //const { data: firstNode } = useSingleGene({ gene: props.geneID });
-
   // get all genes that are connected to the first node
   const { data: graph } = useGene2All({
     gene: props.geneID || undefined,
