@@ -7,22 +7,7 @@ import { nodeTypes } from "./NodeTypes"
 
 const maxNodesPerCircle = 20;
 
-// Function to get the center of the screen
-const getScreenCenterCoordinates = () => {
-  const { innerWidth, innerHeight } = window;
-  const centerX = Math.floor(innerWidth / 2);
-  const centerY = Math.floor(innerHeight / 2);
-  // log coordinates to console
-  console.log(centerX, centerY);
-  return { x: centerX, y: centerY };
-};
 
-// Funktion zur Konvertierung von Polarkoordinaten in kartesische Koordinaten
-const polarToCartesian = (angle, radius, center) => {
-  const x = center.x + radius * Math.cos(angle);
-  const y = center.y + radius * Math.sin(angle);
-  return { x, y };
-};
 
 // Props for the GeneGraph component
 type GeneGraphProps = {
@@ -34,9 +19,6 @@ export function GeneGraph(props: GeneGraphProps) {
   // State for the nodes and edges
   const [nodes, setNodes, onNodesChange] = useNodesState([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
-
-  // continue if gene with that id exists
-  //const { data: firstNode } = useSingleGene({ gene: props.geneID });
 
   // get all genes that are connected to the first node
   const { data: graph } = useGene2All({
@@ -57,7 +39,7 @@ export function GeneGraph(props: GeneGraphProps) {
         data:{
           label:node.id
         },
-        // type:node.type.toString()
+        type:node.type.toString()
       }
     }));
     
