@@ -48,12 +48,17 @@ BASE_PATH = Path(__file__).parent
 
 # add file globals
 gene_names = pd.read_csv(BASE_PATH / "data/gwas_nodes.csv.gz", compression="gzip")
-graph_data = pd.read_csv(
-    BASE_PATH / "data/STRINGv11_OTAR281119_FILTER_combined.csv.gz", compression="gzip"
+geneEdges = (
+    pd.read_csv(BASE_PATH / "data/STRINGv11_OTAR281119_FILTER_combined.csv.gz", compression="gzip")
+    .drop(columns=["combined_score"], axis=1)
+    .rename(columns={"ENSG_A": "source", "ENSG_B": "target"})
 )
-trait_data = pd.read_csv(
-    BASE_PATH / "data/gwas_gene-diseases.csv.gz", compression="gzip"
+traitEdges = (
+    pd.read_csv(BASE_PATH / "data/gwas_gene-diseases.csv.gz", compression="gzip")
+    .drop(columns=["padj"], axis=1)
+    .rename(columns={"gene": "source", "disease": "target"})
 )
+allEdges = pd.concat([geneEdges, traitEdges], axis=0, ignore_index=True)
 
 # dropping not needed columns, renaming ensamble id to just id
 gene_list = (
@@ -97,7 +102,6 @@ disease_nodes = trait_nodes[~trait_nodes["id"].str.contains("CHEBI")].copy()
 # combining different node types into one dataframe
 allNodes = pd.concat([gene_nodes, disease_nodes, drug_nodes], axis=0, ignore_index=True)
 
-
 # takes search string and checks if it is part of a nodes id or name
 @graph_router.get("/autocomplete")
 def autocomplete(search: str, limit: int | None = 10) -> list[str]:
@@ -122,65 +126,81 @@ def autocomplete(search: str, limit: int | None = 10) -> list[str]:
     return results[:limit]
 
 
-@graph_router.get("/gene2all")
-def gene2all(gene: str | None = None, limit: int = 1000) -> Gene2AllResponse | None:
-    # get gene2gene edges
-    # get gene2gene edges
-    df = graph_data
-    d = []
+@graph_router.get("/expand")
+def expand(
+    geneIds: list[str], options: list[bool], limit: int = 1000
+) -> Gene2AllResponse | None:
+    ##accept list of gene_ids
+    # for gene in gene_ids
+    ##calculate nodes and edges
 
-    if gene:
-        df = df[(df["ENSG_A"] == gene) & (df["ENSG_B"] != gene)].copy()
-        df.rename(columns={"ENSG_A": "source", "ENSG_B": "target"}, inplace=True)
-        df = df.drop("combined_score", axis=1)
-        d = df.head(limit).to_dict(orient="records")
+    # variables for accumulating data
+    allFilteredNodes = set()
+    allEdgesResult = pd.DataFrame()
+    allLayoutedEdges = set()
+    
+    for geneId in geneIds:
+        # get gene2gene edges
+        # get gene2gene edges
 
-        # get traits
-        df = trait_data
-        df = df[(df["gene"] == gene) | (df["disease"] == gene)]
-        df.rename(columns={"gene": "source", "disease": "target"}, inplace=True)
-        df = df.drop("padj", axis=1)
-        t = df.head(limit).to_dict(orient="records")
+        # calculate edges
+        if geneId:
+            # filter edges
+            edges = allEdges[
+                (allEdges["source"] == geneId) | (allEdges["target"] == geneId)
+            ].copy()
+            # edges = df.head(limit).to_dict(orient="records")
+            allEdgesResult.append(edges)                      
 
-        for ele in t:
-            d.append(ele)
+            layoutedEdges = []
+            filteredNodes = []
 
-        tup_e = []
-        tup_n = []
+            # add id column
+            for ele in edges.head(limit).to_dict(orient="records"):
+                ele["id"] = ele["source"] + "-" + ele["target"]
+                if ele["source"] not in filteredNodes:
+                    filteredNodes.append(ele["source"])
+                if ele["target"] not in filteredNodes:
+                    filteredNodes.append(ele["target"])
 
-        # add id column
-        for ele in d:
-            ele["id"] = ele["source"] + "-" + ele["target"]
-            if ele["source"] not in tup_n:
-                tup_n.append(ele["source"])
-            if ele["target"] not in tup_n:
-                tup_n.append(ele["target"])
+                layoutedEdges.append((ele["source"], ele["target"]))
+                
+                allFilteredNodes.update(filteredNodes)
+                allLayoutedEdges.update(layoutedEdges)
 
-            tup_e.append((ele["source"], ele["target"]))
+            # merge edges and nodes into dataframe
 
-        # layouting using the networkx package
-        G = nx.Graph()
-        G.add_nodes_from(tup_n)
-        G.add_edges_from(tup_e)
-        positions = nx.spring_layout(G)
+        # end of for
 
-        nodes = []
-        # TODO vlt gibts bei Dataframe was cooleres
-        # add positions to nodes
-        for node in tup_n:
-            n = allNodes[allNodes["id"] == node]
-            nDict = n.to_dict(orient="records")
-            if len(nDict) > 0:
-                nDict[0]["position"] = {
-                    "x": positions[node][0],
-                    "y": positions[node][1],
-                }
-                nodes.append(nDict[0])
+        # drop duplicates
+        # convert nodes to dictionary
 
-        # remove duplicate edges list comprehension
-        removed_dup_edg = []
-        for edge in d:
-            if edge not in removed_dup_edg:
-                removed_dup_edg.append(edge)
+    
+    # layouting using the networkx package
+    G = nx.Graph()
+    G.add_nodes_from(allFilteredNodes)
+    G.add_edges_from(allLayoutedEdges)
+    positions = nx.spring_layout(G)
 
-        return Gene2AllResponse(nodes=nodes, edges=removed_dup_edg)
+    allNodesResult = []
+    # TODO vlt gibts bei Dataframe was cooleres
+    # add positions to nodes
+    for node in allFilteredNodes:
+        n = allNodes[allNodes["id"] == node]
+        nDict = n.to_dict(orient="records")
+        if len(nDict) > 0:
+            nDict[0]["position"] = {
+                "x": positions[node][0],
+                "y": positions[node][1],
+            }
+            allNodesResult.append(n)
+    
+    # remove duplicate edges list comprehension
+    allEdgesResult = allEdgesResult.drop_duplicates(subset=["source","target"], keep="first")    
+    # df = df.sort_values(["disease", "padj"], ascending=[True, False])
+    # removedDupEdg = []
+    # for edge in allEdges:
+    #     if edge not in removedDupEdg:
+    #         removedDupEdg.append(edge)
+            
+    return Gene2AllResponse(nodes=allNodesResult, edges=allEdgesResult)
