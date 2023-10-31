@@ -4,7 +4,7 @@ from pathlib import Path
 import networkx as nx
 import numpy as np
 import pandas as pd
-from fastapi import APIRouter
+from fastapi import APIRouter, Query
 from enum import Enum
 from pydantic import BaseModel, typing
 
@@ -58,7 +58,8 @@ traitEdges = (
     .drop(columns=["padj"], axis=1)
     .rename(columns={"gene": "source", "disease": "target"})
 )
-allEdges = pd.concat([geneEdges, traitEdges], axis=0, ignore_index=True)
+allEdges = pd.concat([geneEdges, traitEdges], axis=0)
+allEdges["id"] = allEdges["source"]+"_"+allEdges["target"]
 
 # dropping not needed columns, renaming ensamble id to just id
 gene_list = (
@@ -127,31 +128,21 @@ def autocomplete(search: str, limit: int | None = 10) -> list[str]:
 
 
 @graph_router.get("/expand")
-def expand(
-    geneIds: list[str], options: list[bool], limit: int = 1000
-) -> Gene2AllResponse | None:
-    ##accept list of gene_ids
-    # for gene in gene_ids
-    ##calculate nodes and edges
-
+def expand(geneIds: list[str] = Query(), options: list[bool]= Query(), limit: int = 1000) -> Gene2AllResponse | None:
     # variables for accumulating data
     allFilteredNodes = set()
     allEdgesResult = pd.DataFrame()
     allLayoutedEdges = set()
     
     for geneId in geneIds:
-        # get gene2gene edges
-        # get gene2gene edges
-
         # calculate edges
         if geneId:
             # filter edges
             edges = allEdges[
                 (allEdges["source"] == geneId) | (allEdges["target"] == geneId)
-            ].copy()
-            # edges = df.head(limit).to_dict(orient="records")
-            allEdgesResult.append(edges)                      
-
+            ]
+            allEdgesResult = pd.concat([allEdgesResult,edges])
+            
             layoutedEdges = []
             filteredNodes = []
 
@@ -167,14 +158,6 @@ def expand(
                 
                 allFilteredNodes.update(filteredNodes)
                 allLayoutedEdges.update(layoutedEdges)
-
-            # merge edges and nodes into dataframe
-
-        # end of for
-
-        # drop duplicates
-        # convert nodes to dictionary
-
     
     # layouting using the networkx package
     G = nx.Graph()
@@ -193,14 +176,12 @@ def expand(
                 "x": positions[node][0],
                 "y": positions[node][1],
             }
-            allNodesResult.append(n)
+            allNodesResult.append(nDict[0])
     
     # remove duplicate edges list comprehension
-    allEdgesResult = allEdgesResult.drop_duplicates(subset=["source","target"], keep="first")    
-    # df = df.sort_values(["disease", "padj"], ascending=[True, False])
-    # removedDupEdg = []
-    # for edge in allEdges:
-    #     if edge not in removedDupEdg:
-    #         removedDupEdg.append(edge)
-            
-    return Gene2AllResponse(nodes=allNodesResult, edges=allEdgesResult)
+    if allEdgesResult is not None:
+        allEdgesResult = allEdgesResult.drop_duplicates(subset=["source","target"], keep="first")    
+    edgeList = []
+    for index, row in allEdgesResult.iterrows():
+        edgeList.append(Edge(id=row["id"],source=row["source"],target=row["target"]))
+    return Gene2AllResponse(nodes=allNodesResult, edges=edgeList)
