@@ -7,6 +7,7 @@ const injectedRtkApi = api.injectEndpoints({
     gene2AllApiAppGene2AllGet: build.query<Gene2AllApiAppGene2AllGetApiResponse, Gene2AllApiAppGene2AllGetApiArg>({
       query: (queryArg) => ({ url: `http://127.0.0.1:9000/api/app/gene2all`, params: { gene: queryArg.gene, limit: queryArg.limit } }),
     }),
+    
   }),
   overrideExisting: false,
 });

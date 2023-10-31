@@ -184,3 +184,38 @@ def gene2all(gene: str | None = None, limit: int = 1000) -> Gene2AllResponse | N
                 removed_dup_edg.append(edge)
 
         return Gene2AllResponse(nodes=nodes, edges=removed_dup_edg)
+
+# additional trait (disease/drug) information
+
+# @graph_router.get("/traitinfo/{trait_id}")
+# def get_trait_info(trait_id: str):
+#     name_info = get_diseaseOrDrug_name(trait_id)
+#     # extraction of name and result
+#     name = name_info["name"]
+#     description = name_info["description"]
+
+#     # create a response JSON with both name and description
+#     response = {
+#         "name": name,
+#         "description": description
+#     }
+
+#     return response
+
+
+# # whole name for genes
+
+# @graph_router.get("/geneinfo/{gene_id}")
+# def get_gene(gene_id: str):
+#     name = get_gene_name(gene_id)
+#     gene_info = get_gene_info(gene_id)
+    
+#     # check whether gene was found
+#     if isinstance(gene_info, str):
+#         return gene_info
+
+#     return {
+#         "Gene Name": name,
+#         "Transcript Product": gene_info.get("Transcript Product"),
+#         "Chromosome Location": gene_info.get("Chromosome Location")
+#     }
