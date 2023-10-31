@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import { useAutocomplete, useGene2Genes } from './store/store';
 import { DrugGraph } from './DrugGraph';
 import { GeneGraph } from './GeneGraph';
+import { FilterNodeTypesArea } from './FilterNodeTypesArea';
 
 export function App() {
   const [search, setSearch] = useState('');
@@ -14,7 +15,7 @@ export function App() {
   });
 
   return (
-    <>
+    <div>
       <Autocomplete
         label="Search for genes"
         placeholder="ENSG..."
@@ -25,6 +26,6 @@ export function App() {
       />
 
       <GeneGraph geneID={search} />
-    </>
+    </div>
   );
 }

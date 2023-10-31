@@ -3,17 +3,12 @@ import { useAutocomplete, useGene2Drugs, useGene2Genes, useSingleGene } from './
 import { ReactFlow, Background, Controls, MiniMap, useNodesState, useEdgesState, Handle, ReactFlowProvider } from 'reactflow';
 import 'reactflow/dist/style.css';
 import { nodeTypes } from "./NodeTypes";
-
-// context for nodes state
-import SimpleFloatingEdge from './EdgeType';
+import { FilterNodeTypesArea } from './FilterNodeTypesArea';
 
 // context for nodes state
 export const GraphNodesContext = createContext(null);
-const maxNodesPerCircle = 20;
 
-const edgeTypes = {
-  floating: SimpleFloatingEdge,
-};
+const maxNodesPerCircle = 20;
 
 // Function to get the center of the screen
 const getScreenCenterCoordinates = () => {
@@ -110,24 +105,22 @@ export function GeneGraph(props: GeneGraphProps) {
   }, [graph]);
 
   return (
-    <div style={{ height: '90%' }}>
+    <div style={{ height: '90%', width: '75%', float: 'left', display: 'flex' }}>
       <GraphNodesContext.Provider value={{ nodes: nodes, setNodes: setNodes }}>
-
         <ReactFlow
           nodes={nodes}
           edges={edges}
           nodeTypes={nodeTypes}
-          edgeTypes={edgeTypes}
+          //edgeTypes={edgeTypes}
           onNodesChange={onNodesChange}
           onEdgesChange={onEdgesChange}
         >
           <Background />
           <Controls />
           <MiniMap />
-
         </ReactFlow>
+        <FilterNodeTypesArea /> 
       </GraphNodesContext.Provider>
-
     </div>
   );
 }

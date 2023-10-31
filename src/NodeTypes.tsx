@@ -30,10 +30,8 @@ const DefaultCustomNode = ({ data, backgroundColor }) => {
         <div style={nodeStyle} onMouseEnter={() => setIsHovered(true)} onMouseLeave={() => setIsHovered(false)}
             onClick={() => setIsHighlighted(!isHighlighted)}>
             <div>{data?.label}</div>
-            <Handle type="source" position={Position.Top} id="a" style={{ visibility: "hidden" }} />
-            <Handle type="source" position={Position.Right} id="b" style={{ visibility: "hidden" }} />
-            <Handle type="source" position={Position.Bottom} id="c" style={{ visibility: "hidden" }} />
-            <Handle type="source" position={Position.Left} id="d" style={{ visibility: "hidden" }} />
+            <Handle type="target" position={Position.Top} style={{ visibility: "hidden" }} />
+            <Handle type="source" position={Position.Right} style={{ visibility: "hidden" }} />
         </div>
     );
 }
