@@ -105,22 +105,32 @@ export function GeneGraph(props: GeneGraphProps) {
   }, [graph]);
 
   return (
-    <div style={{ height: '90%', width: '75%', float: 'left', display: 'flex' }}>
+    <>
+      <div style={{height: '90%', width: '100%', display: 'flex'}}>
       <GraphNodesContext.Provider value={{ nodes: nodes, setNodes: setNodes }}>
-        <ReactFlow
-          nodes={nodes}
-          edges={edges}
-          nodeTypes={nodeTypes}
-          //edgeTypes={edgeTypes}
-          onNodesChange={onNodesChange}
-          onEdgesChange={onEdgesChange}
-        >
-          <Background />
-          <Controls />
-          <MiniMap />
-        </ReactFlow>
-        <FilterNodeTypesArea /> 
+        <div style={{height: '100%', width:'85%'}}>
+          <ReactFlow
+            nodes={nodes}
+            edges={edges}
+            nodeTypes={nodeTypes}
+            //edgeTypes={edgeTypes}
+            onNodesChange={onNodesChange}
+            onEdgesChange={onEdgesChange}
+          >
+            <Background />
+            <Controls />
+            <MiniMap />
+          </ReactFlow>
+        </div>
+        <div style={{minHeight: '100%', width:'15%'}}>
+          <FilterNodeTypesArea />
+        </div>
+        
+
+        
       </GraphNodesContext.Provider>
-    </div>
+      </div>
+
+    </>
   );
 }

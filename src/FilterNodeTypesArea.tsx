@@ -13,8 +13,8 @@ export function FilterNodeTypesArea() {
   return (
 
     
-    <div style={{ height: '90%', minWidth: '25%'}} className='FilterNodeTypeArea'>
-      <Card withBorder shadow="sm" radius="lg" style={{width: '100%'}}>
+    <div style={{ height: '100%', minWidth: '25%'}} className='FilterNodeTypeArea'>
+      <Card withBorder shadow="sm" radius="lg" style={{width: '100%', height: '100%'}}>
         <Card.Section withBorder inheritPadding py="xs">
           <Group position="center">
             <Text weight={700} size="xl" mt="md" style={{textAlign: 'center'}}>Filter</Text>

@@ -15,7 +15,7 @@ export function App() {
   });
 
   return (
-    <div>
+    <>
       <Autocomplete
         label="Search for genes"
         placeholder="ENSG..."
@@ -26,6 +26,6 @@ export function App() {
       />
 
       <GeneGraph geneID={search} />
-    </div>
+    </>
   );
 }
