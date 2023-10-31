@@ -3,16 +3,15 @@ import { useAutocomplete, useGene2Drugs, useGene2Genes, useSingleGene } from './
 import { ReactFlow, Background, Controls, MiniMap, useNodesState, useEdgesState, Handle, ReactFlowProvider } from 'reactflow';
 import 'reactflow/dist/style.css';
 import { nodeTypes } from "./NodeTypes";
-
-// context for nodes state
-import SimpleFloatingEdge from './EdgeType';
+import FloatingEdge from './EdgeType';
+import FloatingConnectionLine from './FloatingConnectionLine';
 
 // context for nodes state
 export const GraphNodesContext = createContext(null);
 const maxNodesPerCircle = 20;
 
 const edgeTypes = {
-  floating: SimpleFloatingEdge,
+  floating: FloatingEdge,
 };
 
 // Function to get the center of the screen
@@ -70,11 +69,9 @@ export function GeneGraph(props: GeneGraphProps) {
           return {
             id: node.ENSG_B,
             position: center,
-            selected: true,
             type: "gene",
             data: {
               label: node.ENSG_A === firstNode[0]?.ENSG_A ? node.ENSG_B_name : node.ENSG_A_name,
-              hidden: false
             },
           };
         } else {
@@ -102,8 +99,6 @@ export function GeneGraph(props: GeneGraphProps) {
           id: edge.ENSG_A + '-' + edge.ENSG_B,
           source: edge.ENSG_A,
           target: edge.ENSG_B,
-          sourceHandle: 'c',
-          targetHandle: 'a',
           type: 'floating',
         }))
     );
@@ -120,6 +115,7 @@ export function GeneGraph(props: GeneGraphProps) {
           edgeTypes={edgeTypes}
           onNodesChange={onNodesChange}
           onEdgesChange={onEdgesChange}
+          connectionLineComponent={FloatingConnectionLine}
         >
           <Background />
           <Controls />
