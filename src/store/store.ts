@@ -10,7 +10,7 @@ export const appApi = generatedAppApi.enhanceEndpoints({
 
 export const {
    useAutocompleteApiAppAutocompleteGetQuery: useAutocomplete,
-   useGene2AllApiAppGene2AllGetQuery : useGene2All
+   useExpandApiAppExpandGetQuery : useExpand
    } = appApi;
 
 export const store = configureStore({

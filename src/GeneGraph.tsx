@@ -1,13 +1,9 @@
 import React, { useState, useEffect, useMemo } from 'react';
 
-import {useGene2All} from './store/store';
+import {useExpand} from './store/store';
 import { ReactFlow, Background, Controls, MiniMap, useNodesState, useEdgesState, Handle } from 'reactflow';
 import 'reactflow/dist/style.css';
 import { nodeTypes } from "./NodeTypes"
-
-const maxNodesPerCircle = 20;
-
-
 
 // Props for the GeneGraph component
 type GeneGraphProps = {
@@ -21,14 +17,13 @@ export function GeneGraph(props: GeneGraphProps) {
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
 
   // get all genes that are connected to the first node
-  const { data: graph } = useGene2All({
-    gene: props.geneID || undefined,
+  const { data: graph } = useExpand({
+      geneIds: [props.geneID],
+      options: [true],
     limit: 1000,
   });
 
   useMemo(() => {
-
-
     setNodes(graph?.nodes.map((node,index)=>{
       return{
         id:node.id,

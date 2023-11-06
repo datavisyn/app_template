@@ -4,8 +4,8 @@ const injectedRtkApi = api.injectEndpoints({
     autocompleteApiAppAutocompleteGet: build.query<AutocompleteApiAppAutocompleteGetApiResponse, AutocompleteApiAppAutocompleteGetApiArg>({
       query: (queryArg) => ({ url: `http://127.0.0.1:9000/api/app/autocomplete`, params: { search: queryArg.search, limit: queryArg.limit } }),
     }),
-    gene2AllApiAppGene2AllGet: build.query<Gene2AllApiAppGene2AllGetApiResponse, Gene2AllApiAppGene2AllGetApiArg>({
-      query: (queryArg) => ({ url: `http://127.0.0.1:9000/api/app/gene2all`, params: { gene: queryArg.gene, limit: queryArg.limit } }),
+    expandApiAppExpandGet: build.query<ExpandApiAppExpandGetApiResponse, ExpandApiAppExpandGetApiArg>({
+      query: (queryArg) => ({ url: `http://127.0.0.1:9000/api/app/expand`, params: { geneIds: queryArg.geneIds, options: queryArg.options, limit: queryArg.limit } }),
     }),
     
   }),
@@ -17,9 +17,10 @@ export type AutocompleteApiAppAutocompleteGetApiArg = {
   search: string;
   limit?: number;
 };
-export type Gene2AllApiAppGene2AllGetApiResponse = /** status 200 Successful Response */ Gene2AllResponse;
-export type Gene2AllApiAppGene2AllGetApiArg = {
-  gene?: string;
+export type ExpandApiAppExpandGetApiResponse = /** status 200 Successful Response */ Gene2AllResponse;
+export type ExpandApiAppExpandGetApiArg = {
+  geneIds: string[];
+  options: boolean[];
   limit?: number;
 };
 export type ValidationError = {
@@ -55,6 +56,6 @@ export type Gene2AllResponse = {
 export const {
   useAutocompleteApiAppAutocompleteGetQuery,
   useLazyAutocompleteApiAppAutocompleteGetQuery,
-  useGene2AllApiAppGene2AllGetQuery,
-  useLazyGene2AllApiAppGene2AllGetQuery,
+  useExpandApiAppExpandGetQuery,
+  useLazyExpandApiAppExpandGetQuery,
 } = injectedRtkApi;
