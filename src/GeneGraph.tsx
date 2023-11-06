@@ -73,6 +73,7 @@ export function GeneGraph(props: GeneGraphProps) {
             data: {
               label: node.ENSG_A === firstNode[0]?.ENSG_A ? node.ENSG_B_name : node.ENSG_A_name,
             },
+            hidden: false
           };
         } else {
           if (index % maxNodesPerCircle === 0) {
@@ -87,6 +88,7 @@ export function GeneGraph(props: GeneGraphProps) {
             data: {
               label: node.ENSG_A === firstNode[0]?.ENSG_A ? node.ENSG_B_name : node.ENSG_A_name,
             },
+            hidden: false
           };
         }
       })
@@ -104,25 +106,25 @@ export function GeneGraph(props: GeneGraphProps) {
     );
   }, [graph]);
 
+
+
   return (
     <div style={{ height: '90%' }}>
-      <GraphNodesContext.Provider value={{ nodes: nodes, setNodes: setNodes }}>
 
-        <ReactFlow
-          nodes={nodes}
-          edges={edges}
-          nodeTypes={nodeTypes}
-          edgeTypes={edgeTypes}
-          onNodesChange={onNodesChange}
-          onEdgesChange={onEdgesChange}
-          connectionLineComponent={FloatingConnectionLine}
-        >
-          <Background />
-          <Controls />
-          <MiniMap />
+      <ReactFlow
+        nodes={nodes}
+        edges={edges}
+        nodeTypes={nodeTypes}
+        edgeTypes={edgeTypes}
+        onNodesChange={onNodesChange}
+        onEdgesChange={onEdgesChange}
+        connectionLineComponent={FloatingConnectionLine}
+      >
+        <Background />
+        <Controls />
+        <MiniMap />
 
-        </ReactFlow>
-      </GraphNodesContext.Provider>
+      </ReactFlow>
 
     </div>
   );
