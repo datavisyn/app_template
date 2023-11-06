@@ -3,14 +3,15 @@ import { useAutocomplete, useGene2Drugs, useGene2Genes, useSingleGene } from './
 import { ReactFlow, Background, Controls, MiniMap, useNodesState, useEdgesState, Handle, ReactFlowProvider } from 'reactflow';
 import 'reactflow/dist/style.css';
 import { nodeTypes } from "./NodeTypes";
-import FloatingEdge from './EdgeType';
-import FloatingConnectionLine from './FloatingConnectionLine';
+
+// context for nodes state
+import SimpleFloatingEdge from './EdgeType';
 
 const maxNodesPerCircle = 20;
-
 const edgeTypes = {
   floating: FloatingEdge, 
 };
+
 
 // Function to get the center of the screen
 const getScreenCenterCoordinates = () => {
@@ -68,10 +69,10 @@ export function GeneGraph(props: GeneGraphProps) {
             id: node.ENSG_B,
             position: center,
             type: "gene",
+            hidden: false,
             data: {
               label: node.ENSG_A === firstNode[0]?.ENSG_A ? node.ENSG_B_name : node.ENSG_A_name,
             },
-            hidden: false
           };
         } else {
           if (index % maxNodesPerCircle === 0) {
@@ -83,10 +84,10 @@ export function GeneGraph(props: GeneGraphProps) {
             id: node.ENSG_B,
             position: position,
             type: "gene",
+            hidden: false,
             data: {
               label: node.ENSG_A === firstNode[0]?.ENSG_A ? node.ENSG_B_name : node.ENSG_A_name,
-            },
-            hidden: false
+            }
           };
         }
       })
@@ -98,18 +99,17 @@ export function GeneGraph(props: GeneGraphProps) {
         .map((edge) => ({
           id: edge.ENSG_A + '-' + edge.ENSG_B,
           source: edge.ENSG_A,
-          sourceNode : nodes.find(node => node.id === edge.ENSG_A),
           target: edge.ENSG_B,
-          targetNode : nodes.find(node => node.id === edge.ENSG_B),
           type: 'floating',
         }))
     );
+
   }, [graph]);
 
 
 
   return (
-    <div style={{ height: '90%' }}>
+    <div style={{ height: '100%', width: '85%' }}>
 
       <ReactFlow
         nodes={nodes}
@@ -123,9 +123,11 @@ export function GeneGraph(props: GeneGraphProps) {
         <Background />
         <Controls />
         <MiniMap />
+        <div style={{ minHeight: '100%', width: '15%' }}>
+              <FilterNodeTypesArea />
+            </div>
 
       </ReactFlow>
-
     </div>
   );
 }
