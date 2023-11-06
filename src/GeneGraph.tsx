@@ -103,10 +103,6 @@ export function GeneGraph(props: GeneGraphProps) {
 
   }, [graph]);
 
-  useEffect(() => {
-    setNodes(nodes)
-  }, [nodes])
-
   return (
     <>
       <div style={{ height: '90%', width: '100%', display: 'flex' }}>
