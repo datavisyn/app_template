@@ -135,10 +135,10 @@ def autocomplete(search: str, limit: int | None = 10) -> list[str]:
 
 @graph_router.get("/expand")
 def expand(geneIds: list[str] = Query(), options: list[bool] = Query(), limit: int = 1000) -> Gene2AllResponse | None:
-    
+    # empty children/parents lists (since we don't know if a node got hidden)
     allNodes["children"] = np.empty((len(allNodes), 0)).tolist()
     allNodes["parents"] = np.empty((len(allNodes), 0)).tolist()
-   
+
     # variables for accumulating data
     allFilteredNodes = set()
     allEdgesResult = pd.DataFrame()
@@ -170,30 +170,27 @@ def expand(geneIds: list[str] = Query(), options: list[bool] = Query(), limit: i
                 node = allNodes.loc[allNodes['id'] == geneId].iloc[0]
                 filteredNodes.append(node["id"])
 
+            # add nodes and edges to overall sets
             allFilteredNodes.update(filteredNodes)
             allLayoutedEdges.update(layoutedEdges)
-            
 
-            filteredNodes.remove(geneId)
+            # only remove passed geneId if it has connections to other nodes
+            if len(filteredNodes) > 1:
+                filteredNodes.remove(geneId)
+
             nodes = allNodes[allNodes["id"].isin(filteredNodes)]
             nodes["parents"].apply(lambda lst: lst.append(geneId))
 
             parent = allNodes[allNodes["id"] == geneId]
-            #parent['children']=parent['children'].astype('object')
-            #parent.at[0, "children"] = filteredNodes
             parent['children'] = parent['children'].apply(lambda x: filteredNodes)
-            #parent["children"] += (filteredNodes)
-            
             allNodesResult = pd.concat([allNodesResult, parent, nodes])
     allNodesResult = allNodesResult.drop_duplicates(subset=["id"], keep="last")
-
 
     # layouting using the networkx package
     G = nx.Graph()
     G.add_nodes_from(allFilteredNodes)
     G.add_edges_from(allLayoutedEdges)
     positions = nx.spring_layout(G)
-
 
     allNodesResultList = []
     # TODO vlt gibts bei Dataframe was cooleres
