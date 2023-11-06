@@ -31,6 +31,8 @@ class Node(BaseModel):
     synonyms: list[str]
     position: PositionType | None
     type: str
+    children: list[str]
+    parents: list[str]
 
 
 class Gene2AllResponse(BaseModel):
@@ -102,8 +104,12 @@ disease_nodes = trait_nodes[~trait_nodes["id"].str.contains("CHEBI")].copy()
 
 # combining different node types into one dataframe
 allNodes = pd.concat([gene_nodes, disease_nodes, drug_nodes], axis=0, ignore_index=True)
+allNodes["children"] = np.empty((len(allNodes), 0)).tolist()
+allNodes["parents"] = np.empty((len(allNodes), 0)).tolist()
 
 # takes search string and checks if it is part of a nodes id or name
+
+
 @graph_router.get("/autocomplete")
 def autocomplete(search: str, limit: int | None = 10) -> list[str]:
     # TODO implement nicer version (might look similar to the following line)
@@ -128,12 +134,17 @@ def autocomplete(search: str, limit: int | None = 10) -> list[str]:
 
 
 @graph_router.get("/expand")
-def expand(geneIds: list[str] = Query(), options: list[bool]= Query(), limit: int = 1000) -> Gene2AllResponse | None:
+def expand(geneIds: list[str] = Query(), options: list[bool] = Query(), limit: int = 1000) -> Gene2AllResponse | None:
+    
+    allNodes["children"] = np.empty((len(allNodes), 0)).tolist()
+    allNodes["parents"] = np.empty((len(allNodes), 0)).tolist()
+   
     # variables for accumulating data
     allFilteredNodes = set()
     allEdgesResult = pd.DataFrame()
+    allNodesResult = pd.DataFrame()
     allLayoutedEdges = set()
-    
+
     for geneId in geneIds:
         # calculate edges
         if geneId:
@@ -141,12 +152,12 @@ def expand(geneIds: list[str] = Query(), options: list[bool]= Query(), limit: in
             edges = allEdges[
                 (allEdges["source"] == geneId) | (allEdges["target"] == geneId)
             ]
-            allEdgesResult = pd.concat([allEdgesResult,edges])
-            
+            allEdgesResult = pd.concat([allEdgesResult, edges])
+
             layoutedEdges = []
             filteredNodes = []
 
-            # add id column
+            # add id column and add nodes to collection
             for ele in edges.head(limit).to_dict(orient="records"):
                 ele["id"] = ele["source"] + "-" + ele["target"]
                 if ele["source"] not in filteredNodes:
@@ -155,33 +166,51 @@ def expand(geneIds: list[str] = Query(), options: list[bool]= Query(), limit: in
                     filteredNodes.append(ele["target"])
 
                 layoutedEdges.append((ele["source"], ele["target"]))
-                
-                allFilteredNodes.update(filteredNodes)
-                allLayoutedEdges.update(layoutedEdges)
-    
+            if len(filteredNodes) == 0:
+                node = allNodes.loc[allNodes['id'] == geneId].iloc[0]
+                filteredNodes.append(node["id"])
+
+            allFilteredNodes.update(filteredNodes)
+            allLayoutedEdges.update(layoutedEdges)
+            
+
+            filteredNodes.remove(geneId)
+            nodes = allNodes[allNodes["id"].isin(filteredNodes)]
+            nodes["parents"].apply(lambda lst: lst.append(geneId))
+
+            parent = allNodes[allNodes["id"] == geneId]
+            #parent['children']=parent['children'].astype('object')
+            #parent.at[0, "children"] = filteredNodes
+            parent['children'] = parent['children'].apply(lambda x: filteredNodes)
+            #parent["children"] += (filteredNodes)
+            
+            allNodesResult = pd.concat([allNodesResult, parent, nodes])
+    allNodesResult = allNodesResult.drop_duplicates(subset=["id"], keep="last")
+
+
     # layouting using the networkx package
     G = nx.Graph()
     G.add_nodes_from(allFilteredNodes)
     G.add_edges_from(allLayoutedEdges)
     positions = nx.spring_layout(G)
 
-    allNodesResult = []
+
+    allNodesResultList = []
     # TODO vlt gibts bei Dataframe was cooleres
     # add positions to nodes
-    for node in allFilteredNodes:
-        n = allNodes[allNodes["id"] == node]
-        nDict = n.to_dict(orient="records")
-        if len(nDict) > 0:
-            nDict[0]["position"] = {
-                "x": positions[node][0],
-                "y": positions[node][1],
+    for node in allNodesResult.to_dict('records'):
+        if len(node) > 0:
+            node["position"] = {
+                "x": positions[node["id"]][0],
+                "y": positions[node["id"]][1],
             }
-            allNodesResult.append(nDict[0])
-    
+            allNodesResultList.append(node)
+
     # remove duplicate edges list comprehension
     if allEdgesResult is not None:
-        allEdgesResult = allEdgesResult.drop_duplicates(subset=["source","target"], keep="first")    
+        allEdgesResult = allEdgesResult.drop_duplicates(subset=["source", "target"], keep="first")
     edgeList = []
     for index, row in allEdgesResult.iterrows():
-        edgeList.append(Edge(id=row["id"],source=row["source"],target=row["target"]))
-    return Gene2AllResponse(nodes=allNodesResult, edges=edgeList)
+        edgeList.append(Edge(id=row["id"], source=row["source"], target=row["target"]))
+
+    return Gene2AllResponse(nodes=allNodesResultList, edges=edgeList)
