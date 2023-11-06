@@ -6,12 +6,10 @@ import { nodeTypes } from "./NodeTypes";
 import FloatingEdge from './EdgeType';
 import FloatingConnectionLine from './FloatingConnectionLine';
 
-// context for nodes state
-export const GraphNodesContext = createContext(null);
 const maxNodesPerCircle = 20;
 
 const edgeTypes = {
-  floating: FloatingEdge,
+  floating: FloatingEdge, 
 };
 
 // Function to get the center of the screen
@@ -100,7 +98,9 @@ export function GeneGraph(props: GeneGraphProps) {
         .map((edge) => ({
           id: edge.ENSG_A + '-' + edge.ENSG_B,
           source: edge.ENSG_A,
+          sourceNode : nodes.find(node => node.id === edge.ENSG_A),
           target: edge.ENSG_B,
+          targetNode : nodes.find(node => node.id === edge.ENSG_B),
           type: 'floating',
         }))
     );
