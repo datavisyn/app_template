@@ -1,18 +1,12 @@
 import React, { useState } from "react"
 import { Handle, Position } from "reactflow"
 
-
 // this is the default custom node
 const DefaultCustomNode = ({ data, backgroundColor }) => {
 
     // state for hovering effect
     const [isHovered, setIsHovered] = useState(false);
     const [isHighlighted, setIsHighlighted] = useState(false);
-    const [isHidden, setIsHidden] = useState(false);
-
-    function onHide() {
-        setIsHidden(true)
-    }
 
     // style applied for every node
     const nodeStyle = {
@@ -22,8 +16,7 @@ const DefaultCustomNode = ({ data, backgroundColor }) => {
         borderRadius: "8px",
         boxShadow: isHovered || isHighlighted ? "0 4px 8px rgba(0, 0, 0, 0.2)" : "none",
         transition: "box-shadow 0.3s ease transform 0.3 ease",
-        transform: isHighlighted ? "scale(1.8)" : "scale(1)",
-        display: isHidden ? "none" : "block"
+        transform: isHovered ? "scale(1.4)" : "scale(1)"
     };
 
     return (

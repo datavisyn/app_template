@@ -5,9 +5,6 @@ import 'reactflow/dist/style.css';
 import { nodeTypes } from "./NodeTypes";
 import { FilterNodeTypesArea } from './FilterNodeTypesArea';
 
-// context for nodes state
-export const GraphNodesContext = createContext(null);
-
 const maxNodesPerCircle = 20;
 
 // Function to get the center of the screen
@@ -67,9 +64,9 @@ export function GeneGraph(props: GeneGraphProps) {
             position: center,
             selected: true,
             type: "gene",
+            hidden: false,
             data: {
               label: node.ENSG_A === firstNode[0]?.ENSG_A ? node.ENSG_B_name : node.ENSG_A_name,
-              hidden: false
             },
           };
         } else {
@@ -82,6 +79,7 @@ export function GeneGraph(props: GeneGraphProps) {
             id: node.ENSG_B,
             position: position,
             type: "gene",
+            hidden: false,
             data: {
               label: node.ENSG_A === firstNode[0]?.ENSG_A ? node.ENSG_B_name : node.ENSG_A_name,
             },
@@ -97,38 +95,41 @@ export function GeneGraph(props: GeneGraphProps) {
           id: edge.ENSG_A + '-' + edge.ENSG_B,
           source: edge.ENSG_A,
           target: edge.ENSG_B,
-          sourceHandle: 'c',
-          targetHandle: 'a',
+          sourceNode: nodes.find(node => node.id === edge.ENSG_A),
+          targetNode: nodes.find(node => node.id === edge.ENSG_B),
           type: 'floating',
         }))
     );
+
   }, [graph]);
+
+  useEffect(() => {
+    setNodes(nodes)
+  }, [nodes])
 
   return (
     <>
-      <div style={{height: '90%', width: '100%', display: 'flex'}}>
-      <GraphNodesContext.Provider value={{ nodes: nodes, setNodes: setNodes }}>
-        <div style={{height: '100%', width:'85%'}}>
-          <ReactFlow
-            nodes={nodes}
-            edges={edges}
-            nodeTypes={nodeTypes}
-            //edgeTypes={edgeTypes}
-            onNodesChange={onNodesChange}
-            onEdgesChange={onEdgesChange}
-          >
-            <Background />
-            <Controls />
-            <MiniMap />
-          </ReactFlow>
-        </div>
-        <div style={{minHeight: '100%', width:'15%'}}>
-          <FilterNodeTypesArea />
-        </div>
-        
+      <div style={{ height: '90%', width: '100%', display: 'flex' }}>
 
-        
-      </GraphNodesContext.Provider>
+        <ReactFlowProvider>
+            <div style={{ height: '100%', width: '85%' }}>
+              <ReactFlow
+                nodes={nodes}
+                edges={edges}
+                nodeTypes={nodeTypes}
+                onNodesChange={onNodesChange}
+                onEdgesChange={onEdgesChange}
+              >
+                <Background />
+                <Controls />
+                <MiniMap />
+              </ReactFlow>
+            </div>
+            <div style={{ minHeight: '100%', width: '15%' }}>
+              <FilterNodeTypesArea />
+            </div>
+        </ReactFlowProvider>
+
       </div>
 
     </>
