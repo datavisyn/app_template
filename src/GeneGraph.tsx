@@ -3,13 +3,13 @@ import { useAutocomplete, useGene2Drugs, useGene2Genes, useSingleGene } from './
 import { ReactFlow, Background, Controls, MiniMap, useNodesState, useEdgesState, Handle, ReactFlowProvider } from 'reactflow';
 import 'reactflow/dist/style.css';
 import { nodeTypes } from "./NodeTypes";
-
-// context for nodes state
-import SimpleFloatingEdge from './EdgeType';
+import FloatingEdge from './EdgeType';
+import FloatingConnectionLine from './FloatingConnectionLine';
+import { FilterNodeTypesArea } from './FilterNodeTypesArea';
 
 const maxNodesPerCircle = 20;
 const edgeTypes = {
-  floating: FloatingEdge, 
+  floating: FloatingEdge,
 };
 
 
@@ -109,25 +109,34 @@ export function GeneGraph(props: GeneGraphProps) {
 
 
   return (
-    <div style={{ height: '100%', width: '85%' }}>
 
-      <ReactFlow
-        nodes={nodes}
-        edges={edges}
-        nodeTypes={nodeTypes}
-        edgeTypes={edgeTypes}
-        onNodesChange={onNodesChange}
-        onEdgesChange={onEdgesChange}
-        connectionLineComponent={FloatingConnectionLine}
-      >
-        <Background />
-        <Controls />
-        <MiniMap />
-        <div style={{ minHeight: '100%', width: '15%' }}>
-              <FilterNodeTypesArea />
-            </div>
+    <>
+      <div style={{ height: '90%', width: '100%', display: 'flex' }}>
 
-      </ReactFlow>
-    </div>
+        <ReactFlowProvider>
+          <div style={{ height: '100%', width: '85%' }}>
+            <ReactFlow
+              nodes={nodes}
+              edges={edges}
+              nodeTypes={nodeTypes}
+              edgeTypes={edgeTypes}
+              onNodesChange={onNodesChange}
+              onEdgesChange={onEdgesChange}
+              connectionLineComponent={FloatingConnectionLine}
+            >
+              <Background />
+              <Controls />
+              <MiniMap />
+            </ReactFlow>
+          </div>
+          <div style={{ minHeight: '100%', width: '15%' }}>
+            <FilterNodeTypesArea />
+          </div>
+        </ReactFlowProvider>
+
+      </div>
+
+    </>
+
   );
 }

@@ -5,7 +5,7 @@ import { getEdgeParams } from './edgeparams';
 
 
 
-function FloatingEdge({ id, source, target, markerEnd, style }: EdgeProps) {
+export function FloatingEdge({ id, source, target, markerEnd, style }: EdgeProps) {
     const sourceNode = useStore(useCallback((store) => store.nodeInternals.get(source), [source]));
     const targetNode = useStore(useCallback((store) => store.nodeInternals.get(target), [target]));
   
