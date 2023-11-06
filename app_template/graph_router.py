@@ -182,7 +182,7 @@ def expand(geneIds: list[str] = Query(), options: list[bool] = Query(), limit: i
             nodes["parents"].apply(lambda lst: lst.append(geneId))
 
             parent = allNodes[allNodes["id"] == geneId]
-            parent['children'] = parent['children'].apply(lambda x: filteredNodes)
+            parent["children"].apply(lambda lst: lst.extend(filteredNodes))
             allNodesResult = pd.concat([allNodesResult, parent, nodes])
     allNodesResult = allNodesResult.drop_duplicates(subset=["id"], keep="last")
 
