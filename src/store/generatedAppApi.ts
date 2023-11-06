@@ -7,6 +7,7 @@ const injectedRtkApi = api.injectEndpoints({
     expandApiAppExpandGet: build.query<ExpandApiAppExpandGetApiResponse, ExpandApiAppExpandGetApiArg>({
       query: (queryArg) => ({ url: `http://127.0.0.1:9000/api/app/expand`, params: { geneIds: queryArg.geneIds, options: queryArg.options, limit: queryArg.limit } }),
     }),
+    
   }),
   overrideExisting: false,
 });
