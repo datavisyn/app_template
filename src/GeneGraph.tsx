@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useMemo, createContext, useContext, useReducer } from 'react';
-import { useAutocomplete, useGene2Drugs, useGene2Genes, useSingleGene } from './store/store';
+
+import {useExpand} from './store/store';
 import { ReactFlow, Background, Controls, MiniMap, useNodesState, useEdgesState, Handle, ReactFlowProvider } from 'reactflow';
 import 'reactflow/dist/style.css';
 import { nodeTypes } from "./NodeTypes";
@@ -42,66 +43,35 @@ export function GeneGraph(props: GeneGraphProps) {
   const [nodes, setNodes, onNodesChange] = useNodesState([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
 
-  // continue if gene with that id exists
-  const { data: firstNode } = useSingleGene({ gene: props.geneID });
-
   // get all genes that are connected to the first node
-  const { data: graph } = useGene2Genes({
-    gene: props.geneID || undefined,
+  const { data: graph } = useExpand({
+      geneIds: [props.geneID],
+      options: [true],
     limit: 1000,
   });
 
-  useEffect(() => {
-    if (!graph || !firstNode) return;
-
-    // add first node to graph
-    const allNodes = graph.concat(firstNode);
-    const firstNodeId = firstNode[0]?.ENSG_B;
-    const nodesCircleAmount = allNodes.length < maxNodesPerCircle ? allNodes.length - 1 : maxNodesPerCircle;
-    const angleStep = (2 * Math.PI) / nodesCircleAmount;
-    const center = getScreenCenterCoordinates();
-    let radius = 250;
-
-    setNodes(
-      allNodes.map((node, index) => {
-        if (node.ENSG_B === firstNodeId) {
-          return {
-            id: node.ENSG_B,
-            position: center,
-            type: "gene",
-            hidden: false,
-            data: {
-              label: node.ENSG_A === firstNode[0]?.ENSG_A ? node.ENSG_B_name : node.ENSG_A_name,
-            },
-          };
-        } else {
-          if (index % maxNodesPerCircle === 0) {
-            radius += 200;
-          }
-          const angle = (index - 1) * angleStep;
-          const position = polarToCartesian(angle, radius, center);
-          return {
-            id: node.ENSG_B,
-            position: position,
-            type: "gene",
-            hidden: false,
-            data: {
-              label: node.ENSG_A === firstNode[0]?.ENSG_A ? node.ENSG_B_name : node.ENSG_A_name,
-            }
-          };
-        }
-      })
-    );
-
+  useMemo(() => {
+    setNodes(graph?.nodes.map((node,index)=>{
+      return{
+        id:node.id,
+        position:{
+          x:node.position.x*1200,
+          y:node.position.y*500
+        },
+        data:{
+          label:node.id
+        },
+        type:node.type.toString()
+      }
+    }));
+    
     setEdges(
-      allNodes
-        .filter(edge => edge.ENSG_A !== edge.ENSG_B)
-        .map((edge) => ({
-          id: edge.ENSG_A + '-' + edge.ENSG_B,
-          source: edge.ENSG_A,
-          target: edge.ENSG_B,
-          type: 'floating',
-        }))
+      graph?.edges.map((edge) => ({
+        id: edge.id,
+        source: edge.source,
+        target: edge.target,
+        type: 'floating',
+      }))
     );
 
   }, [graph]);
