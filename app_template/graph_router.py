@@ -27,6 +27,7 @@ class Node(BaseModel):
     id: str
     entrezId: str
     name: str  # fullname
+    symbol: str | None
     summary: str
     synonyms: list[str]
     position: PositionType | None
@@ -134,7 +135,7 @@ def autocomplete(search: str, limit: int | None = 10) -> list[str]:
 
 
 @graph_router.get("/expand")
-def expand(geneIds: list[str] = Query(), options: list[bool] = Query(), limit: int = 1000) -> Gene2AllResponse | None:
+def expand(geneIds: list[str] = Query(), limit: int = 1000) -> Gene2AllResponse | None:
     # empty children/parents lists (since we don't know if a node got hidden)
     allNodes["children"] = np.empty((len(allNodes), 0)).tolist()
     allNodes["parents"] = np.empty((len(allNodes), 0)).tolist()
