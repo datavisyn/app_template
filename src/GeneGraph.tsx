@@ -14,22 +14,6 @@ const edgeTypes = {
 };
 
 
-// Function to get the center of the screen
-const getScreenCenterCoordinates = () => {
-  const { innerWidth, innerHeight } = window;
-  const centerX = Math.floor(innerWidth / 2);
-  const centerY = Math.floor(innerHeight / 2);
-  // log coordinates to console
-  console.log(centerX, centerY);
-  return { x: centerX, y: centerY };
-};
-
-// Funktion zur Konvertierung von Polarkoordinaten in kartesische Koordinaten
-const polarToCartesian = (angle, radius, center) => {
-  const x = center.x + radius * Math.cos(angle);
-  const y = center.y + radius * Math.sin(angle);
-  return { x, y };
-};
 
 // Props for the GeneGraph component
 type GeneGraphProps = {
@@ -59,7 +43,11 @@ export function GeneGraph(props: GeneGraphProps) {
           y:node.position.y*500
         },
         data:{
-          label:node.id
+          label:node.id,
+          fullname:node.name,
+          summary:node.summary,
+          synonyms:node.synonyms,
+          entrezId:node.entrezId
         },
         type:node.type.toString()
       }
@@ -84,7 +72,7 @@ export function GeneGraph(props: GeneGraphProps) {
       <div style={{ height: '90%', width: '100%', display: 'flex' }}>
 
         <ReactFlowProvider>
-          <div style={{ height: '100%', width: '85%' }}>
+          <div style={{ height: '100%', width: '100%' }}>
             <ReactFlow
               nodes={nodes}
               edges={edges}
@@ -99,9 +87,9 @@ export function GeneGraph(props: GeneGraphProps) {
               <MiniMap />
             </ReactFlow>
           </div>
-          <div style={{ minHeight: '100%', width: '15%' }}>
+          {/* <div style={{ minHeight: '100%', width: '15%' }}>
             <FilterNodeTypesArea />
-          </div>
+          </div> */}
         </ReactFlowProvider>
 
       </div>
