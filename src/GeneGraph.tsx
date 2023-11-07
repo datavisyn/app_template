@@ -33,13 +33,15 @@ export function GeneGraph(props: GeneGraphProps) {
     limit: 1000,
   });
 
+  console.log("width: " + window.innerWidth + " height: " + window.innerHeight);
+
   useMemo(() => {
     setNodes(graph?.nodes.map((node,index)=>{
       return{
         id:node.id,
         position:{
-          x:node.position.x*1200,
-          y:node.position.y*500
+          x:(node.position.x+1)*(window.innerWidth/2),
+          y:(node.position.y+1)*(window.innerHeight/2)
         },
         data:{
           label:node.symbol == "nan" ? node.id : node.symbol,
@@ -63,10 +65,9 @@ export function GeneGraph(props: GeneGraphProps) {
 
   }, [graph]);
 
-
+  console.log(nodes);
 
   return (
-
     <>
       <div style={{ height: '90%', width: '100%', display: 'flex' }}>
 
