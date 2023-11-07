@@ -30,7 +30,6 @@ export function GeneGraph(props: GeneGraphProps) {
   // get all genes that are connected to the first node
   const { data: graph } = useExpand({
       geneIds: [props.geneID],
-      options: [true],
     limit: 1000,
   });
 
@@ -43,7 +42,7 @@ export function GeneGraph(props: GeneGraphProps) {
           y:node.position.y*500
         },
         data:{
-          label:node.id,
+          label:node.symbol == "nan" ? node.id : node.symbol,
           fullname:node.name,
           summary:node.summary,
           synonyms:node.synonyms,

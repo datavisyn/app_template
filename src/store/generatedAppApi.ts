@@ -5,9 +5,8 @@ const injectedRtkApi = api.injectEndpoints({
       query: (queryArg) => ({ url: `http://127.0.0.1:9000/api/app/autocomplete`, params: { search: queryArg.search, limit: queryArg.limit } }),
     }),
     expandApiAppExpandGet: build.query<ExpandApiAppExpandGetApiResponse, ExpandApiAppExpandGetApiArg>({
-      query: (queryArg) => ({ url: `http://127.0.0.1:9000/api/app/expand`, params: { geneIds: queryArg.geneIds, options: queryArg.options, limit: queryArg.limit } }),
+      query: (queryArg) => ({ url: `http://127.0.0.1:9000/api/app/expand`, params: { geneIds: queryArg.geneIds, limit: queryArg.limit } }),
     }),
-    
   }),
   overrideExisting: false,
 });
@@ -20,7 +19,6 @@ export type AutocompleteApiAppAutocompleteGetApiArg = {
 export type ExpandApiAppExpandGetApiResponse = /** status 200 Successful Response */ Gene2AllResponse;
 export type ExpandApiAppExpandGetApiArg = {
   geneIds: string[];
-  options: boolean[];
   limit?: number;
 };
 export type ValidationError = {
@@ -39,10 +37,13 @@ export type Node = {
   id: string;
   entrezId: string;
   name: string;
+  symbol?: string;
   summary: string;
   synonyms: string[];
   position?: PositionType;
   type: string;
+  children: string[];
+  parents: string[];
 };
 export type Edge = {
   id: string;
