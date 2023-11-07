@@ -3,6 +3,7 @@ import { Autocomplete, Loader } from '@mantine/core';
 import React, { useState } from 'react';
 import { useAutocomplete } from './store/store';
 import { GeneGraph } from './GeneGraph';
+import { FilterNodeTypesArea } from './FilterNodeTypesArea';
 
 export function App() {
   const [search, setSearch] = useState('');

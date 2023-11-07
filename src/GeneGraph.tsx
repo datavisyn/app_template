@@ -1,9 +1,19 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, createContext, useContext, useReducer } from 'react';
 
 import {useExpand} from './store/store';
-import { ReactFlow, Background, Controls, MiniMap, useNodesState, useEdgesState, Handle } from 'reactflow';
+import { ReactFlow, Background, Controls, MiniMap, useNodesState, useEdgesState, Handle, ReactFlowProvider } from 'reactflow';
 import 'reactflow/dist/style.css';
-import { nodeTypes } from "./NodeTypes"
+import { nodeTypes } from "./NodeTypes";
+import FloatingEdge from './EdgeType';
+import FloatingConnectionLine from './FloatingConnectionLine';
+import { FilterNodeTypesArea } from './FilterNodeTypesArea';
+
+const maxNodesPerCircle = 20;
+const edgeTypes = {
+  floating: FloatingEdge,
+};
+
+
 
 // Props for the GeneGraph component
 type GeneGraphProps = {
@@ -12,6 +22,7 @@ type GeneGraphProps = {
 
 // GeneGraph component
 export function GeneGraph(props: GeneGraphProps) {
+
   // State for the nodes and edges
   const [nodes, setNodes, onNodesChange] = useNodesState([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
@@ -32,7 +43,11 @@ export function GeneGraph(props: GeneGraphProps) {
           y:node.position.y*500
         },
         data:{
-          label:node.id
+          label:node.id,
+          fullname:node.name,
+          summary:node.summary,
+          synonyms:node.synonyms,
+          entrezId:node.entrezId
         },
         type:node.type.toString()
       }
@@ -43,26 +58,43 @@ export function GeneGraph(props: GeneGraphProps) {
         id: edge.id,
         source: edge.source,
         target: edge.target,
+        type: 'floating',
       }))
     );
 
-  },[graph]);
+  }, [graph]);
 
 
 
-return (
-  <div style={{ height: '90%' }}>
-    <ReactFlow
-      nodes={nodes}
-      edges={edges}
-      nodeTypes={nodeTypes}
-      onNodesChange={onNodesChange}
-      onEdgesChange={onEdgesChange}
-    >
-      <Background />
-      <Controls />
-      <MiniMap />
-    </ReactFlow>
-  </div>
-);
+  return (
+
+    <>
+      <div style={{ height: '90%', width: '100%', display: 'flex' }}>
+
+        <ReactFlowProvider>
+          <div style={{ height: '100%', width: '100%' }}>
+            <ReactFlow
+              nodes={nodes}
+              edges={edges}
+              nodeTypes={nodeTypes}
+              edgeTypes={edgeTypes}
+              onNodesChange={onNodesChange}
+              onEdgesChange={onEdgesChange}
+              connectionLineComponent={FloatingConnectionLine}
+            >
+              <Background />
+              <Controls />
+              <MiniMap />
+            </ReactFlow>
+          </div>
+          {/* <div style={{ minHeight: '100%', width: '15%' }}>
+            <FilterNodeTypesArea />
+          </div> */}
+        </ReactFlowProvider>
+
+      </div>
+
+    </>
+
+  );
 }
