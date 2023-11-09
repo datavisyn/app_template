@@ -1,11 +1,16 @@
 import * as React from 'react';
 import { createRoot } from 'react-dom/client';
-import { VisynApp, VisynAppProvider } from 'visyn_core/app';
+import { Provider } from 'react-redux';
+import { VisynAppProvider } from 'visyn_core/app';
+import { store } from './store/store';
+import { App } from './App';
 
 createRoot(document.getElementById('root')).render(
   <React.StrictMode>
-    <VisynAppProvider appName="App Template">
-      <VisynApp loginMenu={null}>Hello app_template!</VisynApp>
-    </VisynAppProvider>
+    <Provider store={store}>
+      <VisynAppProvider appName="App Template">
+        <App />
+      </VisynAppProvider>
+    </Provider>
   </React.StrictMode>,
 );
