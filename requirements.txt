@@ -1,1 +1,4 @@
 visyn_core@git+https://github.com/datavisyn/visyn_core.git@develop#egg=visyn_core
+pandas==2.0.1
+sqlmodel==0.0.8
+sse-starlette==1.6.1
