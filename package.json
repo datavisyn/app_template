@@ -56,6 +56,7 @@
     "cytoscape": "^3.25.0",
     "d3": "^7.8.5",
     "dagre": "^0.8.5",
+    "react-icons": "^4.11.0",
     "react-redux": "^8.0.2",
     "reactflow": "^11.7.2",
     "visyn_core": "2.0.0",
