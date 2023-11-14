@@ -146,64 +146,69 @@ def expand(geneIds: list[str] = Query(), limit: int = 1000) -> Gene2AllResponse 
     allNodesResult = pd.DataFrame()
     allLayoutedEdges = set()
 
+    # find nodes connected to the geneIds
     for geneId in geneIds:
-        # calculate edges
         if geneId:
-            # filter edges
+            # find edges containing geneId
             edges = allEdges[
                 (allEdges["source"] == geneId) | (allEdges["target"] == geneId)
             ]
-            allEdgesResult = pd.concat([allEdgesResult, edges])
 
-            layoutedEdges = []
             filteredNodes = []
-
-            # add id column and add nodes to collection
+            # add all nodes occuring in the filtered edges to a list
             for ele in edges.head(limit).to_dict(orient="records"):
+                # add id column
                 ele["id"] = ele["source"] + "-" + ele["target"]
                 if ele["source"] not in filteredNodes:
                     filteredNodes.append(ele["source"])
                 if ele["target"] not in filteredNodes:
                     filteredNodes.append(ele["target"])
-
-                layoutedEdges.append((ele["source"], ele["target"]))
+            # if gene has no connections a the gene 
             if len(filteredNodes) == 0:
                 node = allNodes.loc[allNodes['id'] == geneId].iloc[0]
                 filteredNodes.append(node["id"])
 
-            # add nodes and edges to overall sets
             allFilteredNodes.update(filteredNodes)
-            allLayoutedEdges.update(layoutedEdges)
 
             # only remove passed geneId if it has connections to other nodes
             if len(filteredNodes) > 1:
                 filteredNodes.remove(geneId)
 
+            # add current geneId as parent for all nodes aquired in the steps before
             nodes = allNodes[allNodes["id"].isin(filteredNodes)]
             nodes["parents"].apply(lambda lst: lst.append(geneId))
 
+            # set all children for current geneId-Node
             parent = allNodes[allNodes["id"] == geneId]
             parent["children"].apply(lambda lst: lst.extend(filteredNodes))
             allNodesResult = pd.concat([allNodesResult, parent, nodes])
+    # remove possible duplicates
     allNodesResult = allNodesResult.drop_duplicates(subset=["id"], keep="last")
 
-
+    # find all edges between all the nodes we aquired before
     for index, row in allNodesResult.iterrows():
+        # find all edges for each node
         edges =  allEdges[
                 (allEdges["source"] == row["id"]) | (allEdges["target"] == row["id"])
             ]
-        layoutedEdges = []
         for index2, row2 in allNodesResult.iterrows():
-            edgesTogether =  edges[
-                (edges["source"] == row2["id"]) | (edges["target"] == row2["id"])
-            ]
-            # edges = allEdges[((allEdges["source"] == row["id"]) & (allEdges["target"] == row2["id"])) | ((allEdges["source"] == row2["id"]) & (allEdges["target"] == row["id"]))]
-            allEdgesResult = pd.concat([allEdgesResult, edgesTogether])
-            for ele in edges.head(limit).to_dict(orient="records"):
-                ele["id"] = ele["source"] + "-" + ele["target"]
-                layoutedEdges.append((ele["source"], ele["target"]))
-            
-        allLayoutedEdges.update(layoutedEdges)
+            # filter the edges further
+            if row["id"] != row2["id"]:
+                edgesTogether =  edges[
+                    (edges["source"] == row2["id"]) | (edges["target"] == row2["id"])
+                ]
+                allEdgesResult = pd.concat([allEdgesResult, edgesTogether])
+    
+    layoutedEdges = []
+    # drop duplicates
+    # TODO: maybe drop duplicates where source & target are switched
+    if allEdgesResult is not None:
+        allEdgesResult = allEdgesResult.drop_duplicates(subset=["source", "target"], keep="first")
+    for ele in allEdgesResult.to_dict(orient="records"):
+        ele["id"] = ele["source"] + "-" + ele["target"]
+        layoutedEdges.append((ele["source"], ele["target"]))
+
+    allLayoutedEdges.update(layoutedEdges)
 
     # layouting using the networkx package
     G = nx.Graph()
