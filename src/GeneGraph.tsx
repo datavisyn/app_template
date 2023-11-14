@@ -17,11 +17,12 @@ const edgeTypes = {
 
 // Props for the GeneGraph component
 type GeneGraphProps = {
-  geneID: string;
+  geneID: string[]; // changed to array
 };
 
 // GeneGraph component
 export function GeneGraph(props: GeneGraphProps) {
+  const geneIds = props.geneID;
 
   // State for the nodes and edges
   const [nodes, setNodes, onNodesChange] = useNodesState([]);
@@ -29,11 +30,9 @@ export function GeneGraph(props: GeneGraphProps) {
 
   // get all genes that are connected to the first node
   const { data: graph } = useExpand({
-      geneIds: [props.geneID],
+      geneIds: geneIds,
     limit: 1000,
   });
-
-  console.log("width: " + window.innerWidth + " height: " + window.innerHeight);
 
   useMemo(() => {
     setNodes(graph?.nodes.map((node,index)=>{
@@ -64,8 +63,6 @@ export function GeneGraph(props: GeneGraphProps) {
     );
 
   }, [graph]);
-
-  console.log(nodes);
 
   return (
     <>
