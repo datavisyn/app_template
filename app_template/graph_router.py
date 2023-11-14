@@ -182,22 +182,15 @@ def expand(geneIds: list[str] = Query(), limit: int = 1000) -> Gene2AllResponse 
             parent = allNodes[allNodes["id"] == geneId]
             parent["children"].apply(lambda lst: lst.extend(filteredNodes))
             allNodesResult = pd.concat([allNodesResult, parent, nodes])
+
     # remove possible duplicates
     allNodesResult = allNodesResult.drop_duplicates(subset=["id"], keep="last")
-
-    # find all edges between all the nodes we aquired before
-    for index, row in allNodesResult.iterrows():
-        # find all edges for each node
-        edges =  allEdges[
-                (allEdges["source"] == row["id"]) | (allEdges["target"] == row["id"])
-            ]
-        for index2, row2 in allNodesResult.iterrows():
-            # filter the edges further
-            if row["id"] != row2["id"]:
-                edgesTogether =  edges[
-                    (edges["source"] == row2["id"]) | (edges["target"] == row2["id"])
-                ]
-                allEdgesResult = pd.concat([allEdgesResult, edgesTogether])
+    if len(allNodesResult) != 0:
+        # make list of node ids
+        nodeIdList = allNodesResult["id"].tolist()
+        # select edges where both source and target (being an id) occure in nodeIdList
+        edges = allEdges[((allEdges["source"].isin(nodeIdList)) & (allEdges["target"].isin(nodeIdList)))]
+        allEdgesResult = pd.concat([allEdgesResult, edges])
     
     layoutedEdges = []
     # drop duplicates
