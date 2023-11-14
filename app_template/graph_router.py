@@ -187,6 +187,24 @@ def expand(geneIds: list[str] = Query(), limit: int = 1000) -> Gene2AllResponse 
             allNodesResult = pd.concat([allNodesResult, parent, nodes])
     allNodesResult = allNodesResult.drop_duplicates(subset=["id"], keep="last")
 
+
+    for index, row in allNodesResult.iterrows():
+        edges =  allEdges[
+                (allEdges["source"] == row["id"]) | (allEdges["target"] == row["id"])
+            ]
+        layoutedEdges = []
+        for index2, row2 in allNodesResult.iterrows():
+            edgesTogether =  edges[
+                (edges["source"] == row2["id"]) | (edges["target"] == row2["id"])
+            ]
+            # edges = allEdges[((allEdges["source"] == row["id"]) & (allEdges["target"] == row2["id"])) | ((allEdges["source"] == row2["id"]) & (allEdges["target"] == row["id"]))]
+            allEdgesResult = pd.concat([allEdgesResult, edgesTogether])
+            for ele in edges.head(limit).to_dict(orient="records"):
+                ele["id"] = ele["source"] + "-" + ele["target"]
+                layoutedEdges.append((ele["source"], ele["target"]))
+            
+        allLayoutedEdges.update(layoutedEdges)
+
     # layouting using the networkx package
     G = nx.Graph()
     G.add_nodes_from(allFilteredNodes)
