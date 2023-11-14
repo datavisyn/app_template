@@ -1,7 +1,7 @@
 import { Tabs, Text, Button, HoverCard, Group, Flex, Space } from '@mantine/core';
 import React, { useState, useContext } from "react"
 import { Handle, Position, useNodeId, useReactFlow } from "reactflow"
-// import { AiOutlineInfoCircle } from "react-icons/ai";
+import { IconInfoCircle, IconReportSearch, IconTopologyFull} from '@tabler/icons-react';
 
 // this is the default custom node
 function DefaultCustomNode({ data, selected, backgroundColor }) {
@@ -28,6 +28,7 @@ function DefaultCustomNode({ data, selected, backgroundColor }) {
         }));
 
     }
+    
 
     // style applied for every node
     const nodeStyle = {
@@ -39,10 +40,10 @@ function DefaultCustomNode({ data, selected, backgroundColor }) {
         // transition: "box-shadow 0.3s ease transform 0.3 ease",
         // transform: selected ? "scale(1.8)" : "scale(1)",
         // display: nodeInternals.get(data.id).hidden ? "none" : "block",
+        
     };
 
     return (
-
         <HoverCard shadow="md" width={400} withinPortal={true}>
             <HoverCard.Target>
                 <div style={nodeStyle}>
@@ -52,30 +53,19 @@ function DefaultCustomNode({ data, selected, backgroundColor }) {
                 </div>
             </HoverCard.Target>
             <HoverCard.Dropdown>
-                <Flex justify="center">
-                    <Button variant="filled" fullWidth color="gray"> {collapsed ? "Expand" : "Collapse"}</Button>
-                    <Button variant="filled" fullWidth color="gray" onClick={() => onHide()}>Hide</Button>
+                <Flex justify="center" gap="md">
+                    <Button variant="filled" color="gray" fullWidth> {collapsed ? "Expand" : "Collapse"}</Button>
+                    <Button variant="filled" color="gray" fullWidth onClick={() => onHide()}>Hide</Button>
                 </Flex>
                 <Space h="md" />
                 <Tabs color="gray" variant="outline" defaultValue="details">
                     <Tabs.List>
-                        <Tabs.Tab value="details">Details</Tabs.Tab>
-                        <Tabs.Tab value="summary">Summary</Tabs.Tab>
-                        <Tabs.Tab value="structure">Structure</Tabs.Tab>
+                        <Tabs.Tab rightSection={<IconInfoCircle/>} value="details" > Details</Tabs.Tab>
+                        <Tabs.Tab rightSection={<IconReportSearch/>} value="summary">Summary</Tabs.Tab>
+                        <Tabs.Tab rightSection={<IconTopologyFull/>} value="structure">Structure</Tabs.Tab>
                     </Tabs.List>
-
                     <Tabs.Panel value="details">
-                        {/*                         <Text size="md" fw={700}>Symbol</Text>
-                        <Text size="sm">{data?.label}</Text>
-                        <Text size="md" fw={700}>Full Name</Text>
-                        <Text size="sm">{data?.fullname}</Text>
-                        <Text size="md" fw={700}>Synonyms</Text>
-                        <div>{renderSynonymsWithDashes(data?.synonyms)}</div>
-                        <Text size="md" fw={700}>EntrezID</Text>
-                        <Text size="sm">{data?.entrezId}</Text> */}
-
                         {Object.keys(data).map((key: string, index: number) => {
-
                             if (data[key] != null) {
                                 if (key === "synonyms") return (
                                     <div key={index}>
@@ -92,19 +82,15 @@ function DefaultCustomNode({ data, selected, backgroundColor }) {
                                     );
                                 }
                             }
-
                         })}
                     </Tabs.Panel>
-
                     <Tabs.Panel value="summary">
                         <Text size="md" fw={700}>Summary</Text>
                         <Text size="sm">{data?.summary}</Text>
                     </Tabs.Panel>
-
                     <Tabs.Panel value="structure">
                         <Text>MolStar Structure</Text>
                     </Tabs.Panel>
-
                 </Tabs>
             </HoverCard.Dropdown>
         </HoverCard>
