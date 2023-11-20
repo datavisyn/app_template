@@ -47,7 +47,8 @@ export function GeneGraph(props: GeneGraphProps) {
           fullname:node.name,
           summary:node.summary,
           synonyms:node.synonyms,
-          entrezId:node.entrezId
+          entrezId:node.entrezId,
+          id_ensg:node.id,
         },
         type:node.type.toString()
       }
