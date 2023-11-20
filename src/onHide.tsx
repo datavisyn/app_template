@@ -5,7 +5,7 @@ export const onHide = (reactflow, nodeId) => {
 
     // evaluate updated image after button click
     const updatedImage = document.getElementById(nodeId + "_icon").getAttribute('src') === shownIcon ? hiddenIcon : shownIcon
-
+    
     reactflow.setNodes(reactflow.getNodes().map((node) => {
         if (node.id === nodeId) {
             return { ...node, hidden: !node.hidden }

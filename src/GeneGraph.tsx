@@ -7,6 +7,8 @@ import FloatingEdge from './EdgeType';
 import FloatingConnectionLine from './FloatingConnectionLine';
 import { SidebarFilterList } from './SidebarFilterList';
 
+export const NodesContext = React.createContext(null)
+
 const maxNodesPerCircle = 20;
 const edgeTypes = {
   floating: FloatingEdge,
@@ -86,7 +88,10 @@ export function GeneGraph(props: GeneGraphProps) {
               <MiniMap />
             </ReactFlow>
           </div>
-          <SidebarFilterList />
+          <NodesContext.Provider value={{nodes: nodes, setNOdes: setNodes}}>
+            <SidebarFilterList />
+          </NodesContext.Provider>
+          
         </ReactFlowProvider>
 
       </div>
