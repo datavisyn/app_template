@@ -1,32 +1,12 @@
-import { Text, Button, HoverCard, Group, Flex } from '@mantine/core';
-import React, { useState, useContext } from "react"
+import { Text, Button, HoverCard, Flex, } from '@mantine/core';
+import React from "react"
 import { Handle, Position, useNodeId, useReactFlow } from "reactflow"
+import { onHide } from './onHide';
 
 // this is the default custom node
 function DefaultCustomNode({ data, selected, backgroundColor }) {
     const reactflow = useReactFlow();
     const nodeId = useNodeId();
-    const [isHighlighted, setIsHighlighted] = useState(false);
-
-    function onHide() {
-
-        reactflow.setNodes(reactflow.getNodes().map((node) => {
-            if (node.id === nodeId) {
-                return { ...node, hidden: true };
-            }
-            return node;
-        }));
-
-        console.log(reactflow.getNode(nodeId).hidden)
-
-        reactflow.setEdges(reactflow.getEdges().map((edge) => {
-            if (edge.source === nodeId || edge.target === nodeId) {
-                return { ...edge, hidden: true };
-            }
-            return edge;
-        }));
-
-    }
 
     // style applied for every node
     const nodeStyle = {
@@ -34,26 +14,29 @@ function DefaultCustomNode({ data, selected, backgroundColor }) {
         color: "black",
         padding: "14px",
         borderRadius: "8px",
+        border: data?.isRoot ? '3px solid #398354' : ''
         // boxShadow: isHovered || isHighlighted ? "0 4px 8px rgba(0, 0, 0, 0.2)" : "none",
         // transition: "box-shadow 0.3s ease transform 0.3 ease",
         // transform: selected ? "scale(1.8)" : "scale(1)",
         // display: nodeInternals.get(data.id).hidden ? "none" : "block",
     };
 
+    const label = data?.isRoot ? <b>{data?.label}</b> : data?.label
+
     return (
 
         <HoverCard shadow="md" width={400}>
             <HoverCard.Target>
                 <div style={nodeStyle}>
-                    <div>{data?.label}</div>
                     <Handle type="source" position={Position.Top} style={{ visibility: "hidden" }} />
+                    {label}
                     <Handle type="target" position={Position.Right} style={{ visibility: "hidden" }} />
                 </div>
             </HoverCard.Target>
             <HoverCard.Dropdown>
                 <Flex justify="center">
                     <Button color="gray">CollapseExpand</Button>
-                    <Button color="gray" onClick={() => onHide()}>Hide</Button>
+                    <Button color="gray" onClick={() => onHide(reactflow, nodeId)}>Hide</Button>
                 </Flex>
                 <Text size="lg" fw={700}>Details</Text>
                 <Text size="md" fw={700} >Full Name</Text>
