@@ -1,12 +1,15 @@
 import { Text, Button, HoverCard, Flex, } from '@mantine/core';
 import React from "react"
 import { Handle, Position, useNodeId, useReactFlow } from "reactflow"
-import { onHide } from './onHide';
+import { onNodesVisibilityChange } from './onNodesVisibilityChange';
 
 // this is the default custom node
 function DefaultCustomNode({ data, selected, backgroundColor }) {
     const reactflow = useReactFlow();
+    const nodes = reactflow.getNodes();
     const nodeId = useNodeId();
+
+    const nodeIndex = nodes.findIndex(n => n.id === nodeId)
 
     // style applied for every node
     const nodeStyle = {
@@ -36,7 +39,7 @@ function DefaultCustomNode({ data, selected, backgroundColor }) {
             <HoverCard.Dropdown>
                 <Flex justify="center">
                     <Button color="gray">CollapseExpand</Button>
-                    <Button color="gray" onClick={() => onHide(reactflow, nodeId)}>Hide</Button>
+                    <Button color="gray" onClick={() => onNodesVisibilityChange(reactflow, [nodes[nodeIndex]], nodes[nodeIndex].hidden)}>Hide</Button>
                 </Flex>
                 <Text size="lg" fw={700}>Details</Text>
                 <Text size="md" fw={700} >Full Name</Text>

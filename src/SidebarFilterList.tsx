@@ -1,8 +1,7 @@
-import React, { useState, useContext } from 'react'
+import React, { useState } from 'react'
 import { useReactFlow } from "reactflow";
 import { List, Card, Text, ScrollArea, ThemeIcon, Checkbox } from "@mantine/core"
-import { onHide } from './onHide';
-import { NodesContext } from './GeneGraph';
+import { onNodesVisibilityChange } from './onNodesVisibilityChange';
 
 import shownIcon from './images/eye.png'
 import hiddenIcon from './images/eye-closed.png'
@@ -21,7 +20,23 @@ export function SidebarFilterList() {
 
     const handleOptionChange = (e) => {
 
-        
+        const currentlyHandledType = e.target.id === "boxGenesFilter" ? "gene"
+                                        : e.target.id === "boxDiseasesFilter" ? "disease"
+                                        : e.target.id === "boxDrugsFilter" ? "drug"
+                                        : ""
+
+        const nodeList = []
+
+        nodes.forEach(node => {
+            if (node.type === currentlyHandledType) {
+                nodeList.push(node)
+            }
+            
+        });
+
+        setGenesShown(false)
+
+        onNodesVisibilityChange(reactflow, nodeList, genesShown);
 
     }
 
@@ -51,7 +66,7 @@ export function SidebarFilterList() {
                                                     style={{ width: '15px', height: '15px'}}
                                                     color='white'
                                                     src={shownIcon}
-                                                    onClick={() => onHide(reactflow, node.id)}
+                                                    onClick={() => onNodesVisibilityChange(reactflow, [node], !node.hidden)}
                                                 />
                                             </ThemeIcon>
                                         }
