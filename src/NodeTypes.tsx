@@ -39,7 +39,7 @@ function DefaultCustomNode({ data, selected, backgroundColor }) {
             <HoverCard.Dropdown>
                 <Flex justify="center">
                     <Button color="gray">CollapseExpand</Button>
-                    <Button color="gray" onClick={() => onNodesVisibilityChange(reactflow, [nodes[nodeIndex]], nodes[nodeIndex].hidden)}>Hide</Button>
+                    <Button color="gray" onClick={() => onNodesVisibilityChange(reactflow, [nodes[nodeIndex]], !nodes[nodeIndex].hidden)}>Hide</Button>
                 </Flex>
                 <Text size="lg" fw={700}>Details</Text>
                 <Text size="md" fw={700} >Full Name</Text>

@@ -34,9 +34,16 @@ export function SidebarFilterList() {
             
         });
 
-        setGenesShown(false)
-
-        onNodesVisibilityChange(reactflow, nodeList, genesShown);
+        if (e.target.id === "boxGenesFilter") {
+            setGenesShown(!genesShown)
+            onNodesVisibilityChange(reactflow, nodeList, genesShown)
+        } else if (e.target.id === "boxDiseasesFilter") {
+            setDiseasesShown(!diseasesShown)
+            onNodesVisibilityChange(reactflow, nodeList, diseasesShown)
+        } else {
+            setDrugsShown(!drugsShown)
+            onNodesVisibilityChange(reactflow, nodeList, drugsShown)    
+        }
 
     }
 
