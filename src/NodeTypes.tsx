@@ -1,5 +1,5 @@
-import { Tabs, Text, Button, HoverCard, Flex,, Space } from '@mantine/core';
-import React from "react"
+import { Tabs, Text, Button, HoverCard, Flex, Space } from '@mantine/core';
+import React, {useState} from "react"
 import { Handle, Position, useNodeId, useReactFlow } from "reactflow"
 import { onNodesVisibilityChange } from './onNodesVisibilityChange';
 import { IconInfoCircle, IconReportSearch, IconTopologyFull} from '@tabler/icons-react';
@@ -11,28 +11,7 @@ function DefaultCustomNode({ data, selected, backgroundColor }) {
     const nodeId = useNodeId();
     const [collapsed, setCollapsed] = useState(true);
     const nodeIndex = nodes.findIndex(n => n.id === nodeId)
-
-    function onHide() {
-
-        reactflow.setNodes(reactflow.getNodes().map((node) => {
-            if (node.id === nodeId) {
-                return { ...node, hidden: true };
-            }
-            return node;
-        }));
-
-        console.log(reactflow.getNode(nodeId).hidden)
-
-        reactflow.setEdges(reactflow.getEdges().map((edge) => {
-            if (edge.source === nodeId || edge.target === nodeId) {
-                return { ...edge, hidden: true };
-            }
-            return edge;
-        }));
-
-    }
     
-
     // style applied for every node
     const nodeStyle = {
         backgroundColor,
