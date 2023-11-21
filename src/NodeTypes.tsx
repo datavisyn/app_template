@@ -28,17 +28,13 @@ function DefaultCustomNode({ data, selected, backgroundColor }) {
         }));
     }
     function onExpandCollapse(){
-
         if(collapsed){
-
             data?.onExpand(nodeId)
+            setCollapsed(false);
         }
         else{
 
         }
-    }
-    function onCollapse(){
-
     }
     
 

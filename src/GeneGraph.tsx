@@ -6,8 +6,6 @@ import 'reactflow/dist/style.css';
 import { nodeTypes } from "./NodeTypes";
 import FloatingEdge from './EdgeType';
 import FloatingConnectionLine from './FloatingConnectionLine';
-import { FilterNodeTypesArea } from './FilterNodeTypesArea';
-import { onExpand } from './OnExpand';
 
 const maxNodesPerCircle = 20;
 const edgeTypes = {
