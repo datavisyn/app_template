@@ -7,6 +7,7 @@ import { nodeTypes } from "./NodeTypes";
 import FloatingEdge from './EdgeType';
 import FloatingConnectionLine from './FloatingConnectionLine';
 import { FilterNodeTypesArea } from './FilterNodeTypesArea';
+import { onExpand } from './OnExpand';
 
 const maxNodesPerCircle = 20;
 const edgeTypes = {
@@ -18,6 +19,7 @@ const edgeTypes = {
 // Props for the GeneGraph component
 type GeneGraphProps = {
   geneID: string[]; // changed to array
+  addID;
 };
 
 // GeneGraph component
@@ -27,28 +29,16 @@ export function GeneGraph(props: GeneGraphProps) {
   // State for the nodes and edges
   const [nodes, setNodes, onNodesChange] = useNodesState([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
-  const [geneIDs, setGeneIDs] = useState<string[]>(props.geneID);
-  const [graphState, setGraph] = useState<any>();
-
 
 
   // get all genes that are connected to the first node
-  // let { data: graph } = useExpand({
-  //     geneIds: geneIDs,
-  //   limit: 1000,
-  // });
-
-
-  useEffect(()=>{
-      let { data: graph } = useExpand({
-      geneIds: geneIDs,
-      limit: 1000,
-      });
-
-    setGraph(graph);  },[geneIDs]);
+  let { data: graph } = useExpand({
+      geneIds: geneIds,
+    limit: 1000,
+  });
 
   useMemo(() => {
-    setNodes(graphState?.nodes.map((node,index)=>{
+    setNodes(graph?.nodes.map((node,index)=>{
       return{
         id:node.id,
         position:{
@@ -67,11 +57,9 @@ export function GeneGraph(props: GeneGraphProps) {
         type:node.type.toString()
       }
     }));
-
-
     
     setEdges(
-      graphState?.edges.map((edge) => ({
+      graph?.edges.map((edge) => ({
         id: edge.id,
         source: edge.source,
         target: edge.target,
@@ -79,11 +67,12 @@ export function GeneGraph(props: GeneGraphProps) {
       }))
     );
 
-  }, [graphState]);
+  }, [graph]);
 
   function exp(id: string){
     if(!geneIds.includes(id)){
-      setGeneIDs([...geneIDs,id])
+      geneIds = ([...geneIds,id])
+      props.addID(id)
     }
   }
 

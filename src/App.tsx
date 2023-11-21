@@ -14,6 +14,9 @@ export function App() {
     setSelectedValues(values); // Aktualisiere den Zustand mit den neuen Werten
     console.log(values); // Logge die ausgewählten Werte in der Konsole
   };
+  const setIds = (ids: string[]) =>{
+    setSelectedValues([...selectedValues, ids])
+  }
 
   return (
     <>
@@ -29,7 +32,7 @@ export function App() {
         label="searcg Label"
       />
 
-      <GeneGraph geneID={selectedValues} />
+      <GeneGraph geneID={selectedValues} addID={setIds}/>
     </>
   );
 }
