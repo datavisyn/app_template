@@ -118,6 +118,8 @@ python -m venv .venv  # create a new virtual environment
 source .venv/bin/activate  # active it  (for Linux)
 .\.venv\Scripts\Activate.ps1  # active it  (for Windows)
 make develop  # install all dependencies
+yarn add @tabler/icons-react
+pip install networkx
 ```
 
 ### Development
