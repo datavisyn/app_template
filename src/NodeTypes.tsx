@@ -1,12 +1,13 @@
-import { Text, Button, HoverCard, Group, Flex } from '@mantine/core';
+import { Tabs, Text, Button, HoverCard, Group, Flex, Space } from '@mantine/core';
 import React, { useState, useContext } from "react"
 import { Handle, Position, useNodeId, useReactFlow } from "reactflow"
+import { IconInfoCircle, IconReportSearch, IconTopologyFull} from '@tabler/icons-react';
 
 // this is the default custom node
 function DefaultCustomNode({ data, selected, backgroundColor }) {
     const reactflow = useReactFlow();
     const nodeId = useNodeId();
-    const [isHighlighted, setIsHighlighted] = useState(false);
+    const [collapsed, setCollapsed] = useState(true);
 
     function onHide() {
 
@@ -27,6 +28,7 @@ function DefaultCustomNode({ data, selected, backgroundColor }) {
         }));
 
     }
+    
 
     // style applied for every node
     const nodeStyle = {
@@ -38,11 +40,11 @@ function DefaultCustomNode({ data, selected, backgroundColor }) {
         // transition: "box-shadow 0.3s ease transform 0.3 ease",
         // transform: selected ? "scale(1.8)" : "scale(1)",
         // display: nodeInternals.get(data.id).hidden ? "none" : "block",
+        
     };
 
     return (
-
-        <HoverCard shadow="md" width={400}>
+        <HoverCard shadow="md" width={400} withinPortal={true}>
             <HoverCard.Target>
                 <div style={nodeStyle}>
                     <div>{data?.label}</div>
@@ -51,19 +53,45 @@ function DefaultCustomNode({ data, selected, backgroundColor }) {
                 </div>
             </HoverCard.Target>
             <HoverCard.Dropdown>
-                <Flex justify="center">
-                    <Button color="gray">CollapseExpand</Button>
-                    <Button color="gray" onClick={() => onHide()}>Hide</Button>
+                <Flex justify="center" gap="md">
+                    <Button variant="filled" color="gray" fullWidth> {collapsed ? "Expand" : "Collapse"}</Button>
+                    <Button variant="filled" color="gray" fullWidth onClick={() => onHide()}>Hide</Button>
                 </Flex>
-                <Text size="lg" fw={700}>Details</Text>
-                <Text size="md" fw={700} >Full Name</Text>
-                <Text size="sm">{data?.fullname}</Text>
-                <Text size="md" fw={700}>Synonyms</Text>
-                <div>{renderSynonymsWithDashes(data?.synonyms)}</div>
-                <Text size="md" fw={700}>EntrezID</Text>
-                <Text size="sm">{data?.entrezId}</Text>
-                <Text size="md" fw={700}>Summary</Text>
-                <Text size="sm">{data?.summary}</Text>
+                <Space h="md" />
+                <Tabs color="gray" variant="outline" defaultValue="details">
+                    <Tabs.List>
+                        <Tabs.Tab rightSection={<IconInfoCircle/>} value="details" > Details</Tabs.Tab>
+                        <Tabs.Tab rightSection={<IconReportSearch/>} value="summary">Summary</Tabs.Tab>
+                        <Tabs.Tab rightSection={<IconTopologyFull/>} value="structure">Structure</Tabs.Tab>
+                    </Tabs.List>
+                    <Tabs.Panel value="details">
+                        {Object.keys(data).map((key: string, index: number) => {
+                            if (data[key] != null) {
+                                if (key === "synonyms") return (
+                                    <div key={index}>
+                                        <Text size="md" fw={700}>{key.charAt(0).toUpperCase() + key.slice(1)}</Text>
+                                        <Text size="sm">{renderSynonymsWithDashes(data[key])}</Text>
+                                    </div>
+                                )
+                                else if (key != "summary") {
+                                    return (
+                                        <div key={index}>
+                                            <Text size="md" fw={700}>{key.charAt(0).toUpperCase() + key.slice(1)}</Text>
+                                            <Text size="sm">{data[key]}</Text>
+                                        </div>
+                                    );
+                                }
+                            }
+                        })}
+                    </Tabs.Panel>
+                    <Tabs.Panel value="summary">
+                        <Text size="md" fw={700}>Summary</Text>
+                        <Text size="sm">{data?.summary}</Text>
+                    </Tabs.Panel>
+                    <Tabs.Panel value="structure">
+                        <Text>MolStar Structure</Text>
+                    </Tabs.Panel>
+                </Tabs>
             </HoverCard.Dropdown>
         </HoverCard>
     );
