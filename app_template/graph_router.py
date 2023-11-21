@@ -118,14 +118,19 @@ def autocomplete(search: str, limit: int | None = 10) -> list[list[str]]:
 
     symbols = allNodes["symbol"].values.tolist()
     ids = allNodes["id"].values.tolist()
+    names = allNodes["name"].values.tolist()
 
     results = []
 
     # check if passed search parameter is part of a nodes id
-    for id, symbol, name in zip(ids, symbols):
+    for id, symbol, name in zip(ids, symbols, names):
         pattern = search.lower()
         if pattern in str(symbol).lower():
-            results.append([symbol, id])
+            results.append([symbol, id, name])
+        elif pattern in str(id).lower():
+            results.append([symbol, id, name])
+        elif pattern in str(name).lower():
+            results.append([symbol, id, name])
 
     return results[:limit]
 
