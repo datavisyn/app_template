@@ -112,24 +112,20 @@ allNodes["parents"] = np.empty((len(allNodes), 0)).tolist()
 
 
 @graph_router.get("/autocomplete")
-def autocomplete(search: str, limit: int | None = 10) -> list[str]:
+def autocomplete(search: str, limit: int | None = 10) -> list[list[str]]:
     # TODO implement nicer version (might look similar to the following line)
     # df = allNodes[allNodes[(search in allNodes["id"]) | (search in allNodes["name"])| (search in allNodes["entrezId"])]]
 
+    symbols = allNodes["symbol"].values.tolist()
     ids = allNodes["id"].values.tolist()
-    names = allNodes["name"].values.tolist()
 
     results = []
 
     # check if passed search parameter is part of a nodes id
-    for ele in ids:
-        if search.lower() in str(ele).lower():
-            results.append(ele)
-
-    # check if passed search parameter is part of a nodes name
-    for ele in names:
-        if search.lower() in str(ele).lower():
-            results.append(str(ele))
+    for id, symbol, name in zip(ids, symbols):
+        pattern = search.lower()
+        if pattern in str(symbol).lower():
+            results.append([symbol, id])
 
     return results[:limit]
 
