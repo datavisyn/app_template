@@ -44,7 +44,7 @@ function DefaultCustomNode({ data, selected, backgroundColor }) {
     };
 
     return (
-        <HoverCard shadow="md" width={400} withinPortal={true} >
+        <HoverCard shadow="md" width={'25vw'} withinPortal={true} >
             <HoverCard.Target>
                 <div style={nodeStyle}>
                     <div>{data?.label}</div>
@@ -66,7 +66,7 @@ function DefaultCustomNode({ data, selected, backgroundColor }) {
                     </Tabs.List>
                     <Tabs.Panel value="details" >
                         <ScrollArea>
-                            <div style={{ height: 200 }}>
+                            <div style={{ height: '30vh' }}>
                                 {Object.keys(data).map((key: string, index: number) => {
                                     if (data[key] != null) {
                                         if (key === "synonyms") return (
@@ -90,7 +90,7 @@ function DefaultCustomNode({ data, selected, backgroundColor }) {
                     </Tabs.Panel>
                     <Tabs.Panel value="summary">
                         <ScrollArea>
-                            <div style={{ height: 200 }}>
+                            <div style={{ height: '30vh' }}>
                                 <Text size="sm" fw={700}>Summary</Text>
                                 <Text size="sm">{data?.summary}</Text>
                             </div>
@@ -98,7 +98,7 @@ function DefaultCustomNode({ data, selected, backgroundColor }) {
 
                     </Tabs.Panel>
                     <Tabs.Panel value="structure">
-                        <div style={{ height: 200 }}>
+                        <div style={{ height: '30vh' }}>
                             <Text>MolStar Structure</Text>
                         </div>
                     </Tabs.Panel>
