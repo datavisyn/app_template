@@ -1,12 +1,34 @@
-import { Text, Button, HoverCard, Group, Flex } from '@mantine/core';
-import React, { useState, useContext } from "react"
-import { Handle, Position, useNodeId, useReactFlow } from "reactflow"
+import { Text, Button, HoverCard, Flex } from '@mantine/core';
+import React, { useState } from "react"
+import { Handle, Position, useNodeId, useReactFlow } from "reactflow";
+import { useGetTraitInfo } from './store/store';
+import { useEffect } from 'react';
+
+
+var color = {
+    "gene": "#4BB268",
+    "disease": "#FF964D",
+    "drug": "#B42865"
+};
 
 // this is the default custom node
-function DefaultCustomNode({ data, selected, backgroundColor }) {
+function DefaultCustomNode({ data }) {
     const reactflow = useReactFlow();
     const nodeId = useNodeId();
     const [isHighlighted, setIsHighlighted] = useState(false);
+    const label = data?.label;
+
+    const [nodeData, setNodeData] = useState(data);
+
+    const { data: traitInfo, isFetching } = data.type == "disease" ? useGetTraitInfo({traitId:label}) : { data: {}, isFetching: false };
+
+
+    useEffect(() => {
+        if (!isFetching) {
+            setNodeData(Object.assign({}, data, traitInfo));
+        }
+
+    }, [isFetching]);
 
     function onHide() {
 
@@ -17,8 +39,6 @@ function DefaultCustomNode({ data, selected, backgroundColor }) {
             return node;
         }));
 
-        console.log(reactflow.getNode(nodeId).hidden)
-
         reactflow.setEdges(reactflow.getEdges().map((edge) => {
             if (edge.source === nodeId || edge.target === nodeId) {
                 return { ...edge, hidden: true };
@@ -28,9 +48,15 @@ function DefaultCustomNode({ data, selected, backgroundColor }) {
 
     }
 
+    /*     function test(){
+            if(data.type == "disease"){
+                Object.assign({}, data, traitInfo);
+            }
+        } */
+
     // style applied for every node
     const nodeStyle = {
-        backgroundColor,
+        backgroundColor: color[data?.type],
         color: "black",
         padding: "14px",
         borderRadius: "8px",
@@ -55,15 +81,32 @@ function DefaultCustomNode({ data, selected, backgroundColor }) {
                     <Button color="gray">CollapseExpand</Button>
                     <Button color="gray" onClick={() => onHide()}>Hide</Button>
                 </Flex>
+
                 <Text size="lg" fw={700}>Details</Text>
-                <Text size="md" fw={700} >Full Name</Text>
-                <Text size="sm">{data?.fullname}</Text>
-                <Text size="md" fw={700}>Synonyms</Text>
-                <div>{renderSynonymsWithDashes(data?.synonyms)}</div>
-                <Text size="md" fw={700}>EntrezID</Text>
-                <Text size="sm">{data?.entrezId}</Text>
-                <Text size="md" fw={700}>Summary</Text>
-                <Text size="sm">{data?.summary}</Text>
+
+                {Object.keys(nodeData).map((key: string, index: number) => {
+                    if (nodeData[key] != "nan") {
+                        if (key === "synonyms") {
+                            if (data[key].length > 0) {
+                                return (
+                                    <div key={index}>
+                                        <Text size="md" fw={700}>{key.charAt(0).toUpperCase() + key.slice(1)}</Text>
+                                        <Text size="sm">{renderSynonymsWithDashes(nodeData[key])}</Text>
+                                    </div>
+                                )
+                            }
+                        }
+                        else if (key != "summary" && key != "type") {
+                            return (
+                                <div key={index}>
+                                    <Text size="md" fw={700}>{key.charAt(0).toUpperCase() + key.slice(1)}</Text>
+                                    <Text size="sm">{nodeData[key]}</Text>
+                                </div>
+                            );
+                        }
+                    }
+
+                })}
             </HoverCard.Dropdown>
         </HoverCard>
     );
@@ -86,24 +129,22 @@ function renderSynonymsWithDashes(synonyms) {
     );
 }
 
-// this node is used for genes
-const GeneNode = ({ data, selected }) => {
-    return <DefaultCustomNode data={data} selected={selected} backgroundColor={"#4BB268"} />
+/* // this node is used for genes
+const GeneNode = ({ data, id, type }) => {
+    return <DefaultCustomNode data={data} nodeId={id} />
 }
 
 // this node is used for diseases
-const DiseaseNode = ({ data, selected }) => {
-    return <DefaultCustomNode data={data} selected={selected} backgroundColor={"#FF964D"} />
+const DiseaseNode = ({ data, id }) => {
+    return <DefaultCustomNode data={data} nodeId={id} backgroundColor={"#FF964D"} />
 }
 
 // this node is used for drugs
-const DrugNode = ({ data, selected }) => {
-    return <DefaultCustomNode data={data} selected={selected} backgroundColor={"#B42865"} />
-}
+const DrugNode = ({ data, id }) => {
+    return <DefaultCustomNode data={data} nodeId={id} backgroundColor={"#B42865"} />
+} */
 
 // these node types can be used in the graph
 export const nodeTypes = {
-    gene: GeneNode,
-    disease: DiseaseNode,
-    drug: DrugNode
+    node: DefaultCustomNode,
 };

@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useMemo, createContext, useContext, useReducer } from 'react';
-
 import {useExpand} from './store/store';
 import { ReactFlow, Background, Controls, MiniMap, useNodesState, useEdgesState, Handle, ReactFlowProvider } from 'reactflow';
 import 'reactflow/dist/style.css';
@@ -8,7 +7,6 @@ import FloatingEdge from './EdgeType';
 import FloatingConnectionLine from './FloatingConnectionLine';
 import { FilterNodeTypesArea } from './FilterNodeTypesArea';
 
-const maxNodesPerCircle = 20;
 const edgeTypes = {
   floating: FloatingEdge,
 };
@@ -33,8 +31,6 @@ export function GeneGraph(props: GeneGraphProps) {
     limit: 1000,
   });
 
-  console.log("width: " + window.innerWidth + " height: " + window.innerHeight);
-
   useMemo(() => {
     setNodes(graph?.nodes.map((node,index)=>{
       return{
@@ -48,9 +44,10 @@ export function GeneGraph(props: GeneGraphProps) {
           fullname:node.name,
           summary:node.summary,
           synonyms:node.synonyms,
-          entrezId:node.entrezId
+          entrezId:node.entrezId,
+          type:node.type.toString()
         },
-        type:node.type.toString()
+        type: "node"
       }
     }));
     
@@ -64,8 +61,6 @@ export function GeneGraph(props: GeneGraphProps) {
     );
 
   }, [graph]);
-
-  console.log(nodes);
 
   return (
     <>

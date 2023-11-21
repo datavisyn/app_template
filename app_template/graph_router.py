@@ -7,6 +7,7 @@ import pandas as pd
 from fastapi import APIRouter, Query
 from enum import Enum
 from pydantic import BaseModel, typing
+from trait_info import get_diseaseOrDrug_name
 
 _log = logging.getLogger(__name__)
 graph_router = APIRouter(tags=["Graph"])
@@ -215,20 +216,20 @@ def expand(geneIds: list[str] = Query(), limit: int = 1000) -> Gene2AllResponse 
 
 # additional trait (disease/drug) information
 
-# @graph_router.get("/traitinfo/{trait_id}")
-# def get_trait_info(trait_id: str):
-#     name_info = get_diseaseOrDrug_name(trait_id)
-#     # extraction of name and result
-#     name = name_info["name"]
-#     description = name_info["description"]
+@graph_router.get("/traitinfo/{trait_id}")
+def get_trait_info(trait_id: str):
+    name_info = get_diseaseOrDrug_name(trait_id)
+    # extraction of name and result
+    name = name_info["name"]
+    description = name_info["description"]
 
-#     # create a response JSON with both name and description
-#     response = {
-#         "name": name,
-#         "description": description
-#     }
+    # create a response JSON with both name and description
+    response = {
+        "name": name,
+        "description": description
+    }
 
-#     return response
+    return response
 
 
 # # whole name for genes
