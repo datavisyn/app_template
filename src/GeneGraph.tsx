@@ -22,20 +22,33 @@ type GeneGraphProps = {
 
 // GeneGraph component
 export function GeneGraph(props: GeneGraphProps) {
-  const geneIds = props.geneID;
+  let geneIds = props.geneID;
 
   // State for the nodes and edges
   const [nodes, setNodes, onNodesChange] = useNodesState([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
+  const [geneIDs, setGeneIDs] = useState<string[]>(props.geneID);
+  const [graphState, setGraph] = useState<any>();
+
+
 
   // get all genes that are connected to the first node
-  const { data: graph } = useExpand({
-      geneIds: geneIds,
-    limit: 1000,
-  });
+  // let { data: graph } = useExpand({
+  //     geneIds: geneIDs,
+  //   limit: 1000,
+  // });
+
+
+  useEffect(()=>{
+      let { data: graph } = useExpand({
+      geneIds: geneIDs,
+      limit: 1000,
+      });
+
+    setGraph(graph);  },[geneIDs]);
 
   useMemo(() => {
-    setNodes(graph?.nodes.map((node,index)=>{
+    setNodes(graphState?.nodes.map((node,index)=>{
       return{
         id:node.id,
         position:{
@@ -47,14 +60,18 @@ export function GeneGraph(props: GeneGraphProps) {
           fullname:node.name,
           summary:node.summary,
           synonyms:node.synonyms,
-          entrezId:node.entrezId
+          entrezId:node.entrezId,
+          onExpand: exp,
+          onCollapse: coll
         },
         type:node.type.toString()
       }
     }));
+
+
     
     setEdges(
-      graph?.edges.map((edge) => ({
+      graphState?.edges.map((edge) => ({
         id: edge.id,
         source: edge.source,
         target: edge.target,
@@ -62,7 +79,20 @@ export function GeneGraph(props: GeneGraphProps) {
       }))
     );
 
-  }, [graph]);
+  }, [graphState]);
+
+  function exp(id: string){
+    if(!geneIds.includes(id)){
+      setGeneIDs([...geneIDs,id])
+    }
+  }
+
+  function coll(id: string){
+    if(geneIds.includes(id))
+      geneIds = geneIds.filter((f)=>f!==id)
+    console.log(id);
+    console.log(geneIds);
+  }
 
   return (
     <>
@@ -75,6 +105,7 @@ export function GeneGraph(props: GeneGraphProps) {
               edges={edges}
               nodeTypes={nodeTypes}
               edgeTypes={edgeTypes}
+              
               onNodesChange={onNodesChange}
               onEdgesChange={onEdgesChange}
               connectionLineComponent={FloatingConnectionLine}

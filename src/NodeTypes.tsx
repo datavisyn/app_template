@@ -26,6 +26,18 @@ function DefaultCustomNode({ data, selected, backgroundColor }) {
             }
             return edge;
         }));
+    }
+    function onExpandCollapse(){
+
+        if(collapsed){
+
+            data?.onExpand(nodeId)
+        }
+        else{
+
+        }
+    }
+    function onCollapse(){
 
     }
     
@@ -54,7 +66,7 @@ function DefaultCustomNode({ data, selected, backgroundColor }) {
             </HoverCard.Target>
             <HoverCard.Dropdown>
                 <Flex justify="center" gap="md">
-                    <Button variant="filled" color="gray" fullWidth> {collapsed ? "Expand" : "Collapse"}</Button>
+                    <Button variant="filled" color="gray" fullWidth onClick={onExpandCollapse}> {collapsed ? "Expand" : "Collapse"}</Button>
                     <Button variant="filled" color="gray" fullWidth onClick={() => onHide()}>Hide</Button>
                 </Flex>
                 <Space h="md" />
