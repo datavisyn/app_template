@@ -1,31 +1,38 @@
 
-import { Autocomplete, Loader } from '@mantine/core';
+import { Autocomplete, Loader, MultiSelect } from '@mantine/core';
 import React, { useState } from 'react';
 import { useAutocomplete } from './store/store';
 import { GeneGraph } from './GeneGraph';
 import { FilterNodeTypesArea } from './FilterNodeTypesArea';
 
 export function App() {
-  const [search, setSearch] = useState('');
+  const [selectedValues, setSelectedValues] = useState([]);
+  const [search, setSearch] = useState("");
   const { data: autocompleteData, isFetching } = useAutocomplete({ search });
-
+  const handleChange = (values) => {
+    setSearch(values[-1]); // Setze den Suchbegriff auf den ersten ausgewählten Wert
+    setSelectedValues(values); // Aktualisiere den Zustand mit den neuen Werten
+    console.log(values); // Logge die ausgewählten Werte in der Konsole
+  };
 
   return (
     <>
-      <Autocomplete
-        label="Search for genes"
-        placeholder="ENSG..."
-        value={search}
-        onChange={setSearch}
+      <MultiSelect
         data={autocompleteData || []}
+        searchable
+        value={selectedValues}
+        onSearchChange={handleChange}
+        onChange={handleChange}
+        placeholder="ENSG..."
+        nothingFound="Keine Ergebnisse"
         rightSection={isFetching ? <Loader size="sm" /> : null}
+        label="searcg Label"
       />
 
-      <GeneGraph geneID={search} />
+      <GeneGraph geneID={selectedValues} />
     </>
   );
 }
-
 /* just for testing: */
 // import { Autocomplete, Loader, Button } from '@mantine/core';
 // import React, { useState, useEffect, useCallback } from 'react';

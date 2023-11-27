@@ -1,8 +1,9 @@
-import { Text, Button, HoverCard, Flex } from '@mantine/core';
+import { Tabs, Text, Button, HoverCard, Flex, Space } from '@mantine/core';
 import React, { useState } from "react"
 import { Handle, Position, useNodeId, useReactFlow } from "reactflow";
 import { useGetTraitInfo } from './store/store';
 import { useEffect } from 'react';
+import { IconInfoCircle, IconReportSearch, IconTopologyFull } from '@tabler/icons-react';
 
 
 var color = {
@@ -11,16 +12,16 @@ var color = {
     "drug": "#B42865"
 };
 
+
 // this is the default custom node
 function DefaultCustomNode({ data }) {
     const reactflow = useReactFlow();
     const nodeId = useNodeId();
-    const [isHighlighted, setIsHighlighted] = useState(false);
-    const label = data?.label;
+    const [collapsed, setCollapsed] = useState(true);
 
     const [nodeData, setNodeData] = useState(data);
 
-    const { data: traitInfo, isFetching } = data.type == "disease" ? useGetTraitInfo({traitId:label}) : { data: {}, isFetching: false };
+    const { data: traitInfo, isFetching } = data.type == "disease" ? useGetTraitInfo({ traitId: data?.label }) : { data: {}, isFetching: false };
 
 
     useEffect(() => {
@@ -48,11 +49,6 @@ function DefaultCustomNode({ data }) {
 
     }
 
-    /*     function test(){
-            if(data.type == "disease"){
-                Object.assign({}, data, traitInfo);
-            }
-        } */
 
     // style applied for every node
     const nodeStyle = {
@@ -67,8 +63,7 @@ function DefaultCustomNode({ data }) {
     };
 
     return (
-
-        <HoverCard shadow="md" width={400}>
+        <HoverCard shadow="md" width={400} withinPortal={true}>
             <HoverCard.Target>
                 <div style={nodeStyle}>
                     <div>{data?.label}</div>
@@ -77,14 +72,19 @@ function DefaultCustomNode({ data }) {
                 </div>
             </HoverCard.Target>
             <HoverCard.Dropdown>
-                <Flex justify="center">
-                    <Button color="gray">CollapseExpand</Button>
-                    <Button color="gray" onClick={() => onHide()}>Hide</Button>
+                <Flex justify="center" gap="md">
+                    <Button variant="filled" color="gray" fullWidth> {collapsed ? "Expand" : "Collapse"}</Button>
+                    <Button variant="filled" color="gray" fullWidth onClick={() => onHide()}>Hide</Button>
                 </Flex>
-
-                <Text size="lg" fw={700}>Details</Text>
-
-                {Object.keys(nodeData).map((key: string, index: number) => {
+                <Space h="md" />
+                <Tabs color="gray" variant="outline" defaultValue="details">
+                    <Tabs.List>
+                        <Tabs.Tab rightSection={<IconInfoCircle/>} value="details" > Details</Tabs.Tab>
+                        <Tabs.Tab rightSection={<IconReportSearch/>} value="summary">Summary</Tabs.Tab>
+                        <Tabs.Tab rightSection={<IconTopologyFull/>} value="structure">Structure</Tabs.Tab>
+                    </Tabs.List>
+                    <Tabs.Panel value="details">
+                    {Object.keys(nodeData).map((key: string, index: number) => {
                     if (nodeData[key] != "nan") {
                         if (key === "synonyms") {
                             if (data[key].length > 0) {
@@ -105,8 +105,16 @@ function DefaultCustomNode({ data }) {
                             );
                         }
                     }
-
                 })}
+                    </Tabs.Panel>
+                    <Tabs.Panel value="summary">
+                        <Text size="md" fw={700}>Summary</Text>
+                        <Text size="sm">{data?.summary}</Text>
+                    </Tabs.Panel>
+                    <Tabs.Panel value="structure">
+                        <Text>MolStar Structure</Text>
+                    </Tabs.Panel>
+                </Tabs>
             </HoverCard.Dropdown>
         </HoverCard>
     );
