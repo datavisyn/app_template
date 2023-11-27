@@ -1,4 +1,4 @@
-import { Tabs, Text, Button, HoverCard, Flex, Space } from '@mantine/core';
+import { Tabs, Text, Button, HoverCard, Flex, Space, ScrollArea } from '@mantine/core';
 import React, {useState} from "react"
 import { Handle, Position, useNodeId, useReactFlow } from "reactflow"
 import { onNodesVisibilityChange } from './onNodesVisibilityChange';

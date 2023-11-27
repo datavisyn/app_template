@@ -33,36 +33,39 @@ export function GeneGraph(props: GeneGraphProps) {
     limit: 1000,
   });
 
-  console.log()
-
   useMemo(() => {
-    setNodes(graph?.nodes.map((node,index)=>{
-      return{
-        id:node.id,
-        position:{
-          x:(node.position.x+1)*(window.innerWidth/2),
-          y:(node.position.y+1)*(window.innerHeight/2)
-        },
-        data:{
-          label:node.symbol == "nan" ? node.id : node.symbol,
-          fullname:node.name,
-          summary:node.summary,
-          synonyms:node.synonyms,
-          entrezId:node.entrezId,
-          isRoot: props.geneID.includes(node.id) ? true : false
-        },
-        type:node.type.toString()
-      }
-    }));
-    
-    setEdges(
-      graph?.edges.map((edge) => ({
-        id: edge.id,
-        source: edge.source,
-        target: edge.target,
-        type: 'floating',
-      }))
-    );
+
+    (document as any).startViewTransition(() => {
+
+      setNodes(graph?.nodes.map((node,index)=>{
+        return{
+          id:node.id,
+          position:{
+            x:(node.position.x+1)*(window.innerWidth/2),
+            y:(node.position.y+1)*(window.innerHeight/2)
+          },
+          data:{
+            label:node.symbol == "nan" ? node.id : node.symbol,
+            fullname:node.name,
+            summary:node.summary,
+            synonyms:node.synonyms,
+            entrezId:node.entrezId,
+            isRoot: props.geneID.includes(node.id) ? true : false
+          },
+          type:node.type.toString()
+        }
+      }));
+      
+      setEdges(
+        graph?.edges.map((edge) => ({
+          id: edge.id,
+          source: edge.source,
+          target: edge.target,
+          type: 'floating',
+        }))
+      );
+
+    })
 
   }, [graph]);
 
