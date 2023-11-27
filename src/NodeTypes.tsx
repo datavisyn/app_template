@@ -23,13 +23,13 @@ function DefaultCustomNode({ data, selected, backgroundColor }) {
         // transition: "box-shadow 0.3s ease transform 0.3 ease",
         // transform: selected ? "scale(1.8)" : "scale(1)",
         // display: nodeInternals.get(data.id).hidden ? "none" : "block",
-        
+
     };
 
     const label = data?.isRoot ? <b>{data?.label}</b> : data?.label
 
     return (
-        <HoverCard shadow="md" width={400} withinPortal={true}>
+        <HoverCard shadow="md" width={'25vw'} withinPortal={true} >
             <HoverCard.Target>
                 <div style={nodeStyle}>
                     <Handle type="source" position={Position.Top} style={{ visibility: "hidden" }} />
@@ -45,36 +45,47 @@ function DefaultCustomNode({ data, selected, backgroundColor }) {
                 <Space h="md" />
                 <Tabs color="gray" variant="outline" defaultValue="details">
                     <Tabs.List>
-                        <Tabs.Tab rightSection={<IconInfoCircle/>} value="details" > Details</Tabs.Tab>
-                        <Tabs.Tab rightSection={<IconReportSearch/>} value="summary">Summary</Tabs.Tab>
-                        <Tabs.Tab rightSection={<IconTopologyFull/>} value="structure">Structure</Tabs.Tab>
+                        <Tabs.Tab rightSection={<IconInfoCircle />} value="details" > Details</Tabs.Tab>
+                        <Tabs.Tab rightSection={<IconReportSearch />} value="summary">Summary</Tabs.Tab>
+                        <Tabs.Tab rightSection={<IconTopologyFull />} value="structure">Structure</Tabs.Tab>
                     </Tabs.List>
-                    <Tabs.Panel value="details">
-                        {Object.keys(data).map((key: string, index: number) => {
-                            if (data[key] != null) {
-                                if (key === "synonyms") return (
-                                    <div key={index}>
-                                        <Text size="md" fw={700}>{key.charAt(0).toUpperCase() + key.slice(1)}</Text>
-                                        <Text size="sm">{renderSynonymsWithDashes(data[key])}</Text>
-                                    </div>
-                                )
-                                else if (key != "summary") {
-                                    return (
-                                        <div key={index}>
-                                            <Text size="md" fw={700}>{key.charAt(0).toUpperCase() + key.slice(1)}</Text>
-                                            <Text size="sm">{data[key]}</Text>
-                                        </div>
-                                    );
-                                }
-                            }
-                        })}
+                    <Tabs.Panel value="details" >
+                        <ScrollArea>
+                            <div style={{ height: '30vh' }}>
+                                {Object.keys(data).map((key: string, index: number) => {
+                                    if (data[key] != null) {
+                                        if (key === "synonyms") return (
+                                            <div key={index}>
+                                                <Text size="sm" fw={700}>{key.charAt(0).toUpperCase() + key.slice(1)}</Text>
+                                                <Text size="sm">{renderSynonymsWithDashes(data[key])}</Text>
+                                            </div>
+                                        )
+                                        else if (key != "summary") {
+                                            return (
+                                                <div key={index}>
+                                                    <Text size="sm" fw={700}>{key.charAt(0).toUpperCase() + key.slice(1)}</Text>
+                                                    <Text size="sm">{data[key]}</Text>
+                                                </div>
+                                            );
+                                        }
+                                    }
+                                })}
+                            </div>
+                        </ScrollArea>
                     </Tabs.Panel>
                     <Tabs.Panel value="summary">
-                        <Text size="md" fw={700}>Summary</Text>
-                        <Text size="sm">{data?.summary}</Text>
+                        <ScrollArea>
+                            <div style={{ height: '30vh' }}>
+                                <Text size="sm" fw={700}>Summary</Text>
+                                <Text size="sm">{data?.summary}</Text>
+                            </div>
+                        </ScrollArea>
+
                     </Tabs.Panel>
                     <Tabs.Panel value="structure">
-                        <Text>MolStar Structure</Text>
+                        <div style={{ height: '30vh' }}>
+                            <Text>MolStar Structure</Text>
+                        </div>
                     </Tabs.Panel>
                 </Tabs>
             </HoverCard.Dropdown>
