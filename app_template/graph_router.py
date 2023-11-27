@@ -242,7 +242,7 @@ def get_trait_info(trait_id: str):
     # create a response JSON with both name and description
     response = {
         "name": name,
-        "description": description
+        "summary": description
     }
 
     return response

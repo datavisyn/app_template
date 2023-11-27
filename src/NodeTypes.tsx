@@ -27,6 +27,7 @@ function DefaultCustomNode({ data }) {
     useEffect(() => {
         if (!isFetching) {
             setNodeData(Object.assign({}, data, traitInfo));
+            data.summary = traitInfo?.summary;
         }
 
     }, [isFetching]);

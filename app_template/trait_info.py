@@ -52,7 +52,7 @@ def get_CHEBI_name(chebi_id):
 
         return {
             "name": drug_name,
-            "description": description
+            "descr": description
         }
     else:
         return {"error": "not found"}
