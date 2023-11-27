@@ -1,41 +1,24 @@
-import { Tabs, Text, Button, HoverCard, Group, Flex, Space, ScrollArea } from '@mantine/core';
-import React, { useState, useContext } from "react"
+import { Tabs, Text, Button, HoverCard, Flex, Space } from '@mantine/core';
+import React, {useState} from "react"
 import { Handle, Position, useNodeId, useReactFlow } from "reactflow"
-import { IconInfoCircle, IconReportSearch, IconTopologyFull } from '@tabler/icons-react';
+import { onNodesVisibilityChange } from './onNodesVisibilityChange';
+import { IconInfoCircle, IconReportSearch, IconTopologyFull} from '@tabler/icons-react';
 
 // this is the default custom node
 function DefaultCustomNode({ data, selected, backgroundColor }) {
     const reactflow = useReactFlow();
+    const nodes = reactflow.getNodes();
     const nodeId = useNodeId();
     const [collapsed, setCollapsed] = useState(true);
-
-    function onHide() {
-
-        reactflow.setNodes(reactflow.getNodes().map((node) => {
-            if (node.id === nodeId) {
-                return { ...node, hidden: true };
-            }
-            return node;
-        }));
-
-        console.log(reactflow.getNode(nodeId).hidden)
-
-        reactflow.setEdges(reactflow.getEdges().map((edge) => {
-            if (edge.source === nodeId || edge.target === nodeId) {
-                return { ...edge, hidden: true };
-            }
-            return edge;
-        }));
-
-    }
-
-
+    const nodeIndex = nodes.findIndex(n => n.id === nodeId)
+    
     // style applied for every node
     const nodeStyle = {
         backgroundColor,
         color: "black",
         padding: "14px",
         borderRadius: "8px",
+        border: data?.isRoot ? '3px solid #398354' : ''
         // boxShadow: isHovered || isHighlighted ? "0 4px 8px rgba(0, 0, 0, 0.2)" : "none",
         // transition: "box-shadow 0.3s ease transform 0.3 ease",
         // transform: selected ? "scale(1.8)" : "scale(1)",
@@ -43,19 +26,21 @@ function DefaultCustomNode({ data, selected, backgroundColor }) {
 
     };
 
+    const label = data?.isRoot ? <b>{data?.label}</b> : data?.label
+
     return (
         <HoverCard shadow="md" width={'25vw'} withinPortal={true} >
             <HoverCard.Target>
                 <div style={nodeStyle}>
-                    <div>{data?.label}</div>
                     <Handle type="source" position={Position.Top} style={{ visibility: "hidden" }} />
+                    {label}
                     <Handle type="target" position={Position.Right} style={{ visibility: "hidden" }} />
                 </div>
             </HoverCard.Target>
             <HoverCard.Dropdown>
                 <Flex justify="center" gap="md">
                     <Button variant="filled" color="gray" fullWidth> {collapsed ? "Expand" : "Collapse"}</Button>
-                    <Button variant="filled" color="gray" fullWidth onClick={() => onHide()}>Hide</Button>
+                    <Button variant="filled" color="gray" fullWidth onClick={() => onNodesVisibilityChange(reactflow, [nodes[nodeIndex]], !nodes[nodeIndex].hidden)}>Hide</Button>
                 </Flex>
                 <Space h="md" />
                 <Tabs color="gray" variant="outline" defaultValue="details">
