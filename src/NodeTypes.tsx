@@ -3,11 +3,11 @@ import React, { useState } from "react"
 import { Handle, Position, useNodeId, useReactFlow } from "reactflow";
 import { useGetTraitInfo } from './store/store';
 import { useEffect } from 'react';
-import { IconInfoCircle, IconReportSearch, IconTopologyFull, IconNorthStar } from '@tabler/icons-react';
+import { IconInfoCircle, IconReportSearch, IconTopologyFull, IconSearch } from '@tabler/icons-react';
 import { onNodesVisibilityChange } from './onNodesVisibilityChange';
 
 
-var color = {
+var color = {   
     "gene": "#4BB268",
     "disease": "#FF964D",
     "drug": "#B42865"
@@ -64,7 +64,7 @@ function DefaultCustomNode({ data }) {
                     <Handle type="source" position={Position.Top} style={{ visibility: "hidden" }} />
                     {label}
                     <Handle type="target" position={Position.Right} style={{ visibility: "hidden" }} />
-                    {data?.isRoot && <div style={symbolStyle}> <IconNorthStar/></div>}
+                    {data?.isRoot && <div style={symbolStyle}> <IconSearch size={36} style={{fill:"#FFFFFF"}}/></div>}
                 </div>
             </HoverCard.Target>
             <HoverCard.Dropdown>
