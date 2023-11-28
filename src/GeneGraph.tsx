@@ -9,7 +9,6 @@ import { SidebarFilterList } from './SidebarFilterList';
 
 export const NodesContext = React.createContext(null)
 
-const maxNodesPerCircle = 20;
 const edgeTypes = {
   floating: FloatingEdge,
 };
@@ -45,13 +44,17 @@ export function GeneGraph(props: GeneGraphProps) {
         },
         data:{
           label:node.symbol == "nan" ? node.id : node.symbol,
-          fullname:node.name,
-          summary:node.summary,
-          synonyms:node.synonyms,
-          entrezId:node.entrezId,
-          isRoot: props.geneID.includes(node.id) ? true : false
+          displayProps:{
+            fullname:node.name,
+            synonyms:node.synonyms,
+            entrezId:node.entrezId,
+            label:node.symbol == "nan" ? node.id : node.symbol,
+            summary:node.summary,
+          },
+          isRoot: props.geneID.includes(node.id) ? true : false,
+          type:node.type,
         },
-        type:node.type.toString()
+        type: "node"
       }
     }));
     

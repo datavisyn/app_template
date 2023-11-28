@@ -5,13 +5,11 @@ const injectedRtkApi = api.injectEndpoints({
       query: (queryArg) => ({ url: `http://127.0.0.1:9000/api/app/autocomplete`, params: { search: queryArg.search, limit: queryArg.limit } }),
     }),
     expandApiAppExpandGet: build.query<ExpandApiAppExpandGetApiResponse, ExpandApiAppExpandGetApiArg>({
-      query: (queryArg) => {
-        // This is a hack to get around the fact that RTK Query doesn't support arrays in query params
-        const geneParams = queryArg.geneIds.map(id => `geneIds=${encodeURIComponent(id)}`).join('&');
-        const limitParam = `limit=${encodeURIComponent(queryArg.limit)}`;
-        const queryString = `${geneParams}&${limitParam}`;
-        return { url: `http://127.0.0.1:9000/api/app/expand?${queryString}` };
-      },
+      query: (queryArg) => ({ url: `http://127.0.0.1:9000/api/app/expand`, params: { geneIds: queryArg.geneIds, limit: queryArg.limit } }),
+    }),
+    getTraitInfoApiAppTraitinfoTraitIdGet: build.query<GetTraitInfoApiAppTraitinfoTraitIdGetApiResponse, GetTraitInfoApiAppTraitinfoTraitIdGetApiArg>({
+      query: (queryArg) => ({ url: `http://127.0.0.1:9000/api/app/traitinfo/${queryArg.traitId}` }),
+
     }),
   }),
   overrideExisting: false,
@@ -26,6 +24,10 @@ export type ExpandApiAppExpandGetApiResponse = /** status 200 Successful Respons
 export type ExpandApiAppExpandGetApiArg = {
   geneIds: string[];
   limit?: number;
+};
+export type GetTraitInfoApiAppTraitinfoTraitIdGetApiResponse = /** status 200 Successful Response */ any;
+export type GetTraitInfoApiAppTraitinfoTraitIdGetApiArg = {
+  traitId: string;
 };
 export type ValidationError = {
   loc: (string | number)[];
@@ -65,4 +67,6 @@ export const {
   useLazyAutocompleteApiAppAutocompleteGetQuery,
   useExpandApiAppExpandGetQuery,
   useLazyExpandApiAppExpandGetQuery,
+  useGetTraitInfoApiAppTraitinfoTraitIdGetQuery,
+  useLazyGetTraitInfoApiAppTraitinfoTraitIdGetQuery,
 } = injectedRtkApi;

@@ -1,32 +1,61 @@
 import { Tabs, Text, Button, HoverCard, Flex, Space, ScrollArea } from '@mantine/core';
-import React, {useState} from "react"
-import { Handle, Position, useNodeId, useReactFlow } from "reactflow"
+import React, { useState } from "react"
+import { Handle, Position, useNodeId, useReactFlow } from "reactflow";
+import { useGetTraitInfo } from './store/store';
+import { useEffect } from 'react';
+import { IconInfoCircle, IconReportSearch, IconTopologyFull, IconSearch } from '@tabler/icons-react';
 import { onNodesVisibilityChange } from './onNodesVisibilityChange';
-import { IconInfoCircle, IconReportSearch, IconTopologyFull} from '@tabler/icons-react';
+
+
+var color = {   
+    "gene": "#4BB268",
+    "disease": "#FF964D",
+    "drug": "#B42865"
+};
+
 
 // this is the default custom node
-function DefaultCustomNode({ data, selected, backgroundColor }) {
+function DefaultCustomNode({ data }) {
     const reactflow = useReactFlow();
     const nodes = reactflow.getNodes();
     const nodeId = useNodeId();
     const [collapsed, setCollapsed] = useState(true);
+
+    const [nodeData, setNodeData] = useState(data?.displayProps);
+
+    const { data: traitInfo, isFetching } = data.type == "disease" ? useGetTraitInfo({ traitId: data?.label }) : { data: {}, isFetching: false };
+
     const nodeIndex = nodes.findIndex(n => n.id === nodeId)
-    
+
+
+    useEffect(() => {
+        if (!isFetching) {
+            setNodeData(Object.assign(data?.displayProps, traitInfo));
+        }
+
+    }, [isFetching]);
+
+
     // style applied for every node
     const nodeStyle = {
-        backgroundColor,
+        backgroundColor: color[data?.type],
         color: "black",
         padding: "14px",
         borderRadius: "8px",
-        border: data?.isRoot ? '3px solid #398354' : ''
+        border: data?.isRoot ? '5px solid #398354' : '',
         // boxShadow: isHovered || isHighlighted ? "0 4px 8px rgba(0, 0, 0, 0.2)" : "none",
         // transition: "box-shadow 0.3s ease transform 0.3 ease",
         // transform: selected ? "scale(1.8)" : "scale(1)",
         // display: nodeInternals.get(data.id).hidden ? "none" : "block",
-
     };
 
-    const label = data?.isRoot ? <b>{data?.label}</b> : data?.label
+    const symbolStyle: React.CSSProperties = {
+        position: 'absolute',
+        top: '-10px',
+        right: '-10px',
+    };
+
+    const label = data?.isRoot ? <b>{data?.displayProps.label}</b> : data?.displayProps.label
 
     return (
         <HoverCard shadow="md" width={'25vw'} withinPortal={true} >
@@ -35,6 +64,7 @@ function DefaultCustomNode({ data, selected, backgroundColor }) {
                     <Handle type="source" position={Position.Top} style={{ visibility: "hidden" }} />
                     {label}
                     <Handle type="target" position={Position.Right} style={{ visibility: "hidden" }} />
+                    {data?.isRoot && <div style={symbolStyle}> <IconSearch size={36} style={{fill:"#FFFFFF"}}/></div>}
                 </div>
             </HoverCard.Target>
             <HoverCard.Dropdown>
@@ -46,25 +76,29 @@ function DefaultCustomNode({ data, selected, backgroundColor }) {
                 <Tabs color="gray" variant="outline" defaultValue="details">
                     <Tabs.List>
                         <Tabs.Tab rightSection={<IconInfoCircle />} value="details" > Details</Tabs.Tab>
-                        <Tabs.Tab rightSection={<IconReportSearch />} value="summary">Summary</Tabs.Tab>
+                        {data?.displayProps.summary != "nan" ? <Tabs.Tab rightSection={<IconReportSearch />} value="summary">Summary</Tabs.Tab> : <></>}
                         <Tabs.Tab rightSection={<IconTopologyFull />} value="structure">Structure</Tabs.Tab>
                     </Tabs.List>
                     <Tabs.Panel value="details" >
                         <ScrollArea>
                             <div style={{ height: '30vh' }}>
-                                {Object.keys(data).map((key: string, index: number) => {
-                                    if (data[key] != null) {
-                                        if (key === "synonyms") return (
-                                            <div key={index}>
-                                                <Text size="sm" fw={700}>{key.charAt(0).toUpperCase() + key.slice(1)}</Text>
-                                                <Text size="sm">{renderSynonymsWithDashes(data[key])}</Text>
-                                            </div>
-                                        )
+                                {Object.keys(nodeData).map((key: string, index: number) => {
+                                    if (nodeData[key] != "nan") {
+                                        if (key === "synonyms") {
+                                            if (nodeData[key].length > 0) {
+                                                return (
+                                                    <div key={index}>
+                                                        <Text size="md" fw={700}>{key.charAt(0).toUpperCase() + key.slice(1)}</Text>
+                                                        <Text size="sm">{renderSynonymsWithDashes(nodeData[key])}</Text>
+                                                    </div>
+                                                )
+                                            }
+                                        }
                                         else if (key != "summary") {
                                             return (
                                                 <div key={index}>
-                                                    <Text size="sm" fw={700}>{key.charAt(0).toUpperCase() + key.slice(1)}</Text>
-                                                    <Text size="sm">{data[key]}</Text>
+                                                    <Text size="md" fw={700}>{key.charAt(0).toUpperCase() + key.slice(1)}</Text>
+                                                    <Text size="sm">{nodeData[key]}</Text>
                                                 </div>
                                             );
                                         }
@@ -77,11 +111,12 @@ function DefaultCustomNode({ data, selected, backgroundColor }) {
                         <ScrollArea>
                             <div style={{ height: '30vh' }}>
                                 <Text size="sm" fw={700}>Summary</Text>
-                                <Text size="sm">{data?.summary}</Text>
+                                <Text size="sm">{data?.displayProps.summary}</Text>
                             </div>
                         </ScrollArea>
 
                     </Tabs.Panel>
+
                     <Tabs.Panel value="structure">
                         <div style={{ height: '30vh' }}>
                             <Text>MolStar Structure</Text>
@@ -110,24 +145,22 @@ function renderSynonymsWithDashes(synonyms) {
     );
 }
 
-// this node is used for genes
-const GeneNode = ({ data, selected }) => {
-    return <DefaultCustomNode data={data} selected={selected} backgroundColor={"#4BB268"} />
+/* // this node is used for genes
+const GeneNode = ({ data, id, type }) => {
+    return <DefaultCustomNode data={data} nodeId={id} />
 }
 
 // this node is used for diseases
-const DiseaseNode = ({ data, selected }) => {
-    return <DefaultCustomNode data={data} selected={selected} backgroundColor={"#FF964D"} />
+const DiseaseNode = ({ data, id }) => {
+    return <DefaultCustomNode data={data} nodeId={id} backgroundColor={"#FF964D"} />
 }
 
 // this node is used for drugs
-const DrugNode = ({ data, selected }) => {
-    return <DefaultCustomNode data={data} selected={selected} backgroundColor={"#B42865"} />
-}
+const DrugNode = ({ data, id }) => {
+    return <DefaultCustomNode data={data} nodeId={id} backgroundColor={"#B42865"} />
+} */
 
 // these node types can be used in the graph
 export const nodeTypes = {
-    gene: GeneNode,
-    disease: DiseaseNode,
-    drug: DrugNode
+    node: DefaultCustomNode,
 };
