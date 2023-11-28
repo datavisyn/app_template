@@ -3,7 +3,7 @@ import React, { useState } from "react"
 import { Handle, Position, useNodeId, useReactFlow } from "reactflow";
 import { useGetTraitInfo } from './store/store';
 import { useEffect } from 'react';
-import { IconInfoCircle, IconReportSearch, IconTopologyFull } from '@tabler/icons-react';
+import { IconInfoCircle, IconReportSearch, IconTopologyFull, IconNorthStar } from '@tabler/icons-react';
 import { onNodesVisibilityChange } from './onNodesVisibilityChange';
 
 
@@ -42,11 +42,17 @@ function DefaultCustomNode({ data }) {
         color: "black",
         padding: "14px",
         borderRadius: "8px",
-        border: data?.isRoot ? '3px solid #398354' : ''
+        border: data?.isRoot ? '5px solid #398354' : '',
         // boxShadow: isHovered || isHighlighted ? "0 4px 8px rgba(0, 0, 0, 0.2)" : "none",
         // transition: "box-shadow 0.3s ease transform 0.3 ease",
         // transform: selected ? "scale(1.8)" : "scale(1)",
         // display: nodeInternals.get(data.id).hidden ? "none" : "block",
+    };
+
+    const symbolStyle: React.CSSProperties = {
+        position: 'absolute',
+        top: '-10px',
+        right: '-10px',
     };
 
     const label = data?.isRoot ? <b>{data?.displayProps.label}</b> : data?.displayProps.label
@@ -58,6 +64,7 @@ function DefaultCustomNode({ data }) {
                     <Handle type="source" position={Position.Top} style={{ visibility: "hidden" }} />
                     {label}
                     <Handle type="target" position={Position.Right} style={{ visibility: "hidden" }} />
+                    {data?.isRoot && <div style={symbolStyle}> <IconNorthStar/></div>}
                 </div>
             </HoverCard.Target>
             <HoverCard.Dropdown>
@@ -69,7 +76,7 @@ function DefaultCustomNode({ data }) {
                 <Tabs color="gray" variant="outline" defaultValue="details">
                     <Tabs.List>
                         <Tabs.Tab rightSection={<IconInfoCircle />} value="details" > Details</Tabs.Tab>
-                        {data?.displayProps.summary !="nan" ? <Tabs.Tab rightSection={<IconReportSearch />} value="summary">Summary</Tabs.Tab>: <></>}
+                        {data?.displayProps.summary != "nan" ? <Tabs.Tab rightSection={<IconReportSearch />} value="summary">Summary</Tabs.Tab> : <></>}
                         <Tabs.Tab rightSection={<IconTopologyFull />} value="structure">Structure</Tabs.Tab>
                     </Tabs.List>
                     <Tabs.Panel value="details" >
