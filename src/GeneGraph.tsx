@@ -44,11 +44,15 @@ export function GeneGraph(props: GeneGraphProps) {
         },
         data:{
           label:node.symbol == "nan" ? node.id : node.symbol,
-          fullname:node.name,
-          summary:node.summary,
-          synonyms:node.synonyms,
-          entrezId:node.entrezId,
-          isRoot: props.geneID.includes(node.id) ? true : false
+          displayProps:{
+            fullname:node.name,
+            synonyms:node.synonyms,
+            entrezId:node.entrezId,
+            label:node.symbol == "nan" ? node.id : node.symbol,
+            summary:node.summary,
+          },
+          isRoot: props.geneID.includes(node.id) ? true : false,
+          type:node.type,
         },
         type: "node"
       }

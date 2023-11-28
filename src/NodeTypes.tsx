@@ -21,7 +21,7 @@ function DefaultCustomNode({ data }) {
     const nodeId = useNodeId();
     const [collapsed, setCollapsed] = useState(true);
 
-    const [nodeData, setNodeData] = useState(data);
+    const [nodeData, setNodeData] = useState(data?.displayProps);
 
     const { data: traitInfo, isFetching } = data.type == "disease" ? useGetTraitInfo({ traitId: data?.label }) : { data: {}, isFetching: false };
 
@@ -30,29 +30,10 @@ function DefaultCustomNode({ data }) {
 
     useEffect(() => {
         if (!isFetching) {
-            setNodeData(Object.assign({}, data, traitInfo));
-            data.summary = traitInfo?.summary;
+            setNodeData(Object.assign(data?.displayProps, traitInfo));
         }
 
     }, [isFetching]);
-
-    function onHide() {
-
-        reactflow.setNodes(reactflow.getNodes().map((node) => {
-            if (node.id === nodeId) {
-                return { ...node, hidden: true };
-            }
-            return node;
-        }));
-
-        reactflow.setEdges(reactflow.getEdges().map((edge) => {
-            if (edge.source === nodeId || edge.target === nodeId) {
-                return { ...edge, hidden: true };
-            }
-            return edge;
-        }));
-
-    }
 
 
     // style applied for every node
@@ -68,7 +49,7 @@ function DefaultCustomNode({ data }) {
         // display: nodeInternals.get(data.id).hidden ? "none" : "block",
     };
 
-    const label = data?.isRoot ? <b>{data?.label}</b> : data?.label
+    const label = data?.isRoot ? <b>{data?.displayProps.label}</b> : data?.displayProps.label
 
     return (
         <HoverCard shadow="md" width={'25vw'} withinPortal={true} >
@@ -88,7 +69,7 @@ function DefaultCustomNode({ data }) {
                 <Tabs color="gray" variant="outline" defaultValue="details">
                     <Tabs.List>
                         <Tabs.Tab rightSection={<IconInfoCircle />} value="details" > Details</Tabs.Tab>
-                        <Tabs.Tab rightSection={<IconReportSearch />} value="summary">Summary</Tabs.Tab>
+                        {data?.displayProps.summary !="nan" ? <Tabs.Tab rightSection={<IconReportSearch />} value="summary">Summary</Tabs.Tab>: <></>}
                         <Tabs.Tab rightSection={<IconTopologyFull />} value="structure">Structure</Tabs.Tab>
                     </Tabs.List>
                     <Tabs.Panel value="details" >
@@ -97,7 +78,7 @@ function DefaultCustomNode({ data }) {
                                 {Object.keys(nodeData).map((key: string, index: number) => {
                                     if (nodeData[key] != "nan") {
                                         if (key === "synonyms") {
-                                            if (data[key].length > 0) {
+                                            if (nodeData[key].length > 0) {
                                                 return (
                                                     <div key={index}>
                                                         <Text size="md" fw={700}>{key.charAt(0).toUpperCase() + key.slice(1)}</Text>
@@ -106,7 +87,7 @@ function DefaultCustomNode({ data }) {
                                                 )
                                             }
                                         }
-                                        else if (key != "summary" && key != "type") {
+                                        else if (key != "summary") {
                                             return (
                                                 <div key={index}>
                                                     <Text size="md" fw={700}>{key.charAt(0).toUpperCase() + key.slice(1)}</Text>
@@ -123,11 +104,12 @@ function DefaultCustomNode({ data }) {
                         <ScrollArea>
                             <div style={{ height: '30vh' }}>
                                 <Text size="sm" fw={700}>Summary</Text>
-                                <Text size="sm">{data?.summary}</Text>
+                                <Text size="sm">{data?.displayProps.summary}</Text>
                             </div>
                         </ScrollArea>
 
                     </Tabs.Panel>
+
                     <Tabs.Panel value="structure">
                         <div style={{ height: '30vh' }}>
                             <Text>MolStar Structure</Text>
