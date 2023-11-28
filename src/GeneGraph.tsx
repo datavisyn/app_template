@@ -1,17 +1,17 @@
 import React, { useState, useEffect, useMemo, createContext, useContext, useReducer } from 'react';
-import {useExpand} from './store/store';
+import { useExpand } from './store/store';
 import { ReactFlow, Background, Controls, MiniMap, useNodesState, useEdgesState, Handle, ReactFlowProvider } from 'reactflow';
 import 'reactflow/dist/style.css';
 import { nodeTypes } from "./NodeTypes";
 import FloatingEdge from './EdgeType';
 import FloatingConnectionLine from './FloatingConnectionLine';
-import { FilterNodeTypesArea } from './FilterNodeTypesArea';
+import { SidebarFilterList } from './SidebarFilterList';
+
+export const NodesContext = React.createContext(null)
 
 const edgeTypes = {
   floating: FloatingEdge,
 };
-
-
 
 // Props for the GeneGraph component
 type GeneGraphProps = {
@@ -22,7 +22,7 @@ type GeneGraphProps = {
 export function GeneGraph(props: GeneGraphProps) {
   const geneIds = props.geneID;
 
-  // State for the nodes and edges
+  // state for the nodes and edges
   const [nodes, setNodes, onNodesChange] = useNodesState([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
 
@@ -31,6 +31,8 @@ export function GeneGraph(props: GeneGraphProps) {
       geneIds: geneIds,
     limit: 1000,
   });
+
+  console.log()
 
   useMemo(() => {
     setNodes(graph?.nodes.map((node,index)=>{
@@ -46,7 +48,7 @@ export function GeneGraph(props: GeneGraphProps) {
           summary:node.summary,
           synonyms:node.synonyms,
           entrezId:node.entrezId,
-          type:node.type.toString()
+          isRoot: props.geneID.includes(node.id) ? true : false
         },
         type: "node"
       }
@@ -68,7 +70,7 @@ export function GeneGraph(props: GeneGraphProps) {
       <div style={{ height: '90%', width: '100%', display: 'flex' }}>
 
         <ReactFlowProvider>
-          <div style={{ height: '100%', width: '100%' }}>
+          <div style={{ height: '100%', width: '80%' }}>
             <ReactFlow
               nodes={nodes}
               edges={edges}
@@ -83,9 +85,10 @@ export function GeneGraph(props: GeneGraphProps) {
               <MiniMap />
             </ReactFlow>
           </div>
-          {/* <div style={{ minHeight: '100%', width: '15%' }}>
-            <FilterNodeTypesArea />
-          </div> */}
+          <NodesContext.Provider value={{nodes: nodes, setNOdes: setNodes}}>
+            <SidebarFilterList />
+          </NodesContext.Provider>
+          
         </ReactFlowProvider>
 
       </div>

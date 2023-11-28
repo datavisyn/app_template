@@ -1,9 +1,10 @@
-import { Tabs, Text, Button, HoverCard, Flex, Space } from '@mantine/core';
+import { Tabs, Text, Button, HoverCard, Flex, Space, ScrollArea } from '@mantine/core';
 import React, { useState } from "react"
 import { Handle, Position, useNodeId, useReactFlow } from "reactflow";
 import { useGetTraitInfo } from './store/store';
 import { useEffect } from 'react';
 import { IconInfoCircle, IconReportSearch, IconTopologyFull } from '@tabler/icons-react';
+import { onNodesVisibilityChange } from './onNodesVisibilityChange';
 
 
 var color = {
@@ -16,12 +17,15 @@ var color = {
 // this is the default custom node
 function DefaultCustomNode({ data }) {
     const reactflow = useReactFlow();
+    const nodes = reactflow.getNodes();
     const nodeId = useNodeId();
     const [collapsed, setCollapsed] = useState(true);
 
     const [nodeData, setNodeData] = useState(data);
 
     const { data: traitInfo, isFetching } = data.type == "disease" ? useGetTraitInfo({ traitId: data?.label }) : { data: {}, isFetching: false };
+
+    const nodeIndex = nodes.findIndex(n => n.id === nodeId)
 
 
     useEffect(() => {
@@ -57,63 +61,77 @@ function DefaultCustomNode({ data }) {
         color: "black",
         padding: "14px",
         borderRadius: "8px",
+        border: data?.isRoot ? '3px solid #398354' : ''
         // boxShadow: isHovered || isHighlighted ? "0 4px 8px rgba(0, 0, 0, 0.2)" : "none",
         // transition: "box-shadow 0.3s ease transform 0.3 ease",
         // transform: selected ? "scale(1.8)" : "scale(1)",
         // display: nodeInternals.get(data.id).hidden ? "none" : "block",
     };
 
+    const label = data?.isRoot ? <b>{data?.label}</b> : data?.label
+
     return (
-        <HoverCard shadow="md" width={400} withinPortal={true}>
+        <HoverCard shadow="md" width={'25vw'} withinPortal={true} >
             <HoverCard.Target>
                 <div style={nodeStyle}>
-                    <div>{data?.label}</div>
                     <Handle type="source" position={Position.Top} style={{ visibility: "hidden" }} />
+                    {label}
                     <Handle type="target" position={Position.Right} style={{ visibility: "hidden" }} />
                 </div>
             </HoverCard.Target>
             <HoverCard.Dropdown>
                 <Flex justify="center" gap="md">
                     <Button variant="filled" color="gray" fullWidth> {collapsed ? "Expand" : "Collapse"}</Button>
-                    <Button variant="filled" color="gray" fullWidth onClick={() => onHide()}>Hide</Button>
+                    <Button variant="filled" color="gray" fullWidth onClick={() => onNodesVisibilityChange(reactflow, [nodes[nodeIndex]], !nodes[nodeIndex].hidden)}>Hide</Button>
                 </Flex>
                 <Space h="md" />
                 <Tabs color="gray" variant="outline" defaultValue="details">
                     <Tabs.List>
-                        <Tabs.Tab rightSection={<IconInfoCircle/>} value="details" > Details</Tabs.Tab>
-                        <Tabs.Tab rightSection={<IconReportSearch/>} value="summary">Summary</Tabs.Tab>
-                        <Tabs.Tab rightSection={<IconTopologyFull/>} value="structure">Structure</Tabs.Tab>
+                        <Tabs.Tab rightSection={<IconInfoCircle />} value="details" > Details</Tabs.Tab>
+                        <Tabs.Tab rightSection={<IconReportSearch />} value="summary">Summary</Tabs.Tab>
+                        <Tabs.Tab rightSection={<IconTopologyFull />} value="structure">Structure</Tabs.Tab>
                     </Tabs.List>
-                    <Tabs.Panel value="details">
-                    {Object.keys(nodeData).map((key: string, index: number) => {
-                    if (nodeData[key] != "nan") {
-                        if (key === "synonyms") {
-                            if (data[key].length > 0) {
-                                return (
-                                    <div key={index}>
-                                        <Text size="md" fw={700}>{key.charAt(0).toUpperCase() + key.slice(1)}</Text>
-                                        <Text size="sm">{renderSynonymsWithDashes(nodeData[key])}</Text>
-                                    </div>
-                                )
-                            }
-                        }
-                        else if (key != "summary" && key != "type") {
-                            return (
-                                <div key={index}>
-                                    <Text size="md" fw={700}>{key.charAt(0).toUpperCase() + key.slice(1)}</Text>
-                                    <Text size="sm">{nodeData[key]}</Text>
-                                </div>
-                            );
-                        }
-                    }
-                })}
+                    <Tabs.Panel value="details" >
+                        <ScrollArea>
+                            <div style={{ height: '30vh' }}>
+                                {Object.keys(nodeData).map((key: string, index: number) => {
+                                    if (nodeData[key] != "nan") {
+                                        if (key === "synonyms") {
+                                            if (data[key].length > 0) {
+                                                return (
+                                                    <div key={index}>
+                                                        <Text size="md" fw={700}>{key.charAt(0).toUpperCase() + key.slice(1)}</Text>
+                                                        <Text size="sm">{renderSynonymsWithDashes(nodeData[key])}</Text>
+                                                    </div>
+                                                )
+                                            }
+                                        }
+                                        else if (key != "summary" && key != "type") {
+                                            return (
+                                                <div key={index}>
+                                                    <Text size="md" fw={700}>{key.charAt(0).toUpperCase() + key.slice(1)}</Text>
+                                                    <Text size="sm">{nodeData[key]}</Text>
+                                                </div>
+                                            );
+                                        }
+                                    }
+                                })}
+                            </div>
+                        </ScrollArea>
                     </Tabs.Panel>
                     <Tabs.Panel value="summary">
-                        <Text size="md" fw={700}>Summary</Text>
-                        <Text size="sm">{data?.summary}</Text>
+                        <ScrollArea>
+                            <div style={{ height: '30vh' }}>
+                                <Text size="sm" fw={700}>Summary</Text>
+                                <Text size="sm">{data?.summary}</Text>
+                            </div>
+                        </ScrollArea>
+
                     </Tabs.Panel>
                     <Tabs.Panel value="structure">
-                        <Text>MolStar Structure</Text>
+                        <div style={{ height: '30vh' }}>
+                            <Text>MolStar Structure</Text>
+                        </div>
                     </Tabs.Panel>
                 </Tabs>
             </HoverCard.Dropdown>
