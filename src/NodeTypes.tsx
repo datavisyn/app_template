@@ -51,8 +51,8 @@ function DefaultCustomNode({ data }) {
 
     const symbolStyle: React.CSSProperties = {
         position: 'absolute',
-        top: '-10px',
-        right: '-10px',
+        top: '-8px',
+        right: '-8px',
     };
 
     const label = data?.isRoot ? <b>{data?.displayProps.label}</b> : data?.displayProps.label
@@ -64,7 +64,7 @@ function DefaultCustomNode({ data }) {
                     <Handle type="source" position={Position.Top} style={{ visibility: "hidden" }} />
                     {label}
                     <Handle type="target" position={Position.Right} style={{ visibility: "hidden" }} />
-                    {data?.isRoot && <div style={symbolStyle}> <IconSearch size={36} style={{fill:"#FFFFFF"}}/></div>}
+                    {data?.isRoot && <div style={symbolStyle}> <IconSearch size={24} style={{fill:'rgba(255, 255, 255, 0.8)'}}/></div>}
                 </div>
             </HoverCard.Target>
             <HoverCard.Dropdown>
