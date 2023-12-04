@@ -239,7 +239,7 @@ def get_trait_info(trait_id: str):
     # extraction of name and result
     name = name_info["name"] #type: ignore
     description = name_info["description"] #type: ignore
-
+    
     # create a response JSON with both name and description
     response = {
         "name": name,

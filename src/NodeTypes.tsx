@@ -34,7 +34,16 @@ function DefaultCustomNode({ data }) {
         }
 
     }, [isFetching]);
+    function onExpandCollapse(){
+        if(collapsed){
+            data?.onExpand(nodeId)
+            setCollapsed(false);
+        }
+        else{
 
+        }
+    }
+    
 
     // style applied for every node
     const nodeStyle = {
@@ -69,7 +78,7 @@ function DefaultCustomNode({ data }) {
             </HoverCard.Target>
             <HoverCard.Dropdown>
                 <Flex justify="center" gap="md">
-                    <Button variant="filled" color="gray" fullWidth> {collapsed ? "Expand" : "Collapse"}</Button>
+                    <Button variant="filled" color="gray" fullWidth onClick={onExpandCollapse}> {collapsed ? "Expand" : "Collapse"}</Button>
                     <Button variant="filled" color="gray" fullWidth onClick={() => onNodesVisibilityChange(reactflow, [nodes[nodeIndex]], !nodes[nodeIndex].hidden)}>Hide</Button>
                 </Flex>
                 <Space h="md" />

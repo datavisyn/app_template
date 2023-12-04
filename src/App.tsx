@@ -26,6 +26,9 @@ export function App() {
   const handleChange = (values) => {
     setSearch(values);
   };
+  const setIds = (ids: string[]) =>{
+    setSelectedValues([...selectedValues, ids])
+  }
 
   return (
     <>
@@ -40,7 +43,7 @@ export function App() {
         rightSection={isFetching ? <Loader size="sm" /> : null}
       />
 
-      <GeneGraph geneID={selectedIds} />
+      <GeneGraph geneID={selectedIds} addID={setIds}/>
     </>
   );
 }

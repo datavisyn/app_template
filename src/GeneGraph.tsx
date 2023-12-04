@@ -16,18 +16,20 @@ const edgeTypes = {
 // Props for the GeneGraph component
 type GeneGraphProps = {
   geneID: string[]; // changed to array
+  addID;
 };
 
 // GeneGraph component
 export function GeneGraph(props: GeneGraphProps) {
-  const geneIds = props.geneID;
+  let geneIds = props.geneID;
 
   // state for the nodes and edges
   const [nodes, setNodes, onNodesChange] = useNodesState([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
 
+
   // get all genes that are connected to the first node
-  const { data: graph } = useExpand({
+  let { data: graph } = useExpand({
       geneIds: geneIds,
     limit: 1000,
   });
@@ -53,6 +55,8 @@ export function GeneGraph(props: GeneGraphProps) {
           },
           isRoot: props.geneID.includes(node.id) ? true : false,
           type:node.type,
+          onExpand: exp,
+          onCollapse: coll
         },
         type: "node"
       }
@@ -69,6 +73,20 @@ export function GeneGraph(props: GeneGraphProps) {
 
   }, [graph]);
 
+  function exp(id: string){
+    if(!geneIds.includes(id)){
+      geneIds = ([...geneIds,id])
+      props.addID(id)
+    }
+  }
+
+  function coll(id: string){
+    if(geneIds.includes(id))
+      geneIds = geneIds.filter((f)=>f!==id)
+    console.log(id);
+    console.log(geneIds);
+  }
+
   return (
     <>
       <div style={{ height: '90%', width: '100%', display: 'flex' }}>
@@ -80,6 +98,7 @@ export function GeneGraph(props: GeneGraphProps) {
               edges={edges}
               nodeTypes={nodeTypes}
               edgeTypes={edgeTypes}
+              
               onNodesChange={onNodesChange}
               onEdgesChange={onEdgesChange}
               connectionLineComponent={FloatingConnectionLine}
