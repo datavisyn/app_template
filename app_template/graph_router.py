@@ -196,9 +196,9 @@ def expand(geneIds: list[str] = Query(), limit: int = 1000) -> Gene2AllResponse 
     
     layoutedEdges = []
     # drop duplicates
-    # TODO: maybe drop duplicates where source & target are switched
     if allEdgesResult is not None:
-        allEdgesResult = allEdgesResult.drop_duplicates(subset=["source", "target"], keep="first")
+        allEdgesResult = allEdgesResult[~pd.DataFrame(np.sort(allEdgesResult[["source","target"]].values,1)).duplicated().values] #type: ignore
+        #allEdgesResult = allEdgesResult.drop_duplicates(subset=["source", "target"], keep="first")
     for ele in allEdgesResult.to_dict(orient="records"):
         ele["id"] = ele["source"] + "-" + ele["target"]
         layoutedEdges.append((ele["source"], ele["target"]))
@@ -237,8 +237,8 @@ def expand(geneIds: list[str] = Query(), limit: int = 1000) -> Gene2AllResponse 
 def get_trait_info(trait_id: str):
     name_info = get_diseaseOrDrug_name(trait_id)
     # extraction of name and result
-    name = name_info["name"]
-    description = name_info["description"]
+    name = name_info["name"] #type: ignore
+    description = name_info["description"] #type: ignore
 
     # create a response JSON with both name and description
     response = {
