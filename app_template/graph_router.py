@@ -237,7 +237,6 @@ def expand(geneIds: list[str] = Query(), limit: int = 1000) -> Gene2AllResponse 
 def get_trait_info(trait_id: str):
     name_info = get_diseaseOrDrug_name(trait_id)
     # extraction of name and result
-    name = name_info["name"]
     name = name_info["name"] # type: ignore
     description = name_info["description"] # type: ignore
 
