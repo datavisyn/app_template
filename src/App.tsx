@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import { useAutocomplete } from './store/store';
 import { GeneGraph } from './GeneGraph';
 import { FilterNodeTypesArea } from './FilterNodeTypesArea';
+import LayoutFlow from './GeneGraphFrontendLayout';
 
 export function App() {
   const [selectedValues, setSelectedValues] = useState([]);
@@ -41,6 +42,7 @@ export function App() {
       />
 
       <GeneGraph geneID={selectedIds} />
+      {/* <LayoutFlow geneID={selectedIds}/> */}
     </>
   );
 }
