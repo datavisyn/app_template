@@ -196,9 +196,9 @@ def expand(geneIds: list[str] = Query(), limit: int = 1000) -> Gene2AllResponse 
     
     layoutedEdges = []
     # drop duplicates
-    # TODO: maybe drop duplicates where source & target are switched
     if allEdgesResult is not None:
-        allEdgesResult = allEdgesResult.drop_duplicates(subset=["source", "target"], keep="first")
+        allEdgesResult = allEdgesResult[~pd.DataFrame(np.sort(allEdgesResult[["source","target"]].values,1)).duplicated().values]
+        #allEdgesResult = allEdgesResult.drop_duplicates(subset=["source", "target"], keep="first")
     for ele in allEdgesResult.to_dict(orient="records"):
         ele["id"] = ele["source"] + "-" + ele["target"]
         layoutedEdges.append((ele["source"], ele["target"]))
