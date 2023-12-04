@@ -18,7 +18,7 @@ function DefaultCustomNode({ data, selected, backgroundColor }) {
         color: "black",
         padding: "14px",
         borderRadius: "8px",
-        border: data?.isRoot ? '3px solid #398354' : ''
+        border: data?.isRoot ? '3px solid #398354' : '',
         // boxShadow: isHovered || isHighlighted ? "0 4px 8px rgba(0, 0, 0, 0.2)" : "none",
         // transition: "box-shadow 0.3s ease transform 0.3 ease",
         // transform: selected ? "scale(1.8)" : "scale(1)",

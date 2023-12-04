@@ -74,7 +74,7 @@ export function GeneGraph(props: GeneGraphProps) {
       <div style={{ height: '90%', width: '100%', display: 'flex' }}>
 
         <ReactFlowProvider>
-          <div style={{ height: '100%', width: '80%' }}>
+          <div style={{ height: '100%', width: '77%' }}>
             <ReactFlow
               nodes={nodes}
               edges={edges}
@@ -83,13 +83,14 @@ export function GeneGraph(props: GeneGraphProps) {
               onNodesChange={onNodesChange}
               onEdgesChange={onEdgesChange}
               connectionLineComponent={FloatingConnectionLine}
+              fitView 
             >
               <Background />
               <Controls />
               <MiniMap />
             </ReactFlow>
           </div>
-          <NodesContext.Provider value={{nodes: nodes, setNOdes: setNodes}}>
+          <NodesContext.Provider value={{nodes: nodes, setNodes: setNodes}}>
             <SidebarFilterList />
           </NodesContext.Provider>
           
