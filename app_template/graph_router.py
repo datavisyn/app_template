@@ -7,6 +7,7 @@ import pandas as pd
 from fastapi import APIRouter, Query
 from enum import Enum
 from pydantic import BaseModel, typing
+from trait_info import get_diseaseOrDrug_name
 
 _log = logging.getLogger(__name__)
 graph_router = APIRouter(tags=["Graph"])
@@ -112,24 +113,25 @@ allNodes["parents"] = np.empty((len(allNodes), 0)).tolist()
 
 
 @graph_router.get("/autocomplete")
-def autocomplete(search: str, limit: int | None = 10) -> list[str]:
+def autocomplete(search: str, limit: int | None = 10) -> list[list[str]]:
     # TODO implement nicer version (might look similar to the following line)
     # df = allNodes[allNodes[(search in allNodes["id"]) | (search in allNodes["name"])| (search in allNodes["entrezId"])]]
 
+    symbols = allNodes["symbol"].values.tolist()
     ids = allNodes["id"].values.tolist()
     names = allNodes["name"].values.tolist()
 
     results = []
 
     # check if passed search parameter is part of a nodes id
-    for ele in ids:
-        if search.lower() in str(ele).lower():
-            results.append(ele)
-
-    # check if passed search parameter is part of a nodes name
-    for ele in names:
-        if search.lower() in str(ele).lower():
-            results.append(str(ele))
+    for id, symbol, name in zip(ids, symbols, names):
+        pattern = search.lower()
+        if pattern in str(symbol).lower():
+            results.append([symbol, id, name])
+        elif pattern in str(id).lower():
+            results.append([symbol, id, name])
+        elif pattern in str(name).lower():
+            results.append([symbol, id, name])
 
     return results[:limit]
 
@@ -231,20 +233,20 @@ def expand(geneIds: list[str] = Query(), limit: int = 1000) -> Gene2AllResponse 
 
 # additional trait (disease/drug) information
 
-# @graph_router.get("/traitinfo/{trait_id}")
-# def get_trait_info(trait_id: str):
-#     name_info = get_diseaseOrDrug_name(trait_id)
-#     # extraction of name and result
-#     name = name_info["name"]
-#     description = name_info["description"]
+@graph_router.get("/traitinfo/{trait_id}")
+def get_trait_info(trait_id: str):
+    name_info = get_diseaseOrDrug_name(trait_id)
+    # extraction of name and result
+    name = name_info["name"]
+    description = name_info["description"]
 
-#     # create a response JSON with both name and description
-#     response = {
-#         "name": name,
-#         "description": description
-#     }
+    # create a response JSON with both name and description
+    response = {
+        "name": name,
+        "summary": description
+    }
 
-#     return response
+    return response
 
 
 # # whole name for genes

@@ -8,11 +8,23 @@ import { FilterNodeTypesArea } from './FilterNodeTypesArea';
 export function App() {
   const [selectedValues, setSelectedValues] = useState([]);
   const [search, setSearch] = useState("");
+  const [selectedIds, setSelectedIds] = useState([]);
+
   const { data: autocompleteData, isFetching } = useAutocomplete({ search });
+  const symbolToIdMap = new Map(autocompleteData?.map(item => [(item[0]+' ('+item[2]+')'), item[1]])); // makes a id-List for backend
+  const symbolsList = autocompleteData?.map(item => (item[0]+' ('+item[2]+')')); // Maked a SymbolList for FrontEnd
+  
+  // handels the change of selected values (these in the box)
+  const handleSelectedChange = (values) => {
+    console.log(values);
+    const ids = values.map(value => symbolToIdMap.get(value));
+    setSelectedValues(values); // Contains also already selected values
+    setSelectedIds(ids); // update ids
+  };
+
+  // handels the change of the search field (so value will Be E, EG, EGS, ...)
   const handleChange = (values) => {
-    setSearch(values[-1]); // Setze den Suchbegriff auf den ersten ausgewählten Wert
-    setSelectedValues(values); // Aktualisiere den Zustand mit den neuen Werten
-    console.log(values); // Logge die ausgewählten Werte in der Konsole
+    setSearch(values);
   };
   const setIds = (ids: string[]) =>{
     setSelectedValues([...selectedValues, ids])
@@ -21,18 +33,17 @@ export function App() {
   return (
     <>
       <MultiSelect
-        data={autocompleteData || []}
+        data={symbolsList || []}
         searchable
         value={selectedValues}
         onSearchChange={handleChange}
-        onChange={handleChange}
+        onChange={handleSelectedChange}
         placeholder="ENSG..."
         nothingFound="Keine Ergebnisse"
         rightSection={isFetching ? <Loader size="sm" /> : null}
-        label="searcg Label"
       />
 
-      <GeneGraph geneID={selectedValues} addID={setIds}/>
+      <GeneGraph geneID={selectedIds} addID={setIds}/>
     </>
   );
 }
