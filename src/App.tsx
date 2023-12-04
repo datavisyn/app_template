@@ -11,11 +11,12 @@ export function App() {
   const [selectedIds, setSelectedIds] = useState([]);
 
   const { data: autocompleteData, isFetching } = useAutocomplete({ search });
-  const symbolToIdMap = new Map(autocompleteData?.map(item => [item[0], item[1]])); // makes a id-List for backend
-  const symbolsList = autocompleteData?.map(item => item[0]); // Maked a SymbolList for FrontEnd
+  const symbolToIdMap = new Map(autocompleteData?.map(item => [(item[0]+' ('+item[2]+')'), item[1]])); // makes a id-List for backend
+  const symbolsList = autocompleteData?.map(item => (item[0]+' ('+item[2]+')')); // Maked a SymbolList for FrontEnd
   
   // handels the change of selected values (these in the box)
   const handleSelectedChange = (values) => {
+    console.log(values);
     const ids = values.map(value => symbolToIdMap.get(value));
     setSelectedValues(values); // Contains also already selected values
     setSelectedIds(ids); // update ids
