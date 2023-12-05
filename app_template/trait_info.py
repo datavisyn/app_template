@@ -25,6 +25,7 @@ def get_EFO_name(efo_id):
         term = data["_embedded"]["terms"][0]
         disease_name = term["label"]
         description = term.get("description", "Description not available")
+        description = description[0] if  len(description) else "nan"
 
         return {
             "name": disease_name,

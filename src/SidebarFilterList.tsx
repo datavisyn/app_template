@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { useReactFlow } from "reactflow";
+import { EdgeLabelRenderer, useReactFlow } from "reactflow";
 import { List, Card, Text, ScrollArea, ThemeIcon, Checkbox, Group, Select, Divider } from "@mantine/core"
 import { onNodesVisibilityChange } from './onNodesVisibilityChange';
 
@@ -86,20 +86,21 @@ export function SidebarFilterList() {
     const renderNodeTree = () => {
 
         const geneNodeLabels = nodes.map((node) => {
-            if (node.type === 'gene') {
-                return node.data.label
+            if (node.data.type === 'gene') {
+                console.log(node.data.displayProps.label)
+                return node.data.displayProps.label
             }
         })
 
         const diseaseNodeLabels = nodes.map((node) => {
-            if (node.type === 'disease') {
-                return node.data.label
+            if (node.data.type === 'disease') {
+                return node.data.displayProps.label
             }
         })
 
         const drugNodeLabels = nodes.map((node) => {
-            if (node.type === 'drug') {
-                return node.data.label
+            if (node.data.type === 'drug') {
+                return node.data.displayProps.label
             }
         })
 
@@ -108,6 +109,7 @@ export function SidebarFilterList() {
                 <TreeView aria-aria-label='node tree' defaultCollapseIcon={<ExpandMoreIcon />} defaultExpandIcon={<ChevronRightIcon />}>
                     <TreeItem nodeId='listNodeGene' label='genes'>
                         {geneNodeLabels.map((label) => {
+                            console.log(label)
                             return <TreeItem nodeId={label + "_treeItem"} label={label}/>
                         })}
                     </TreeItem>
