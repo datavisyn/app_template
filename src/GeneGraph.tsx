@@ -34,42 +34,44 @@ export function GeneGraph(props: GeneGraphProps) {
     limit: 1000,
   });
 
-  console.log()
-
   useMemo(() => {
-    setNodes(graph?.nodes.map((node,index)=>{
-      return{
-        id:node.id,
-        position:{
-          x:(node.position.x+1)*(window.innerWidth/2),
-          y:(node.position.y+1)*(window.innerHeight/2)
-        },
-        data:{
-          label:node.symbol == "nan" ? node.id : node.symbol,
-          displayProps:{
-            fullname:node.name,
-            synonyms:node.synonyms,
-            entrezId:node.entrezId,
-            label:node.symbol == "nan" ? node.id : node.symbol,
-            summary:node.summary,
+
+    (document as any).startViewTransition(() => {
+      setNodes(graph?.nodes.map((node,index)=>{
+        return{
+          id:node.id,
+          position:{
+            x:(node.position.x+1)*(window.innerWidth/2),
+            y:(node.position.y+1)*(window.innerHeight/2)
           },
-          isRoot: props.geneID.includes(node.id) ? true : false,
-          type:node.type,
-          onExpand: exp,
-          onCollapse: coll
-        },
-        type: "node"
-      }
-    }));
-    
-    setEdges(
-      graph?.edges.map((edge) => ({
-        id: edge.id,
-        source: edge.source,
-        target: edge.target,
-        type: 'floating',
-      }))
-    );
+          data:{
+            label:node.symbol == "nan" ? node.id : node.symbol,
+            displayProps:{
+              fullname:node.name,
+              synonyms:node.synonyms,
+              entrezId:node.entrezId,
+              label:node.symbol == "nan" ? node.id : node.symbol,
+              summary:node.summary,
+            },
+            isRoot: props.geneID.includes(node.id) ? true : false,
+            type:node.type,
+            onExpand: exp,
+            onCollapse: coll
+          },
+          type: "node"
+        }
+      }));
+      
+      setEdges(
+        graph?.edges.map((edge) => ({
+          id: edge.id,
+          source: edge.source,
+          target: edge.target,
+          type: 'floating',
+        }))
+      );
+
+    })
 
   }, [graph]);
 
@@ -92,7 +94,7 @@ export function GeneGraph(props: GeneGraphProps) {
       <div style={{ height: '90%', width: '100%', display: 'flex' }}>
 
         <ReactFlowProvider>
-          <div style={{ height: '100%', width: '80%' }}>
+          <div style={{ height: '100%', width: '77%' }}>
             <ReactFlow
               nodes={nodes}
               edges={edges}
@@ -102,13 +104,14 @@ export function GeneGraph(props: GeneGraphProps) {
               onNodesChange={onNodesChange}
               onEdgesChange={onEdgesChange}
               connectionLineComponent={FloatingConnectionLine}
+              fitView 
             >
               <Background />
               <Controls />
               <MiniMap />
             </ReactFlow>
           </div>
-          <NodesContext.Provider value={{nodes: nodes, setNOdes: setNodes}}>
+          <NodesContext.Provider value={{nodes: nodes, setNodes: setNodes}}>
             <SidebarFilterList />
           </NodesContext.Provider>
           
