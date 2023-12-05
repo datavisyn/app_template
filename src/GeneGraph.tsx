@@ -9,7 +9,6 @@ import { SidebarFilterList } from './SidebarFilterList';
 
 export const NodesContext = React.createContext(null)
 
-const maxNodesPerCircle = 20;
 const edgeTypes = {
   floating: FloatingEdge,
 };
@@ -17,76 +16,102 @@ const edgeTypes = {
 // Props for the GeneGraph component
 type GeneGraphProps = {
   geneID: string[]; // changed to array
+  addID;
 };
 
 // GeneGraph component
 export function GeneGraph(props: GeneGraphProps) {
-  const geneIds = props.geneID;
+  let geneIds = props.geneID;
 
   // state for the nodes and edges
   const [nodes, setNodes, onNodesChange] = useNodesState([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
 
+
   // get all genes that are connected to the first node
-  const { data: graph } = useExpand({
+  let { data: graph } = useExpand({
       geneIds: geneIds,
     limit: 1000,
   });
 
-  console.log()
-
   useMemo(() => {
-    setNodes(graph?.nodes.map((node,index)=>{
-      return{
-        id:node.id,
-        position:{
-          x:(node.position.x+1)*(window.innerWidth/2),
-          y:(node.position.y+1)*(window.innerHeight/2)
-        },
-        data:{
-          label:node.symbol == "nan" ? node.id : node.symbol,
-          fullname:node.name,
-          summary:node.summary,
-          synonyms:node.synonyms,
-          entrezId:node.entrezId,
-          isRoot: props.geneID.includes(node.id) ? true : false
-        },
-        type:node.type.toString()
-      }
-    }));
-    
-    setEdges(
-      graph?.edges.map((edge) => ({
-        id: edge.id,
-        source: edge.source,
-        target: edge.target,
-        type: 'floating',
-      }))
-    );
+
+    (document as any).startViewTransition(() => {
+      setNodes(graph?.nodes.map((node,index)=>{
+        return{
+          id:node.id,
+          position:{
+            x:(node.position.x+1)*(window.innerWidth/2),
+            y:(node.position.y+1)*(window.innerHeight/2)
+          },
+          data:{
+            label:node.symbol == "nan" ? node.id : node.symbol,
+            displayProps:{
+              fullname:node.name,
+              synonyms:node.synonyms,
+              entrezId:node.entrezId,
+              label:node.symbol == "nan" ? node.id : node.symbol,
+              summary:node.summary,
+            },
+            isRoot: props.geneID.includes(node.id) ? true : false,
+            type:node.type,
+            onExpand: exp,
+            onCollapse: coll
+          },
+          type: "node"
+        }
+      }));
+      
+      setEdges(
+        graph?.edges.map((edge) => ({
+          id: edge.id,
+          source: edge.source,
+          target: edge.target,
+          type: 'floating',
+        }))
+      );
+
+    })
 
   }, [graph]);
+
+  function exp(id: string){
+    if(!geneIds.includes(id)){
+      geneIds = ([...geneIds,id])
+      props.addID(id)
+    }
+  }
+
+  function coll(id: string){
+    if(geneIds.includes(id))
+      geneIds = geneIds.filter((f)=>f!==id)
+    console.log(id);
+    console.log(geneIds);
+  }
 
   return (
     <>
       <div style={{ height: '90%', width: '100%', display: 'flex' }}>
 
         <ReactFlowProvider>
-          <div style={{ height: '100%', width: '80%' }}>
+          <div style={{ height: '100%', width: '77%' }}>
             <ReactFlow
               nodes={nodes}
               edges={edges}
               nodeTypes={nodeTypes}
               edgeTypes={edgeTypes}
+              
               onNodesChange={onNodesChange}
               onEdgesChange={onEdgesChange}
               connectionLineComponent={FloatingConnectionLine}
+              fitView 
             >
               <Background />
               <Controls />
               <MiniMap />
             </ReactFlow>
           </div>
-          <NodesContext.Provider value={{nodes: nodes, setNOdes: setNodes}}>
+          <NodesContext.Provider value={{nodes: nodes, setNodes: setNodes}}>
             <SidebarFilterList />
           </NodesContext.Provider>
           

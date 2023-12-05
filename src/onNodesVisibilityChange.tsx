@@ -26,7 +26,7 @@ export const onNodesVisibilityChange = (reactflow, nodes, visible)=> {
         
         const image = node.hidden ? hiddenIcon : shownIcon
 
-        document.getElementById(node.id + "_icon").setAttribute('src', image)
+        //document.getElementById(node.id + "_icon").setAttribute('src', image)
     });
 
     reactflow.setNodes(updatedNodes)
