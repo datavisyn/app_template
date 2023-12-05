@@ -27,7 +27,7 @@ export function App() {
     setSearch(values);
   };
   const setIds = (ids: string[]) =>{
-    setSelectedValues([...selectedValues, ids])
+    setSelectedIds([...selectedIds, ids])
   }
 
   return (
