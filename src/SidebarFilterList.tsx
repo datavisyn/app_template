@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
-import { EdgeLabelRenderer, useReactFlow } from "reactflow";
-import { List, Card, Text, ScrollArea, ThemeIcon, Checkbox, Group, Select, Divider } from "@mantine/core"
+import { useReactFlow } from "reactflow";
+import { Card, ScrollArea, Group, Select, Divider } from "@mantine/core"
 import { onNodesVisibilityChange } from './onNodesVisibilityChange';
 
 import { TreeView } from '@mui/x-tree-view';
@@ -9,7 +9,6 @@ import type {} from '@mui/x-tree-view/themeAugmentation';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
-import shownIcon from './images/eye.png'
 
 const theme = createTheme({
     components: {
