@@ -16,6 +16,7 @@ const theme = createTheme({
         styleOverrides: {
           root: {
             backgroundColor: 'white',
+            height: '100%'
           },
         },
       },
@@ -24,6 +25,9 @@ const theme = createTheme({
 
 // component for sidebar with filter area and list of nodes
 export function SidebarFilterList() {
+    // full height list:
+    
+
 
     // get state of nodes from parent component
     const reactflow = useReactFlow()
@@ -128,14 +132,14 @@ export function SidebarFilterList() {
     }
 
     return (
-        <div style={{ height: '90%', width: '23%', padding: '10px' }}>
+        <div style={{ height: '90vh', width: '23%', padding: '10px' }}>
             <Card withBorder shadow='sm' radius="lg" style={{ width: '100%', height: '100%' }}>
                 <Group position="apart" style={{ padding: '6px 4px' }} >
                     <div>Nodes</div>
                     {loadData()}
                 </Group>
                 <Divider />
-                <ScrollArea h={250} offsetScrollbars scrollbarSize={2} >
+                <ScrollArea style={{ height: 'calc(100% - 60px)' }} offsetScrollbars scrollbarSize={2}>
                     {renderNodeTree()}
                 </ScrollArea>
             </Card>
