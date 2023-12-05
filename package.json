@@ -50,8 +50,6 @@
     "webpack:prod": "visyn_scripts build --mode production --env workspace_mode=single"
   },
   "dependencies": {
-    "@emotion/react": "^11.11.1",
-    "@emotion/styled": "^11.11.0",
     "@mantine/core": "^5.5.5",
     "@mantine/hooks": "^5.5.5",
     "@mui/icons-material": "^5.14.18",
