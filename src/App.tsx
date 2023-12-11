@@ -5,6 +5,7 @@ import { useAutocomplete } from './store/store';
 import { GeneGraph } from './GeneGraph';
 import { FilterNodeTypesArea } from './FilterNodeTypesArea';
 import LayoutFlow from './GeneGraphFrontendLayout';
+import { LayoutGraph } from './GeneGraphLayout';
 
 export function App() {
   const [selectedValues, setSelectedValues] = useState([]);
@@ -44,8 +45,9 @@ export function App() {
         rightSection={isFetching ? <Loader size="sm" /> : null}
       />
 
-      <GeneGraph geneID={selectedIds} addID={setIds}/>
+      {/* <GeneGraph geneID={selectedIds} addID={setIds}/> */}
       {/* <LayoutFlow geneID={selectedIds}/> */}
+      <LayoutGraph geneID = {selectedIds} addID={setIds}/>
     </>
   );
 }
