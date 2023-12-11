@@ -6,6 +6,7 @@ import { nodeTypes } from "./NodeTypes";
 import FloatingEdge from './EdgeType';
 import FloatingConnectionLine from './FloatingConnectionLine';
 import { SidebarFilterList } from './SidebarFilterList';
+import { node } from 'execa';
 
 export const NodesContext = React.createContext(null)
 
@@ -22,10 +23,12 @@ type GeneGraphProps = {
 // GeneGraph component
 export function GeneGraph(props: GeneGraphProps) {
   let geneIds = props.geneID;
+  let currentNodes = [];
 
   // state for the nodes and edges
   const [nodes, setNodes, onNodesChange] = useNodesState([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
+  const [currentGeneIds, setGeneIds] = useState(geneIds)
 
 
   // get all genes that are connected to the first node
@@ -34,10 +37,9 @@ export function GeneGraph(props: GeneGraphProps) {
     limit: 1000,
   });
 
-  useMemo(() => {
-
+  useEffect(() => {
     (document as any).startViewTransition(() => {
-      setNodes(graph?.nodes.map((node,index)=>{
+      currentNodes = graph?.nodes.map((node,index)=>{
         return{
           id:node.id,
           position:{
@@ -53,14 +55,18 @@ export function GeneGraph(props: GeneGraphProps) {
               label:node.symbol == "nan" ? node.id : node.symbol,
               summary:node.summary,
             },
+            children: node.children,
+            parents: node.parents,
             isRoot: props.geneID.includes(node.id) ? true : false,
             type:node.type,
             onExpand: exp,
             onCollapse: coll
           },
           type: "node"
-        }
-      }));
+        }});
+      setNodes(currentNodes)
+        
+    
       
       setEdges(
         graph?.edges.map((edge) => ({
@@ -82,11 +88,25 @@ export function GeneGraph(props: GeneGraphProps) {
     }
   }
 
-  function coll(id: string){
-    if(geneIds.includes(id))
-      geneIds = geneIds.filter((f)=>f!==id)
-    console.log(id);
-    console.log(geneIds);
+  function coll(id: string, children: [string]){
+    geneIds = geneIds.filter(geneId => geneId != id)
+    setGeneIds(geneIds)
+    currentNodes.forEach((child) => {
+      child.data.parents = child.data.parents.filter((parent: string) => parent != id)})
+      
+    var removeChildren = currentNodes.filter(node => children.includes(node.id))
+    removeChildren = removeChildren.filter(node => node.data?.parents.length == 0)
+    currentNodes = currentNodes.filter(node => !removeChildren.includes(node))
+    setNodes(currentNodes)
+    // setNodes(nodes.filter(node => !removeChildIds.(node.id)))
+    // setNodes(nodes.filter(node => removeChildIds.forEach((...) => {}).includes(node.id)));
+    // node.childNodes.forEach(childId =>{
+    //   nodes.remov
+    // })
+    // if(geneIds.includes(id))
+    //   geneIds = geneIds.filter((f)=>f!==id)
+    // console.log(id);
+    // console.log(geneIds);
   }
 
   return (

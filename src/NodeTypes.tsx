@@ -19,7 +19,7 @@ function DefaultCustomNode({ data }) {
     const reactflow = useReactFlow();
     const nodes = reactflow.getNodes();
     const nodeId = useNodeId();
-    const [collapsed, setCollapsed] = useState(true);
+    const [collapsed, setCollapsed] = useState(!data?.isRoot);
 
     const [nodeData, setNodeData] = useState(data?.displayProps);
 
@@ -37,10 +37,12 @@ function DefaultCustomNode({ data }) {
     function onExpandCollapse(){
         if(collapsed){
             data?.onExpand(nodeId)
-            setCollapsed(false);
+            setCollapsed(false)
         }
         else{
-
+            var realChildren = (data?.children).filter(childId => !data?.parents.includes(childId))
+            data?.onCollapse(nodeId, realChildren)
+            setCollapsed(true)
         }
     }
     
