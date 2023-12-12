@@ -92,18 +92,21 @@ export function GeneGraphLayout(props: GeneGraphProps) {
   useEffect(() => {
     if (getNodes() != null && getNodes()?.length != currentNodes && getNodes()[0]["width"] != null) {
       setCurrentNodes(getNodes().length);
-      //setFitted(false);
+      setFitted(true);
       getLayoutedElements();
     }
-    // if(!fitted && getNodes().length != 0 && getEdges().length)
-    //   setFitted(true);
+
+    if (fitted) {
       fitView({
         maxZoom: 15,
         minZoom: 0.1,
         duration: 5000,
         nodes: getNodes()
       });
-    
+
+      setFitted(false)
+    }
+
 
   }, [getNodes(), getEdges()]);
 
