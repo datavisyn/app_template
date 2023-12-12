@@ -41,6 +41,7 @@ const useLayoutedElements = () => {
       children: getNodes(),
       edges: getEdges(),
     };
+    console.log(graph);
 
     elk.layout(graph as any).then(({ children }) => {
 
@@ -51,10 +52,15 @@ const useLayoutedElements = () => {
       });
 
       setNodes(children as any);
-      window.requestAnimationFrame(() => {
-        fitView();
-      });
 
+      window.requestAnimationFrame(() => {
+        fitView({
+          maxZoom: 15,
+          minZoom: 0.1,
+          duration: 5000,
+          nodes: getNodes()
+        });
+      });
     });
   }, []);
 
@@ -70,6 +76,7 @@ function GeneGraphLayout(props: GeneGraphProps) {
   const [nodes, setNodes, onNodesChange] = useNodesState([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
   const { getLayoutedElements } = useLayoutedElements();
+  const [currentNodes,setCurrentNodes] = useState(0);
 
 
 
@@ -79,10 +86,24 @@ function GeneGraphLayout(props: GeneGraphProps) {
     limit: 1000,
   });
 
+  const {getNodes,fitView,getEdges} = useReactFlow();
+
+  useEffect(() => {
+      if (getNodes() != null && getNodes()?.length != currentNodes && getNodes()[0]["width"] != null) {
+        setCurrentNodes(getNodes().length);
+        getLayoutedElements({ 'elk.algorithm': 'org.eclipse.elk.force', });
+      }
+      fitView({
+        maxZoom: 15,
+        minZoom: 0.1,
+        duration: 5000,
+        nodes: getNodes()
+      });
+      }, [getNodes(),getEdges()]);
+
   useMemo(() => {
-
+    setCurrentNodes(0);
     (document as any).startViewTransition(() => {
-
 
       setNodes(graph?.nodes.map((node, index) => {
         return {
@@ -117,10 +138,7 @@ function GeneGraphLayout(props: GeneGraphProps) {
           type: 'floating',
         }))
       );
-      console.log(graph);
-      if(graph != null){
-        getLayoutedElements({ 'elk.algorithm': 'org.eclipse.elk.force' })
-      }
+
     })
 
   }, [graph]);
