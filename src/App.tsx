@@ -16,7 +16,6 @@ export function App() {
 
   // handels the change of selected values (these in the box)
   const handleSelectedChange = (values) => {
-    console.log(values);
     const ids = values.map(value => symbolToIdMap.get(value));
     setSelectedValues(values); // Contains also already selected values
     setSelectedIds(ids); // update ids
@@ -26,8 +25,8 @@ export function App() {
   const handleChange = (values) => {
     setSearch(values);
   };
-  const setIds = (ids: string[]) => {
-    setSelectedIds([...selectedIds, ids])
+  const setIds = (ids: string[]) =>{
+    setSelectedIds(ids)
   }
 
   return (
