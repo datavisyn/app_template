@@ -69,14 +69,14 @@ const useLayoutedElements = () => {
 
 
 // GeneGraph component
-function GeneGraphLayout(props: GeneGraphProps) {
+export function GeneGraphLayout(props: GeneGraphProps) {
   let geneIds = props.geneID;
 
   // state for the nodes and edges
   const [nodes, setNodes, onNodesChange] = useNodesState([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
   const { getLayoutedElements } = useLayoutedElements();
-  const [currentNodes,setCurrentNodes] = useState(0);
+  const [currentNodes, setCurrentNodes] = useState(0);
 
 
 
@@ -86,20 +86,20 @@ function GeneGraphLayout(props: GeneGraphProps) {
     limit: 1000,
   });
 
-  const {getNodes,fitView,getEdges} = useReactFlow();
+  const { getNodes, fitView, getEdges } = useReactFlow();
 
   useEffect(() => {
-      if (getNodes() != null && getNodes()?.length != currentNodes && getNodes()[0]["width"] != null) {
-        setCurrentNodes(getNodes().length);
-        getLayoutedElements({ 'elk.algorithm': 'org.eclipse.elk.force', });
-      }
-      fitView({
-        maxZoom: 15,
-        minZoom: 0.1,
-        duration: 5000,
-        nodes: getNodes()
-      });
-      }, [getNodes(),getEdges()]);
+    if (getNodes() != null && getNodes()?.length != currentNodes && getNodes()[0]["width"] != null) {
+      setCurrentNodes(getNodes().length);
+      getLayoutedElements({ 'elk.algorithm': 'org.eclipse.elk.force', });
+    }
+    fitView({
+      maxZoom: 15,
+      minZoom: 0.1,
+      duration: 5000,
+      nodes: getNodes()
+    });
+  }, [getNodes(), getEdges()]);
 
   useMemo(() => {
     setCurrentNodes(0);
@@ -157,57 +157,28 @@ function GeneGraphLayout(props: GeneGraphProps) {
   }
 
   return (
+    <div style={{ height: '100%', width: '100%', display: 'flex' }}>
+      <ReactFlow
+        nodes={nodes}
+        edges={edges}
+        nodeTypes={nodeTypes}
+        edgeTypes={edgeTypes}
 
-    <ReactFlow
-      nodes={nodes}
-      edges={edges}
-      nodeTypes={nodeTypes}
-      edgeTypes={edgeTypes}
+        minZoom={0.1}
+        maxZoom={10}
 
-      minZoom={0.1}
-      maxZoom={10}
-
-      onNodesChange={onNodesChange}
-      onEdgesChange={onEdgesChange}
-      connectionLineComponent={FloatingConnectionLine}
-      fitView
-    >
-      <Background />
-      <Controls />
-      <MiniMap />
-      <Panel position="top-right">
-        <button
-          onClick={() =>
-            getLayoutedElements({ 'elk.algorithm': 'org.eclipse.elk.force', })
-          }
-        >
-          Do Shit
-        </button>
-      </Panel>
-    </ReactFlow >
-
+        onNodesChange={onNodesChange}
+        onEdgesChange={onEdgesChange}
+        connectionLineComponent={FloatingConnectionLine}
+        fitView
+      >
+        <Background />
+        <Controls />
+        <MiniMap />
+      </ReactFlow >
+      <NodesContext.Provider value={{ nodes: nodes, setNodes: setNodes }}>
+        <SidebarFilterList />
+      </NodesContext.Provider>
+    </div>
   );
-}
-
-export const LayoutGraph = (props) => {
-  return (
-    <>
-      <div style={{ height: '90%', width: '100%', display: 'flex' }}>
-
-        <ReactFlowProvider>
-          <div style={{ height: '100%', width: '77%' }}>
-            <GeneGraphLayout geneID={props.geneID} addID={props.addID} />
-          </div>
-          {/* <NodesContext.Provider value={{nodes: nodes, setNodes: setNodes}}>
-            <SidebarFilterList />
-          </NodesContext.Provider> */}
-
-        </ReactFlowProvider>
-
-      </div>
-
-    </>
-
-  );
-
 }
