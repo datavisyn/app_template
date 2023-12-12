@@ -69,7 +69,7 @@ const useLayoutedElements = () => {
 
 
 // GeneGraph component
-function GeneGraphLayout(props: GeneGraphProps) {
+export function GeneGraphLayout(props: GeneGraphProps) {
   let geneIds = props.geneID;
 
   // state for the nodes and edges
@@ -163,57 +163,28 @@ function GeneGraphLayout(props: GeneGraphProps) {
   }
 
   return (
+    <div style={{ height: '100%', width: '100%', display: 'flex' }}>
+      <ReactFlow
+        nodes={nodes}
+        edges={edges}
+        nodeTypes={nodeTypes}
+        edgeTypes={edgeTypes}
 
-    <ReactFlow
-      nodes={nodes}
-      edges={edges}
-      nodeTypes={nodeTypes}
-      edgeTypes={edgeTypes}
+        minZoom={0.1}
+        maxZoom={10}
 
-      minZoom={0.1}
-      maxZoom={10}
-
-      onNodesChange={onNodesChange}
-      onEdgesChange={onEdgesChange}
-      connectionLineComponent={FloatingConnectionLine}
-      fitView
-    >
-      <Background />
-      <Controls />
-      <MiniMap />
-      <Panel position="top-right">
-        <button
-          onClick={() =>
-            getLayoutedElements({ 'elk.algorithm': 'org.eclipse.elk.force', })
-          }
-        >
-          Do Shit
-        </button>
-      </Panel>
-    </ReactFlow >
-
+        onNodesChange={onNodesChange}
+        onEdgesChange={onEdgesChange}
+        connectionLineComponent={FloatingConnectionLine}
+        fitView
+      >
+        <Background />
+        <Controls />
+        <MiniMap />
+      </ReactFlow >
+      <NodesContext.Provider value={{ nodes: nodes, setNodes: setNodes }}>
+        <SidebarFilterList />
+      </NodesContext.Provider>
+    </div>
   );
-}
-
-export const LayoutGraph = (props) => {
-  return (
-    <>
-      <div style={{ height: '90%', width: '100%', display: 'flex' }}>
-
-        <ReactFlowProvider>
-          <div style={{ height: '100%', width: '77%' }}>
-            <GeneGraphLayout geneID={props.geneID} addID={props.addID} />
-          </div>
-          {/* <NodesContext.Provider value={{nodes: nodes, setNodes: setNodes}}>
-            <SidebarFilterList />
-          </NodesContext.Provider> */}
-
-        </ReactFlowProvider>
-
-      </div>
-
-    </>
-
-  );
-
 }

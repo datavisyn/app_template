@@ -1,11 +1,9 @@
 
-import { Autocomplete, Loader, MultiSelect } from '@mantine/core';
+import { Loader, MultiSelect } from '@mantine/core';
 import React, { useState } from 'react';
 import { useAutocomplete } from './store/store';
-import { GeneGraph } from './GeneGraph';
-import { FilterNodeTypesArea } from './FilterNodeTypesArea';
-import LayoutFlow from './GeneGraphFrontendLayout';
-import { LayoutGraph } from './GeneGraphLayout';
+import { GeneGraphLayout } from './GeneGraphLayout';
+import { ReactFlowProvider } from 'reactflow';
 
 export function App() {
   const [selectedValues, setSelectedValues] = useState([]);
@@ -13,9 +11,9 @@ export function App() {
   const [selectedIds, setSelectedIds] = useState([]);
 
   const { data: autocompleteData, isFetching } = useAutocomplete({ search });
-  const symbolToIdMap = new Map(autocompleteData?.map(item => [(item[0]+' ('+item[2]+')'), item[1]])); // makes a id-List for backend
-  const symbolsList = autocompleteData?.map(item => (item[0]+' ('+item[2]+')')); // Maked a SymbolList for FrontEnd
-  
+  const symbolToIdMap = new Map(autocompleteData?.map(item => [(item[0] + ' (' + item[2] + ')'), item[1]])); // makes a id-List for backend
+  const symbolsList = autocompleteData?.map(item => (item[0] + ' (' + item[2] + ')')); // Maked a SymbolList for FrontEnd
+
   // handels the change of selected values (these in the box)
   const handleSelectedChange = (values) => {
     console.log(values);
@@ -28,7 +26,7 @@ export function App() {
   const handleChange = (values) => {
     setSearch(values);
   };
-  const setIds = (ids: string[]) =>{
+  const setIds = (ids: string[]) => {
     setSelectedIds([...selectedIds, ids])
   }
 
@@ -47,7 +45,9 @@ export function App() {
 
       {/* <GeneGraph geneID={selectedIds} addID={setIds}/> */}
       {/* <LayoutFlow geneID={selectedIds}/> */}
-      <LayoutGraph geneID = {selectedIds} addID={setIds}/>
+      <ReactFlowProvider>
+        <GeneGraphLayout geneID={selectedIds} addID={setIds} />
+      </ReactFlowProvider>
     </>
   );
 }
