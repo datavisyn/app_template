@@ -90,7 +90,6 @@ export function SidebarFilterList() {
 
         const geneNodeLabels = nodes.map((node) => {
             if (node.data.type === 'gene') {
-                console.log(node.data.displayProps.label)
                 return node.data.displayProps.label
             }
         })
@@ -112,7 +111,6 @@ export function SidebarFilterList() {
                 <TreeView aria-aria-label='node tree' defaultCollapseIcon={<ExpandMoreIcon />} defaultExpandIcon={<ChevronRightIcon />}>
                     <TreeItem nodeId='listNodeGene' label='genes'>
                         {geneNodeLabels.map((label) => {
-                            console.log(label)
                             return <TreeItem nodeId={label + "_treeItem"} label={label}/>
                         })}
                     </TreeItem>
