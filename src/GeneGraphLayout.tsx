@@ -41,7 +41,6 @@ const useLayoutedElements = () => {
       children: getNodes(),
       edges: getEdges(),
     };
-    console.log(graph);
 
     elk.layout(graph as any).then(({ children }) => {
 
@@ -77,7 +76,6 @@ export function GeneGraphLayout(props: GeneGraphProps) {
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
   const { getLayoutedElements } = useLayoutedElements();
   const [currentNodes, setCurrentNodes] = useState(0);
-  const [fitted, setFitted] = useState<boolean>(false);
 
 
 
@@ -92,20 +90,29 @@ export function GeneGraphLayout(props: GeneGraphProps) {
   useEffect(() => {
     if (getNodes() != null && getNodes()?.length != currentNodes && getNodes()[0]["width"] != null) {
       setCurrentNodes(getNodes().length);
-      setFitted(true);
       getLayoutedElements();
     }
 
-    if (fitted) {
-      fitView({
-        maxZoom: 15,
-        minZoom: 0.1,
-        duration: 5000,
-        nodes: getNodes()
-      });
+    //TODO 
+    // //fit only if number of nodes has changed
+    // // if (getNodes().length != currentNodes) {
+    // //   setCurrentNodes(getNodes().length);
+    // //   fitView({
+    // //     maxZoom: 15,
+    // //     minZoom: 0.1,
+    // //     duration: 5000,
+    // //     nodes: getNodes()
+    // //   });
+    // }
 
-      setFitted(false)
-    }
+      window.requestAnimationFrame(() => {
+        fitView({
+          maxZoom: 15,
+          minZoom: 0.1,
+          duration: 5000,
+          nodes: getNodes()
+        });
+      });
 
 
   }, [getNodes(), getEdges()]);
