@@ -15,7 +15,7 @@ var color = {
 
 
 // this is the default custom node
-function DefaultCustomNode({ data }) {
+function DefaultCustomNode({ data, selected }) {
     const reactflow = useReactFlow();
     const nodes = reactflow.getNodes();
     const nodeId = useNodeId();
@@ -34,6 +34,7 @@ function DefaultCustomNode({ data }) {
         }
 
     }, [isFetching]);
+
     function onExpandCollapse(){
         if(collapsed){
             data?.onExpand(nodeId)
@@ -52,10 +53,7 @@ function DefaultCustomNode({ data }) {
         padding: "14px",
         borderRadius: "8px",
         border: data?.isRoot ? '3px solid #398354' : '',
-        // boxShadow: isHovered || isHighlighted ? "0 4px 8px rgba(0, 0, 0, 0.2)" : "none",
-        // transition: "box-shadow 0.3s ease transform 0.3 ease",
-        // transform: selected ? "scale(1.8)" : "scale(1)",
-        // display: nodeInternals.get(data.id).hidden ? "none" : "block",
+        opacity: selected? 1 : 0.5,
     };
 
     const symbolStyle: React.CSSProperties = {
@@ -82,7 +80,7 @@ function DefaultCustomNode({ data }) {
                     <Button variant="filled" color="gray" fullWidth onClick={() => onNodesVisibilityChange(reactflow, [nodes[nodeIndex]], !nodes[nodeIndex].hidden)}>Hide</Button>
                 </Flex>
                 <Space h="md" />
-                <Tabs color="gray" variant="outline" defaultValue="details">
+                <Tabs color="gray" variant="outline" defaultValue="details"> 
                     <Tabs.List>
                         <Tabs.Tab rightSection={<IconInfoCircle />} value="details" > Details</Tabs.Tab>
                         {data?.displayProps.summary != "nan" ? <Tabs.Tab rightSection={<IconReportSearch />} value="summary">Summary</Tabs.Tab> : <></>}
