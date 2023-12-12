@@ -28,13 +28,13 @@ const elk = new ELK();
 const useLayoutedElements = () => {
   const { getNodes, setNodes, getEdges, fitView } = useReactFlow();
   const defaultOptions = {
-    'elk.algorithm': 'layered',
+    'elk.algorithm': 'org.eclipse.elk.force',
     'elk.layered.spacing.nodeNodeBetweenLayers': 100,
     'elk.spacing.nodeNode': 80,
   };
 
-  const getLayoutedElements = useCallback((options) => {
-    const layoutOptions = { ...defaultOptions, ...options };
+  const getLayoutedElements = useCallback(() => {
+    const layoutOptions = { ...defaultOptions };
     const graph = {
       id: 'root',
       layoutOptions: layoutOptions,
@@ -76,7 +76,8 @@ function GeneGraphLayout(props: GeneGraphProps) {
   const [nodes, setNodes, onNodesChange] = useNodesState([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
   const { getLayoutedElements } = useLayoutedElements();
-  const [currentNodes,setCurrentNodes] = useState(0);
+  const [currentNodes, setCurrentNodes] = useState(0);
+  const [fitted, setFitted] = useState<boolean>(false);
 
 
 
@@ -86,20 +87,25 @@ function GeneGraphLayout(props: GeneGraphProps) {
     limit: 1000,
   });
 
-  const {getNodes,fitView,getEdges} = useReactFlow();
+  const { getNodes, fitView, getEdges } = useReactFlow();
 
   useEffect(() => {
-      if (getNodes() != null && getNodes()?.length != currentNodes && getNodes()[0]["width"] != null) {
-        setCurrentNodes(getNodes().length);
-        getLayoutedElements({ 'elk.algorithm': 'org.eclipse.elk.force', });
-      }
+    if (getNodes() != null && getNodes()?.length != currentNodes && getNodes()[0]["width"] != null) {
+      setCurrentNodes(getNodes().length);
+      //setFitted(false);
+      getLayoutedElements();
+    }
+    // if(!fitted && getNodes().length != 0 && getEdges().length)
+    //   setFitted(true);
       fitView({
         maxZoom: 15,
         minZoom: 0.1,
         duration: 5000,
         nodes: getNodes()
       });
-      }, [getNodes(),getEdges()]);
+    
+
+  }, [getNodes(), getEdges()]);
 
   useMemo(() => {
     setCurrentNodes(0);
