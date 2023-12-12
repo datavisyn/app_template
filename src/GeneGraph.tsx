@@ -36,7 +36,6 @@ export function GeneGraph(props: GeneGraphProps) {
   });
 
   useMemo(() => {
-    
     (document as any).startViewTransition(() => {
       currentNodes = graph?.nodes.map((node,index)=>{
         return{
