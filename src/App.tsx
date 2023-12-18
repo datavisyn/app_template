@@ -2,7 +2,7 @@
 import { Loader, MultiSelect } from '@mantine/core';
 import React, { useState } from 'react';
 import { useAutocomplete } from './store/store';
-import { GeneGraph, GeneGraphLayout } from './GeneGraph';
+import { GeneGraph } from './GeneGraph';
 import { ReactFlowProvider } from 'reactflow';
 
 export function App() {
