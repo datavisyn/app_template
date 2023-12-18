@@ -26,6 +26,9 @@ const theme = createTheme({
 
 // component for sidebar with filter area and list of nodes
 export function SidebarFilterList() {
+    // full height list:
+    
+
 
     // get state of nodes from parent component
     const reactflow = useReactFlow()
