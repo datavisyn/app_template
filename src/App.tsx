@@ -2,7 +2,7 @@
 import { Loader, MultiSelect } from '@mantine/core';
 import React, { useState } from 'react';
 import { useAutocomplete } from './store/store';
-import { GeneGraphLayout } from './GeneGraphLayout';
+import { GeneGraph, GeneGraphLayout } from './GeneGraph';
 import { ReactFlowProvider } from 'reactflow';
 
 export function App() {
@@ -25,7 +25,7 @@ export function App() {
   const handleChange = (values) => {
     setSearch(values);
   };
-  const setIds = (ids: string[]) =>{
+  const setIds = (ids: string[]) => {
     setSelectedIds(ids)
   }
 
@@ -45,7 +45,7 @@ export function App() {
       {/* <GeneGraph geneID={selectedIds} addID={setIds}/> */}
       {/* <LayoutFlow geneID={selectedIds}/> */}
       <ReactFlowProvider>
-        <GeneGraphLayout geneID={selectedIds} addID={setIds} />
+        <GeneGraph geneID={selectedIds} setIds={setIds} />
       </ReactFlowProvider>
     </>
   );
