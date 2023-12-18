@@ -70,7 +70,6 @@ const useLayoutedElements = () => {
 // GeneGraph component
 export function GeneGraph(props: GeneGraphProps) {
   let geneIds = props.geneID;
-  let currentNodes = [];
 
   // state for the nodes and edges
   const [nodes, setNodes, onNodesChange] = useNodesState([]);
@@ -89,22 +88,12 @@ export function GeneGraph(props: GeneGraphProps) {
   const { getNodes, fitView, getEdges } = useReactFlow();
 
   useMemo(() => {
+    console.log(getNodes())
     if (getNodes() != null && getNodes()?.length != curNodes && getNodes()[0]["width"] != null) {
         setCurNodes(getNodes().length);
         getLayoutedElements();
     }
 
-    //TODO 
-    // //fit only if number of nodes has changed
-    // // if (getNodes().length != currentNodes) {
-    // //   setCurrentNodes(getNodes().length);
-    // //   fitView({
-    // //     maxZoom: 15,
-    // //     minZoom: 0.1,
-    // //     duration: 5000,
-    // //     nodes: getNodes()
-    // //   });
-    // }
 
     window.requestAnimationFrame(() => {
       fitView({
@@ -116,13 +105,13 @@ export function GeneGraph(props: GeneGraphProps) {
     });
 
 
-  }, [getNodes(), getEdges()]);
+  }, [getNodes().map(node => {node.id})]);
 
   useMemo(() => {
     setCurNodes(0);
     (document as any).startViewTransition(() => {
 
-      currentNodes = graph?.nodes.map((node, index) => {
+      setNodes(graph?.nodes.map((node, index) => {
         return {
           id: node.id,
           position: {
@@ -147,9 +136,8 @@ export function GeneGraph(props: GeneGraphProps) {
           },
           type: "node"
         }
-      });
+      }));
 
-      setNodes(currentNodes)
 
       setEdges(
         graph?.edges.map((edge) => ({
@@ -173,6 +161,7 @@ export function GeneGraph(props: GeneGraphProps) {
 
   function coll(id: string, children: [string]) {
     geneIds = geneIds.filter(geneId => geneId != id)
+    let currentNodes = getNodes();
     currentNodes.forEach((child) => {
       child.data.parents = child.data.parents.filter((parent: string) => parent != id)
     })
