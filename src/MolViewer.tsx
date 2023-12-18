@@ -59,6 +59,7 @@ function MolViewer({ options, entrez_id }: MolViewerProps) {
               const viewerOptions: Partial<ViewerOptions> = {
                 ...options,
                 layoutShowControls: false, // Set layoutShowControls to false
+                layoutIsExpanded: false,
               };
   
               const viewer = await Viewer.create('mol-container', viewerOptions);
