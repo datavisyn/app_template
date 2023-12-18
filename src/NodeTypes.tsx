@@ -5,6 +5,7 @@ import { useGetTraitInfo } from './store/store';
 import { useEffect } from 'react';
 import { IconInfoCircle, IconReportSearch, IconTopologyFull, IconSearch } from '@tabler/icons-react';
 import { onNodesVisibilityChange } from './onNodesVisibilityChange';
+import MolViewer from './MolViewer';
 
 
 var color = {   
@@ -129,9 +130,11 @@ function DefaultCustomNode({ data }) {
                     </Tabs.Panel>
 
                     <Tabs.Panel value="structure">
-                        <div style={{ height: '30vh' }}>
-                            <Text>MolStar Structure</Text>
-                        </div>
+                        <ScrollArea>
+                            <div style={{ height: '30vh' }}>
+                                <MolViewer entrez_id={nodeId} options={{ layoutShowControls: false }} />
+                            </div>
+                        </ScrollArea>
                     </Tabs.Panel>
                 </Tabs>
             </HoverCard.Dropdown>
