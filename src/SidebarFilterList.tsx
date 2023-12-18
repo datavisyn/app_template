@@ -1,5 +1,5 @@
-import React, { useState } from 'react'
-import { useReactFlow } from "reactflow";
+import React, { useState, useEffect, } from 'react'
+import { useReactFlow, useOnSelectionChange } from "reactflow";
 import { Card, ScrollArea, Group, Divider, MultiSelect } from "@mantine/core"
 import { onNodesVisibilityChange } from './onNodesVisibilityChange';
 import { TreeView } from '@mui/x-tree-view';
@@ -28,8 +28,18 @@ const theme = createTheme({
 export function SidebarFilterList() {
 
     // get state of nodes from parent component
-    const reactflow = useReactFlow()
-    const nodes = reactflow.getNodes()
+    const reactflow = useReactFlow();
+    const nodes = reactflow.getNodes();
+    const [nodesSelected, setNodesSelected] = useState(nodes.filter(node => node.selected));
+    const [searchSelected, setSearchSelected] = useState([]);
+
+    useOnSelectionChange({
+        onChange: ({ nodes, edges }) => {
+            console.log("nodes", nodes)
+            setNodesSelected(nodes.filter(node => node.selected))
+        },
+        
+    });
 
 
     const NodeTree = () => {
@@ -45,10 +55,23 @@ export function SidebarFilterList() {
         const nodeLists = [geneNodeLabels, diseaseNodeLabels, drugNodeLabels]
         const types = ["genes", "diseases", "drugs"]
 
+        const [treeViewSelection, setTreeViewSelection] = useState(nodesSelected.map(node => node.data?.label + "_treeItem"));
+
+
+        useEffect(() => {
+            setTreeViewSelection(nodesSelected.map(node => node.data?.label + "_treeItem"))
+
+        }, [nodesSelected])
 
         return (
             <ThemeProvider theme={theme}>
-                <TreeView multiSelect={false} aria-aria-label='node tree' defaultCollapseIcon={<ExpandMoreIcon />} defaultExpandIcon={<ChevronRightIcon />}>
+                <TreeView
+                    multiSelect={true}
+                    aria-aria-label='node_tree'
+                    defaultCollapseIcon={<ExpandMoreIcon />}
+                    defaultExpandIcon={<ChevronRightIcon />}
+                    selected={treeViewSelection}
+                >
                     {
                         nodeLists.map((list, index) => {
                             if (list.length > 0) return (
@@ -57,8 +80,8 @@ export function SidebarFilterList() {
                                         return <TreeItem nodeId={label + "_treeItem"} label={label} />
                                     })}
                                 </TreeItem>)
-                        }
-                        )}
+                        })
+                    }
                 </TreeView>
             </ThemeProvider>
         )
@@ -89,6 +112,8 @@ export function SidebarFilterList() {
                         variant='filled'
                         size='xs'
                         radius='xl'
+                        value={searchSelected.map(node => node.data?.label)}
+                        
                     />
 
                 </Group>
