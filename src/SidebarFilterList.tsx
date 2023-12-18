@@ -31,12 +31,13 @@ export function SidebarFilterList() {
     const reactflow = useReactFlow();
     const nodes = reactflow.getNodes();
     const [nodesSelected, setNodesSelected] = useState(nodes.filter(node => node.selected));
-    const [searchSelected, setSearchSelected] = useState([]);
+
+    const [selectionNodes, setSelectionNodes] = useState(nodes.filter(node => node.selected));
 
     useOnSelectionChange({
         onChange: ({ nodes, edges }) => {
-            console.log("nodes", nodes)
             setNodesSelected(nodes.filter(node => node.selected))
+            setSelectionNodes(nodes.filter(node => node.selected))
         },
         
     });
@@ -56,12 +57,23 @@ export function SidebarFilterList() {
         const types = ["genes", "diseases", "drugs"]
 
         const [treeViewSelection, setTreeViewSelection] = useState(nodesSelected.map(node => node.data?.label + "_treeItem"));
-
+        const [treeViewExpanded, setTreeViewExpanded] = useState([])
 
         useEffect(() => {
-            setTreeViewSelection(nodesSelected.map(node => node.data?.label + "_treeItem"))
-
+            setTreeViewSelection(nodesSelected.map(node => node.data?.label))
         }, [nodesSelected])
+
+        const handleNodeSelect = (event, value) => {
+            // setTreeViewExpanded(value)
+
+            var selected = nodes.filter(node => value.includes(node.data?.label))
+            if(selected.length > 0){
+                onNodesSelectionChange(reactflow, selected)
+            }
+            
+
+            
+        }
 
         return (
             <ThemeProvider theme={theme}>
@@ -71,13 +83,15 @@ export function SidebarFilterList() {
                     defaultCollapseIcon={<ExpandMoreIcon />}
                     defaultExpandIcon={<ChevronRightIcon />}
                     selected={treeViewSelection}
+                    onNodeSelect={handleNodeSelect}
+                    // expanded={treeViewExpanded}
                 >
                     {
                         nodeLists.map((list, index) => {
                             if (list.length > 0) return (
-                                <TreeItem nodeId={'listNode_' + types[index]} label={types[index]}>
+                                <TreeItem nodeId={types[index]} label={types[index]}>
                                     {list.map((label) => {
-                                        return <TreeItem nodeId={label + "_treeItem"} label={label} />
+                                        return <TreeItem nodeId={label} label={label} />
                                     })}
                                 </TreeItem>)
                         })
@@ -112,8 +126,7 @@ export function SidebarFilterList() {
                         variant='filled'
                         size='xs'
                         radius='xl'
-                        value={searchSelected.map(node => node.data?.label)}
-                        
+                        value={selectionNodes.map(node => node.data?.label)}
                     />
 
                 </Group>
