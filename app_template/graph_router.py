@@ -137,7 +137,10 @@ def autocomplete(search: str, limit: int | None = 10) -> list[list[str]]:
 
 
 @graph_router.get("/expand")
-def expand(geneIds: list[str] = Query(), limit: int = 1000) -> Gene2AllResponse | None:
+def expand(geneIds: list[str] = Query(), fixedGeneIds: list[str] = Query(), limit: int = 1000) -> Gene2AllResponse | None:
+    
+    if geneIds[0] == "":
+        return Gene2AllResponse(nodes=[], edges=[])
     # empty children/parents lists (since we don't know if a node got hidden)
     allNodes["children"] = np.empty((len(allNodes), 0)).tolist()
     allNodes["parents"] = np.empty((len(allNodes), 0)).tolist()
@@ -185,6 +188,8 @@ def expand(geneIds: list[str] = Query(), limit: int = 1000) -> Gene2AllResponse 
             parent["children"].apply(lambda lst: lst.extend(filteredNodes))
             allNodesResult = pd.concat([allNodesResult, parent, nodes])
 
+    if fixedGeneIds[0] != "":
+        allNodesResult = pd.concat([allNodesResult, allNodes[allNodes["id"].isin(fixedGeneIds)]])
     # remove possible duplicates
     allNodesResult = allNodesResult.drop_duplicates(subset=["id"], keep="last")
     if len(allNodesResult) != 0:
