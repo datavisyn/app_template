@@ -89,9 +89,17 @@ export function GeneGraph(props: GeneGraphProps) {
   const { getNodes, fitView, getEdges } = useReactFlow();
 
   useEffect(() => {
+    console.log("Nodes")
+    console.log(getNodes())
+    console.log(getNodes().length)
+    console.log("currnodes")
+    console.log(curNodes)
     if (getNodes() != null && getNodes()?.length != curNodes && getNodes()[0]["width"] != null) {
-      setCurNodes(getNodes().length);
-      getLayoutedElements();
+      setTimeout(() => {
+        console.log("if")
+        setCurNodes(getNodes().length);
+        getLayoutedElements();
+      }, 1000);
     }
 
     //TODO 
@@ -148,6 +156,8 @@ export function GeneGraph(props: GeneGraphProps) {
           type: "node"
         }
       });
+      console.log("effect")
+      console.log(currentNodes)
       setNodes(currentNodes)
 
       setEdges(
