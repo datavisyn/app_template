@@ -45,21 +45,19 @@ export function SidebarFilterList() {
 
         // toogle tree Node Categorie -> call hide for all nodes in list
         const toggleNodeCategory = (type) => {
-            console.log("toggleNodeCategory", type)
             var newType = type.slice(0, -1);
 
             const updatedNodes = nodes.map(node => {
                 if (node.data.type === newType) {
-                    console.log("node smae type: ", node.data.type)
                     globalBool = !node.hidden;
                     return { ...node, hidden: !node.hidden };
                 }
                 return node;
             });
             
-            console.log("updatedNodes", updatedNodes)
+     
             setNodes(updatedNodes);
-            console.log(" current bool ", updatedNodes[0].hidden);
+
             onNodesVisibilityChange(reactflow, updatedNodes.filter(node => node.data.type === newType), globalBool);
         };
 
