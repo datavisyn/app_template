@@ -74,14 +74,19 @@ export function GeneGraph(props: GeneGraphProps) {
   // state for the nodes and edges
   const [nodes, setNodes, onNodesChange] = useNodesState([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
-  const { getLayoutedElements } = useLayoutedElements();
+  let fixedIds = []
+  if(nodes != undefined &&  nodes.length != 0){
+    // let fixedNodes = nodes.filter(node => node.data.children.length == 0 && node.data.parents.length == 0)
+    // fixedIds = fixedNodes.map(({ id }) => id);
+  }  const { getLayoutedElements } = useLayoutedElements();
   const [curNodes, setCurNodes] = useState(0);
 
 
 
   // get all genes that are connected to the first node
   let { data: graph } = useExpand({
-    geneIds: geneIds,
+      geneIds: geneIds,
+      fixedGeneIds: fixedIds,
     limit: 1000,
   });
 
@@ -164,8 +169,12 @@ export function GeneGraph(props: GeneGraphProps) {
     let currentNodes = getNodes();
     currentNodes.forEach((child) => {
       child.data.parents = child.data.parents.filter((parent: string) => parent != id)
+      if(child.id == id){
+        child.data.children = []
+        child.data.isRoot = false
+      }
     })
-
+      
     var removeChildren = currentNodes.filter(node => children.includes(node.id))
     removeChildren = removeChildren.filter(node => node.data?.parents.length == 0)
     currentNodes = currentNodes.filter(node => !removeChildren.includes(node))

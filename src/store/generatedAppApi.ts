@@ -7,28 +7,35 @@ const injectedRtkApi = api.injectEndpoints({
     expandApiAppExpandGet: build.query<ExpandApiAppExpandGetApiResponse, ExpandApiAppExpandGetApiArg>({
       query: (queryArg) => {
         // This is a hack to get around the fact that RTK Query doesn't support arrays in query params
-        const geneParams = queryArg.geneIds.map(id => `geneIds=${encodeURIComponent(id)}`).join('&');
+        let geneParams = queryArg.geneIds.map(id => `geneIds=${encodeURIComponent(id)}`).join('&');
+        if (geneParams == "")
+          geneParams = "geneIds"
+          let fixedGeneParams = queryArg.fixedGeneIds.map(id => `fixedGeneIds=${encodeURIComponent(id)}`).join('&');
+          if (fixedGeneParams == "")
+          fixedGeneParams = "fixedGeneIds"
+
         const limitParam = `limit=${encodeURIComponent(queryArg.limit)}`;
-        const queryString = `${geneParams}&${limitParam}`;
+        const queryString = `${geneParams}&${fixedGeneParams}&${limitParam}`;
         return { url: `http://127.0.0.1:9000/api/app/expand?${queryString}` };
       },
     }),
     getTraitInfoApiAppTraitinfoTraitIdGet: build.query<GetTraitInfoApiAppTraitinfoTraitIdGetApiResponse, GetTraitInfoApiAppTraitinfoTraitIdGetApiArg>({
       query: (queryArg) => ({ url: `http://127.0.0.1:9000/api/app/traitinfo/${queryArg.traitId}` }),
-
     }),
   }),
   overrideExisting: false,
 });
 export { injectedRtkApi as generatedAppApi };
-export type AutocompleteApiAppAutocompleteGetApiResponse = /** status 200 Successful Response */ string[];
+export type AutocompleteApiAppAutocompleteGetApiResponse = /** status 200 Successful Response */ string[][];
 export type AutocompleteApiAppAutocompleteGetApiArg = {
   search: string;
   limit?: number;
 };
+
 export type ExpandApiAppExpandGetApiResponse = /** status 200 Successful Response */ Gene2AllResponse;
 export type ExpandApiAppExpandGetApiArg = {
   geneIds: string[];
+  fixedGeneIds: string[];
   limit?: number;
 };
 export type GetTraitInfoApiAppTraitinfoTraitIdGetApiResponse = /** status 200 Successful Response */ any;
