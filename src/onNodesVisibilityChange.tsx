@@ -12,9 +12,14 @@ export const onNodesVisibilityChange = (reactflow, nodes, visible)=> {
         return node
     })
 
-    const updatedEdges = reactflow.getEdges().filter(edge => 
-        nodes.some(n => n.id === edge.source) && nodes.some(n => n.id === edge.target));
-    
+    const updatedEdges = reactflow.getEdges().map((edge) => {
+
+        if ((nodes.some(n => n.id == edge.source) || nodes.some(n => n.id === edge.target))) {
+            return {...edge, hidden: visible}
+        }
+
+        return edge
+    })
 
     // get updated images for each nodes that should be hidden
     updatedNodes.forEach(node => {
