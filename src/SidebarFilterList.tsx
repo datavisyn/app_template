@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState, useMemo } from 'react'
 import { useReactFlow } from "reactflow";
 import { Card, ScrollArea, Group, Divider, MultiSelect } from "@mantine/core"
 import { onNodesVisibilityChange } from './onNodesVisibilityChange';
@@ -9,6 +9,11 @@ import { ThemeProvider, createTheme } from '@mui/material/styles';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import { onNodesSelectionChange } from './onNodesSelectionChange';
+import VisibilityIcon from '@mui/icons-material/Visibility';
+import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
+import { filter } from 'd3';
+
+
 
 const theme = createTheme({
     components: {
@@ -31,38 +36,101 @@ export function SidebarFilterList() {
     const reactflow = useReactFlow()
     const nodes = reactflow.getNodes()
 
-
     const NodeTree = () => {
+        const [nodes, setNodes] = useState([]);
+        var globalBool = false;
 
-        const geneNodeLabels = nodes.filter(node => node.data.type === 'gene').map(node => node.data.displayProps.label);
+        // toogle tree Node Categorie -> call hide for all nodes in list
+        const toggleNodeCategory = (type) => {
+            console.log("toggleNodeCategory", type)
+            var newType = type.slice(0, -1);
 
-        const diseaseNodeLabels = nodes.filter(node => node.data.type === 'disease').map(node => {
-            return node.data.displayProps.label;
-        });
+            const updatedNodes = nodes.map(node => {
+                if (node.data.type === newType) {
+                    console.log("node smae type: ", node.data.type)
+                    globalBool = !node.hidden;
+                    return { ...node, hidden: !node.hidden };
+                }
+                return node;
+            });
+            
+            console.log("updatedNodes", updatedNodes)
+            setNodes(updatedNodes);
+            console.log(" current bool ", updatedNodes[0].hidden);
+            onNodesVisibilityChange(reactflow, updatedNodes.filter(node => node.data.type === newType), globalBool);
+        };
 
-        const drugNodeLabels = nodes.filter(node => node.data.type === 'drug').map(node => node.data.displayProps.label);
 
-        const nodeLists = [geneNodeLabels, diseaseNodeLabels, drugNodeLabels]
-        const types = ["genes", "diseases", "drugs"]
+
+        // toogle Hidden Nodes
+        const toggleNodeVisibility = (nodeId) => {
+            let currentHidden;
+            let updatedNode;
+
+            const updatedNodes = nodes.map(node => {
+                if (node.id === nodeId) {
+                    currentHidden = !node.hidden;
+                    updatedNode = { ...node, hidden: currentHidden };
+                    return updatedNode;
+                }
+                return node;
+            });
+
+
+
+
+            setNodes(updatedNodes);
+            onNodesVisibilityChange(reactflow, [updatedNode], currentHidden);
+        };
+
+        // Übergeben Sie das gesamte Node-Objekt, nicht nur das Label
+        const geneNodes = nodes.filter(node => node.data.type === 'gene');
+        const diseaseNodes = nodes.filter(node => node.data.type === 'disease');
+        const drugNodes = nodes.filter(node => node.data.type === 'drug');
+
+        const nodeLists = [geneNodes, diseaseNodes, drugNodes];
+        const types = ["genes", "diseases", "drugs"];
+
+        useEffect(() => {
+            setNodes(reactflow.getNodes());
+        }, [reactflow]);
 
 
         return (
             <ThemeProvider theme={theme}>
-                <TreeView multiSelect={false} aria-aria-label='node tree' defaultCollapseIcon={<ExpandMoreIcon />} defaultExpandIcon={<ChevronRightIcon />}>
-                    {
-                        nodeLists.map((list, index) => {
-                            if (list.length > 0) return (
-                                <TreeItem nodeId={'listNode_' + types[index]} label={types[index]}>
-                                    {list.map((label) => {
-                                        return <TreeItem nodeId={label + "_treeItem"} label={label} />
-                                    })}
-                                </TreeItem>)
-                        }
-                        )}
+                <TreeView>
+                    {nodeLists.map((list, index) => {
+                        if (list.length > 0) return (
+                            <TreeItem
+                                key={'listNode_' + index + "_" + types[index]} // Unique Key -> Prevent Error
+                                nodeId={'listNode_' + index + "_" + types[index]}
+                                label={types[index]}
+                                onDoubleClick={() => toggleNodeCategory(types[index])}
+                                expandIcon={<ChevronRightIcon />}
+                                collapseIcon={<ExpandMoreIcon />}
+                            >
+                                {list.map((node) => (
+                                    <TreeItem
+                                        key={node.id} // Unique Key -> Prevent Error
+                                        nodeId={node.data.displayProps.label + "_" + index + "_treeItem"}
+                                        label={node.data.displayProps.label}
+                                        endIcon={node.hidden ? <VisibilityOffIcon /> : <VisibilityIcon />}
+                                        onClick={() => toggleNodeVisibility(node.id)}
+
+                                    />
+                                ))}
+                            </TreeItem>
+                        )
+                    })}
                 </TreeView>
+
             </ThemeProvider>
         )
     }
+
+
+
+
 
     const scrollHeight = document.getElementById('card')?.clientHeight - 100
 
