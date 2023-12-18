@@ -1,7 +1,4 @@
-import { Tabs, Text, Button, Flex, Space, ScrollArea, CloseButton, Title } from '@mantine/core';
-
-
-import { Popover } from '@mantine/core';
+import { Tabs, Text, Button, Flex, Space, ScrollArea, Popover } from '@mantine/core';
 import React, { useState } from "react"
 import { Handle, Position, useNodeId, useReactFlow } from "reactflow";
 import { useGetTraitInfo } from './store/store';
@@ -11,6 +8,9 @@ import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import PlagiarismOutlinedIcon from '@mui/icons-material/PlagiarismOutlined';
 import InsightsIcon from '@mui/icons-material/Insights';
 import SearchIcon from '@mui/icons-material/Search';
+import CloseIcon from '@mui/icons-material/Close';
+import { median } from 'd3';
+import { height } from '@mui/system';
 
 var color = {   
     "gene": "#4BB268",
@@ -72,22 +72,19 @@ function DefaultCustomNode({ data }) {
     const [popoverOpen, setPopoverOpen] = useState(false);
 
     const openPopover = () => {
-      setPopoverOpen(true);
-    };
+        setPopoverOpen(prev => !prev);
+      };
   
     const closePopover = () => {
       setPopoverOpen(false);
-      console.log("close");
     };
 
     const label = data?.isRoot ? <b>{data?.displayProps.label}</b> : data?.displayProps.label
 
-    const iconClose = <InfoOutlinedIcon fontSize='small' />;
-
     return (
-        <Popover shadow="md" width={358} zIndex={100} withinPortal={true} opened={popoverOpen}>
+        <Popover trapFocus shadow="md" width={358} opened={popoverOpen} position="bottom" withinPortal >
             <Popover.Target>
-                <div style={nodeStyle} onClick={openPopover}>
+                <div style={nodeStyle} onClick={openPopover} >
                     <Handle type="source" position={Position.Top} style={{ visibility: "hidden" }} />
                     {label}
                     <Handle type="target" position={Position.Right} style={{ visibility: "hidden" }} />
@@ -98,7 +95,7 @@ function DefaultCustomNode({ data }) {
                 <Flex justify="center" gap="md">
                     <Button variant="filled" color="gray" fullWidth onClick={onExpandCollapse}> {collapsed ? "Expand" : "Collapse"}</Button>
                     <Button variant="filled" color="gray" fullWidth onClick={() => onNodesVisibilityChange(reactflow, [nodes[nodeIndex]], !nodes[nodeIndex].hidden)}>Hide</Button>
-                    <CloseButton  onClick={closePopover}/>
+                    <Button onClick={closePopover} color='red'  ><CloseIcon /></Button>
                 </Flex>
         
                 <Space h="md" />
@@ -143,9 +140,7 @@ function DefaultCustomNode({ data }) {
                                 <Text size="sm">{data?.displayProps.summary}</Text>
                             </div>
                         </ScrollArea>
-
                     </Tabs.Panel>
-
                     <Tabs.Panel value="structure">
                         <div style={{ height: '30vh' }}>
                             <Text>MolStar Structure</Text>
