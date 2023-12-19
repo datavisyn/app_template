@@ -97,7 +97,7 @@ export function GeneGraph(props: GeneGraphProps) {
 
   return (
     <>
-      <div style={{ height: '90%', width: '100%', display: 'flex' }}>
+      <div style={{ height: '85vh', width: '100%', display: 'flex' }}>
 
         <ReactFlowProvider>
           <div style={{ height: '100%', width: '77%' }}>

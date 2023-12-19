@@ -180,21 +180,23 @@ export function SidebarFilterList() {
             <Card id='card' withBorder shadow='sm' radius="lg" style={{ height: '100%' }}>
                 <Group position="apart" style={{ padding: '6px 4px' }} >
                     <div>Nodes</div>
-                    <MultiSelect
-                        data={nodes.map((node) => {
-                            return node.data?.label;
-                        })}
-                        searchable
-                        clearable
-                        onChange={handleSelectedChange}
-                        placeholder="search node..."
-                        nothingFound="No nodes found"
-                        id='searchbarNodes'
-                        variant='filled'
-                        size='xs'
-                        radius='xl'
-                        value={selectionNodes.map(node => node.data?.label)}
-                    />
+                    <ScrollArea offsetScrollbars scrollbarSize={2}>
+                        <MultiSelect
+                            data={nodes.map((node) => {
+                                return node.data?.label;
+                            })}
+                            searchable
+                            clearable
+                            onChange={handleSelectedChange}
+                            placeholder="search node..."
+                            nothingFound="No nodes found"
+                            id='searchbarNodes'
+                            variant='filled'
+                            size='xs'
+                            radius='xl'
+                            value={selectionNodes.map(node => node.data?.label)}
+                        />
+                    </ScrollArea>
 
                 </Group>
                 <Divider />
