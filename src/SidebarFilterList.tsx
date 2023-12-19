@@ -31,8 +31,6 @@ const theme = createTheme({
 
 // component for sidebar with filter area and list of nodes
 export function SidebarFilterList() {
-    // full height list:
-    
 
 
     // get state of nodes from parent component
@@ -47,12 +45,18 @@ export function SidebarFilterList() {
             setNodesSelected(nodes.filter(node => node.selected))
             setSelectionNodes(nodes.filter(node => node.selected))
         },
-        
+
     });
 
 
     const NodeTree = () => {
         const [nodes, setNodes] = useState([]);
+
+
+        useEffect(() => {
+            setNodes(reactflow.getNodes());
+        }, [reactflow])
+
         var globalBool = false;
 
         // toogle tree Node Categorie -> call hide for all nodes in list
@@ -66,12 +70,13 @@ export function SidebarFilterList() {
                 }
                 return node;
             });
-            
-     
+
+
             setNodes(updatedNodes);
 
             onNodesVisibilityChange(reactflow, updatedNodes.filter(node => node.data.type === newType), globalBool);
         };
+
 
 
 
@@ -89,14 +94,13 @@ export function SidebarFilterList() {
                 return node;
             });
 
-
-
-
             setNodes(updatedNodes);
             onNodesVisibilityChange(reactflow, [updatedNode], currentHidden);
         };
 
         // Übergeben Sie das gesamte Node-Objekt, nicht nur das Label
+
+        console.log(nodes)
         const geneNodeLabels = nodes.filter(node => node.data.type === 'gene');
         const diseaseNodeLabels = nodes.filter(node => node.data.type === 'disease');
         const drugNodeLabels = nodes.filter(node => node.data.type === 'drug');
@@ -115,41 +119,39 @@ export function SidebarFilterList() {
             // setTreeViewExpanded(value)
 
             var selected = nodes.filter(node => value.includes(node.data?.label))
-            if(selected.length > 0){
+            if (selected.length > 0) {
                 onNodesSelectionChange(reactflow, selected)
             }
-            
 
-            
         }
 
         return (
             <ThemeProvider theme={theme}>
                 <TreeView
                     multiSelect={true}
-                    aria-aria-label='node_tree'
                     defaultCollapseIcon={<ExpandMoreIcon />}
                     defaultExpandIcon={<ChevronRightIcon />}
                     selected={treeViewSelection}
                     onNodeSelect={handleNodeSelect}
-                    // expanded={treeViewExpanded}
+                // expanded={treeViewExpanded}
                 >
                     {
                         nodeLists.map((list, index) => {
                             if (list.length > 0) return (
-                                <TreeItem 
-                                key={'listNode_' + index + "_" + types[index]} // Unique Key -> Prevent Error
-                                onDoubleClick={() => toggleNodeCategory(types[index])}
-                                expandIcon={<ChevronRightIcon />}
-                                collapseIcon={<ExpandMoreIcon />}
-                                nodeId={types[index]} 
-                                label={types[index]}>
-                                    {list.map((label) => {
-                                        return <TreeItem 
-                                        nodeId={label} 
-                                        label={label} 
-                                        endIcon={label.hidden ? <VisibilityOffIcon /> : <VisibilityIcon />}
-                                        onClick={() => toggleNodeVisibility(node.id)}
+                                <TreeItem
+                                    key={'listNode_' + index + "_" + types[index]} // Unique Key -> Prevent Error
+                                    onDoubleClick={() => toggleNodeCategory(types[index])}
+                                    expandIcon={<ChevronRightIcon />}
+                                    collapseIcon={<ExpandMoreIcon />}
+                                    nodeId={types[index]}
+                                    label={types[index]}>
+                                    {list.map((node) => {
+                                        return <TreeItem
+                                            key={node.id} // Unique Key -> Prevent Error
+                                            nodeId={node.data.displayProps.label}
+                                            label={node.data.displayProps.label}
+                                            endIcon={node.hidden ? <VisibilityOffIcon /> : <VisibilityIcon />}
+                                            onClick={() => toggleNodeVisibility(node.id)}
 
                                         />
                                     })}
