@@ -10,8 +10,7 @@ import PlagiarismOutlinedIcon from '@mui/icons-material/PlagiarismOutlined';
 import InsightsIcon from '@mui/icons-material/Insights';
 import SearchIcon from '@mui/icons-material/Search';
 import CloseIcon from '@mui/icons-material/Close';
-import { median } from 'd3';
-import { height } from '@mui/system';
+
 
 var color = {   
     "gene": "#4BB268",
