@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useMemo } from 'react'
-import { useReactFlow } from "reactflow";
+import { useReactFlow, useOnSelectionChange } from "reactflow";
 import { Card, ScrollArea, Group, Divider, MultiSelect } from "@mantine/core"
 import { onNodesVisibilityChange } from './onNodesVisibilityChange';
 import { TreeView } from '@mui/x-tree-view';
@@ -31,16 +31,32 @@ const theme = createTheme({
 
 // component for sidebar with filter area and list of nodes
 export function SidebarFilterList() {
-    // full height list:
-    
 
 
     // get state of nodes from parent component
-    const reactflow = useReactFlow()
-    const nodes = reactflow.getNodes()
+    const reactflow = useReactFlow();
+    const nodes = reactflow.getNodes();
+    const [nodesSelected, setNodesSelected] = useState(nodes.filter(node => node.selected));
+
+    const [selectionNodes, setSelectionNodes] = useState(nodes.filter(node => node.selected));
+
+    useOnSelectionChange({
+        onChange: ({ nodes, edges }) => {
+            setNodesSelected(nodes.filter(node => node.selected))
+            setSelectionNodes(nodes.filter(node => node.selected))
+        },
+
+    });
+
 
     const NodeTree = () => {
         const [nodes, setNodes] = useState([]);
+
+
+        useEffect(() => {
+            setNodes(reactflow.getNodes());
+        }, [reactflow])
+
         var globalBool = false;
 
         // toogle tree Node Categorie -> call hide for all nodes in list
@@ -54,12 +70,13 @@ export function SidebarFilterList() {
                 }
                 return node;
             });
-            
-     
+
+
             setNodes(updatedNodes);
 
             onNodesVisibilityChange(reactflow, updatedNodes.filter(node => node.data.type === newType), globalBool);
         };
+
 
 
 
@@ -77,52 +94,70 @@ export function SidebarFilterList() {
                 return node;
             });
 
-
-
-
             setNodes(updatedNodes);
             onNodesVisibilityChange(reactflow, [updatedNode], currentHidden);
         };
 
         // Übergeben Sie das gesamte Node-Objekt, nicht nur das Label
-        const geneNodes = nodes.filter(node => node.data.type === 'gene');
-        const diseaseNodes = nodes.filter(node => node.data.type === 'disease');
-        const drugNodes = nodes.filter(node => node.data.type === 'drug');
 
-        const nodeLists = [geneNodes, diseaseNodes, drugNodes];
-        const types = ["genes", "diseases", "drugs"];
+        console.log(nodes)
+        const geneNodeLabels = nodes.filter(node => node.data.type === 'gene');
+        const diseaseNodeLabels = nodes.filter(node => node.data.type === 'disease');
+        const drugNodeLabels = nodes.filter(node => node.data.type === 'drug');
+
+        const nodeLists = [geneNodeLabels, diseaseNodeLabels, drugNodeLabels]
+        const types = ["genes", "diseases", "drugs"]
+
+        const [treeViewSelection, setTreeViewSelection] = useState(nodesSelected.map(node => node.data?.label + "_treeItem"));
+        const [treeViewExpanded, setTreeViewExpanded] = useState([])
 
         useEffect(() => {
-            setNodes(reactflow.getNodes());
-        }, [reactflow]);
+            setTreeViewSelection(nodesSelected.map(node => node.data?.label))
+        }, [nodesSelected])
 
+        const handleNodeSelect = (event, value) => {
+            // setTreeViewExpanded(value)
+
+            var selected = nodes.filter(node => value.includes(node.data?.label))
+            if (selected.length > 0) {
+                onNodesSelectionChange(reactflow, selected)
+            }
+
+        }
 
         return (
             <ThemeProvider theme={theme}>
-                <TreeView>
-                    {nodeLists.map((list, index) => {
-                        if (list.length > 0) return (
-                            <TreeItem
-                                key={'listNode_' + index + "_" + types[index]} // Unique Key -> Prevent Error
-                                nodeId={'listNode_' + index + "_" + types[index]}
-                                label={types[index]}
-                                onDoubleClick={() => toggleNodeCategory(types[index])}
-                                expandIcon={<ChevronRightIcon />}
-                                collapseIcon={<ExpandMoreIcon />}
-                            >
-                                {list.map((node) => (
-                                    <TreeItem
-                                        key={node.id} // Unique Key -> Prevent Error
-                                        nodeId={node.data.displayProps.label + "_" + index + "_treeItem"}
-                                        label={node.data.displayProps.label}
-                                        endIcon={node.hidden ? <VisibilityOffIcon /> : <VisibilityIcon />}
-                                        onClick={() => toggleNodeVisibility(node.id)}
+                <TreeView
+                    multiSelect={true}
+                    defaultCollapseIcon={<ExpandMoreIcon />}
+                    defaultExpandIcon={<ChevronRightIcon />}
+                    selected={treeViewSelection}
+                    onNodeSelect={handleNodeSelect}
+                // expanded={treeViewExpanded}
+                >
+                    {
+                        nodeLists.map((list, index) => {
+                            if (list.length > 0) return (
+                                <TreeItem
+                                    key={'listNode_' + index + "_" + types[index]} // Unique Key -> Prevent Error
+                                    onDoubleClick={() => toggleNodeCategory(types[index])}
+                                    expandIcon={<ChevronRightIcon />}
+                                    collapseIcon={<ExpandMoreIcon />}
+                                    nodeId={types[index]}
+                                    label={types[index]}>
+                                    {list.map((node) => {
+                                        return <TreeItem
+                                            key={node.id} // Unique Key -> Prevent Error
+                                            nodeId={node.data.displayProps.label}
+                                            label={node.data.displayProps.label}
+                                            endIcon={node.hidden ? <VisibilityOffIcon /> : <VisibilityIcon />}
+                                            onClick={() => toggleNodeVisibility(node.id)}
 
-                                    />
-                                ))}
-                            </TreeItem>
-                        )
-                    })}
+                                        />
+                                    })}
+                                </TreeItem>)
+                        })
+                    }
                 </TreeView>
 
             </ThemeProvider>
@@ -158,6 +193,7 @@ export function SidebarFilterList() {
                         variant='filled'
                         size='xs'
                         radius='xl'
+                        value={selectionNodes.map(node => node.data?.label)}
                     />
 
                 </Group>

@@ -12,5 +12,6 @@ export const onNodesSelectionChange = (reactflow, nodes) => {
         reactflow.setNodes(reactflow.getNodes().map((n) => {
             return { ...n, selected: true }
         }))
+
     }
 }
