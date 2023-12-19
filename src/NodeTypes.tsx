@@ -28,7 +28,7 @@ function DefaultCustomNode({ data, selected }) {
 
     const [nodeData, setNodeData] = useState(data?.displayProps);
 
-    const { data: traitInfo, isFetching } = data.type == "disease" ? useGetTraitInfo({ traitId: data?.label }) : { data: {}, isFetching: false };
+    const { data: traitInfo, isFetching } = data.type != "gene" ? useGetTraitInfo({ traitId: data?.label }) : { data: {}, isFetching: false };
 
     const nodeIndex = nodes.findIndex(n => n.id === nodeId)
 

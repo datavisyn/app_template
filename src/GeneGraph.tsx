@@ -106,7 +106,6 @@ export function GeneGraph(props: GeneGraphProps) {
               edges={edges}
               nodeTypes={nodeTypes}
               edgeTypes={edgeTypes}
-              
               onNodesChange={onNodesChange}
               onEdgesChange={onEdgesChange}
               connectionLineComponent={FloatingConnectionLine}
