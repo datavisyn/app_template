@@ -14,7 +14,12 @@ export function FloatingEdge({ id, source, target, markerEnd, style }: EdgeProps
     }
   
     const { sx, sy, tx, ty, sourcePos, targetPos } = getEdgeParams(sourceNode, targetNode);
-  
+    
+    // check for NaN values
+    if (isNaN(sx) || isNaN(sy) || isNaN(tx) || isNaN(ty)) {
+      // console.log(sourcePos, targetPos);
+      return null;
+    }
     const [edgePath] = getStraightPath({
       sourceX: sx,
       sourceY: sy,

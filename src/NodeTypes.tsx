@@ -4,6 +4,7 @@ import { Handle, Position, useNodeId, useReactFlow } from "reactflow";
 import { useGetTraitInfo } from './store/store';
 import { useEffect } from 'react';
 import { onNodesVisibilityChange } from './onNodesVisibilityChange';
+import MolViewer from './MolViewer';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import PlagiarismOutlinedIcon from '@mui/icons-material/PlagiarismOutlined';
 import InsightsIcon from '@mui/icons-material/Insights';
@@ -20,11 +21,11 @@ var color = {
 
 
 // this is the default custom node
-function DefaultCustomNode({ data }) {
+function DefaultCustomNode({ data, selected }) {
     const reactflow = useReactFlow();
     const nodes = reactflow.getNodes();
     const nodeId = useNodeId();
-    const [collapsed, setCollapsed] = useState(true);
+    const [collapsed, setCollapsed] = useState(!data?.isRoot);
 
     const [nodeData, setNodeData] = useState(data?.displayProps);
 
@@ -39,13 +40,16 @@ function DefaultCustomNode({ data }) {
         }
 
     }, [isFetching]);
+
     function onExpandCollapse(){
         if(collapsed){
             data?.onExpand(nodeId)
-            setCollapsed(false);
+            setCollapsed(false)
         }
         else{
-
+            var realChildren = (data?.children).filter(childId => !data?.parents.includes(childId))
+            data?.onCollapse(nodeId, realChildren)
+            setCollapsed(true)
         }
     }
     
@@ -57,10 +61,7 @@ function DefaultCustomNode({ data }) {
         padding: "14px",
         borderRadius: "8px",
         border: data?.isRoot ? '3px solid #398354' : '',
-        // boxShadow: isHovered || isHighlighted ? "0 4px 8px rgba(0, 0, 0, 0.2)" : "none",
-        // transition: "box-shadow 0.3s ease transform 0.3 ease",
-        // transform: selected ? "scale(1.8)" : "scale(1)",
-        // display: nodeInternals.get(data.id).hidden ? "none" : "block",
+        opacity: selected? 1 : 0.5,
     };
 
     const symbolStyle: React.CSSProperties = {
@@ -93,13 +94,13 @@ function DefaultCustomNode({ data }) {
             </Popover.Target>
             <Popover.Dropdown>
                 <Flex justify="center" gap="md">
-                    <Button variant="filled" color="gray" fullWidth onClick={onExpandCollapse}> {collapsed ? "Expand" : "Collapse"}</Button>
+                    <Button variant="filled" color="gray" fullWidth onClick={onExpandCollapse}> {data?.isRoot ? "Collapse" : "Expand"}</Button>
                     <Button variant="filled" color="gray" fullWidth onClick={() => onNodesVisibilityChange(reactflow, [nodes[nodeIndex]], !nodes[nodeIndex].hidden)}>Hide</Button>
                     <Button onClick={closePopover} color='red'  ><CloseIcon /></Button>
                 </Flex>
         
                 <Space h="md" />
-                <Tabs color="gray" variant="outline" defaultValue="details">
+                <Tabs color="gray" variant="outline" defaultValue="details"> 
                     <Tabs.List>
                         <Tabs.Tab rightSection={<InfoOutlinedIcon fontSize='small' />} value="details" > Details</Tabs.Tab>
                         {data?.displayProps.summary != "nan" ? <Tabs.Tab rightSection={<PlagiarismOutlinedIcon fontSize='small'/>} value="summary">Summary</Tabs.Tab> : <></>}
@@ -142,9 +143,11 @@ function DefaultCustomNode({ data }) {
                         </ScrollArea>
                     </Tabs.Panel>
                     <Tabs.Panel value="structure">
-                        <div style={{ height: '30vh' }}>
-                            <Text>MolStar Structure</Text>
-                        </div>
+                        <ScrollArea>
+                            <div style={{ height: '30vh' }}>
+                                <MolViewer entrez_id={nodeId} options={{ layoutShowControls: false }} />
+                            </div>
+                        </ScrollArea>
                     </Tabs.Panel>
                 </Tabs>
             </Popover.Dropdown>
