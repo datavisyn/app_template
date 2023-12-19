@@ -82,7 +82,7 @@ function DefaultCustomNode({ data, selected }) {
     const label = data?.isRoot ? <b>{data?.displayProps.label}</b> : data?.displayProps.label
 
     return (
-        <Popover trapFocus shadow="md" width={358} opened={popoverOpen} position="bottom" withinPortal >
+        <Popover trapFocus shadow="md" width={390} opened={popoverOpen} position="bottom" withinPortal >
             <Popover.Target>
                 <div style={nodeStyle} onClick={openPopover} >
                     <Handle type="source" position={Position.Top} style={{ visibility: "hidden" }} />
