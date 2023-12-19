@@ -3,6 +3,8 @@ import { Loader, MultiSelect } from '@mantine/core';
 import React, { useState } from 'react';
 import { useAutocomplete } from './store/store';
 import { GeneGraph } from './GeneGraph';
+import { ReactFlowProvider } from 'reactflow';
+import { Height } from '@mui/icons-material';
 
 export function App() {
   const [selectedValues, setSelectedValues] = useState([]);
@@ -10,9 +12,9 @@ export function App() {
   const [selectedIds, setSelectedIds] = useState([]);
 
   const { data: autocompleteData, isFetching } = useAutocomplete({ search });
-  const symbolToIdMap = new Map(autocompleteData?.map(item => [(item[0]+' ('+item[2]+')'), item[1]])); // makes a id-List for backend
-  const symbolsList = autocompleteData?.map(item => (item[0]+' ('+item[2]+')')); // Maked a SymbolList for FrontEnd
-  
+  const symbolToIdMap = new Map(autocompleteData?.map(item => [(item[0] + ' (' + item[2] + ')'), item[1]])); // makes a id-List for backend
+  const symbolsList = autocompleteData?.map(item => (item[0] + ' (' + item[2] + ')')); // Maked a SymbolList for FrontEnd
+
   // handels the change of selected values (these in the box)
   const handleSelectedChange = (values) => {
     const ids = values.map(value => symbolToIdMap.get(value));
@@ -24,12 +26,12 @@ export function App() {
   const handleChange = (values) => {
     setSearch(values);
   };
-  const setIds = (ids: string[]) =>{
+  const setIds = (ids: string[]) => {
     setSelectedIds(ids)
   }
 
   return (
-    <>
+    <div style={{height:"95%"}}>
       <MultiSelect
         data={symbolsList || []}
         searchable
@@ -41,8 +43,12 @@ export function App() {
         rightSection={isFetching ? <Loader size="sm" /> : null}
       />
 
-      <GeneGraph geneID={selectedIds} setIds={setIds}/>
-    </>
+      {/* <GeneGraph geneID={selectedIds} addID={setIds}/> */}
+      {/* <LayoutFlow geneID={selectedIds}/> */}
+      <ReactFlowProvider>
+        <GeneGraph geneID={selectedIds} setIds={setIds} />
+      </ReactFlowProvider>
+    </div>
   );
 }
 /* just for testing: */
