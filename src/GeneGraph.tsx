@@ -180,28 +180,35 @@ export function GeneGraph(props: GeneGraphProps) {
   }
 
   return (
-    <div style={{ height: '100%', width: '100%', display: 'flex' }}>
-      <ReactFlow
-        nodes={nodes}
-        edges={edges}
-        nodeTypes={nodeTypes}
-        edgeTypes={edgeTypes}
+    <>
+      <div style={{ height: '85vh', width: '100%', display: 'flex' }}>
 
-        minZoom={0.1}
-        maxZoom={10}
+        <ReactFlowProvider>
+          <div style={{ height: '100%', width: '77%' }}>
+            <ReactFlow
+              nodes={nodes}
+              edges={edges}
+              nodeTypes={nodeTypes}
+              edgeTypes={edgeTypes}
+              onNodesChange={onNodesChange}
+              onEdgesChange={onEdgesChange}
+              connectionLineComponent={FloatingConnectionLine}
+              fitView 
+            >
+              <Background />
+              <Controls />
+              <MiniMap />
+            </ReactFlow>
+          </div>
+          <NodesContext.Provider value={{nodes: nodes, setNodes: setNodes}}>
+            <SidebarFilterList />
+          </NodesContext.Provider>
+          
+        </ReactFlowProvider>
 
-        onNodesChange={onNodesChange}
-        onEdgesChange={onEdgesChange}
-        connectionLineComponent={FloatingConnectionLine}
-        fitView
-      >
-        <Background />
-        <Controls />
-        <MiniMap />
-      </ReactFlow >
-      <NodesContext.Provider value={{ nodes: nodes, setNodes: setNodes }}>
-        <SidebarFilterList />
-      </NodesContext.Provider>
-    </div>
+      </div>
+
+    </>
+
   );
 }
