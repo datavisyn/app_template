@@ -75,27 +75,27 @@ export function GeneGraph(props: GeneGraphProps) {
   const [nodes, setNodes, onNodesChange] = useNodesState([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
   let fixedIds = []
-  if(nodes != undefined &&  nodes.length != 0){
+  if (nodes != undefined && nodes.length != 0) {
     // let fixedNodes = nodes.filter(node => node.data.children.length == 0 && node.data.parents.length == 0)
     // fixedIds = fixedNodes.map(({ id }) => id);
-  }  const { getLayoutedElements } = useLayoutedElements();
+  } const { getLayoutedElements } = useLayoutedElements();
   const [curNodes, setCurNodes] = useState(0);
 
 
 
   // get all genes that are connected to the first node
   let { data: graph } = useExpand({
-      geneIds: geneIds,
-      fixedGeneIds: fixedIds,
+    geneIds: geneIds,
+    fixedGeneIds: fixedIds,
     limit: 1000,
   });
 
   const { getNodes, fitView, getEdges } = useReactFlow();
 
   useMemo(() => {
-    if (getNodes().length !==0 && getEdges().length !==0 && getNodes()?.length != curNodes && getNodes()[0]["width"] != null) {
-        setCurNodes(getNodes().length);
-        getLayoutedElements();
+    if (getNodes().length !== 0 && getEdges().length !== 0 && getNodes()?.length != curNodes && getNodes()[0]["width"] != null) {
+      setCurNodes(getNodes().length);
+      getLayoutedElements();
     }
 
 
@@ -109,7 +109,7 @@ export function GeneGraph(props: GeneGraphProps) {
     });
 
 
-  }, [getNodes().map(node => {node.id})]);
+  }, [getNodes().map(node => { node.id })]);
 
   useMemo(() => {
     setCurNodes(0);
@@ -140,8 +140,9 @@ export function GeneGraph(props: GeneGraphProps) {
           },
           type: "node",
           selected: true,
-        }}));
-      
+        }
+      }));
+
       setEdges(
         graph?.edges.map((edge) => ({
           id: edge.id,
@@ -167,12 +168,12 @@ export function GeneGraph(props: GeneGraphProps) {
     let currentNodes = getNodes();
     currentNodes.forEach((child) => {
       child.data.parents = child.data.parents.filter((parent: string) => parent != id)
-      if(child.id == id){
+      if (child.id == id) {
         child.data.children = []
         child.data.isRoot = false
       }
     })
-      
+
     var removeChildren = currentNodes.filter(node => children.includes(node.id))
     removeChildren = removeChildren.filter(node => node.data?.parents.length == 0)
     currentNodes = currentNodes.filter(node => !removeChildren.includes(node))
@@ -180,35 +181,24 @@ export function GeneGraph(props: GeneGraphProps) {
   }
 
   return (
-    <>
-      <div style={{ height: '85vh', width: '100%', display: 'flex' }}>
-
-        <ReactFlowProvider>
-          <div style={{ height: '100%', width: '77%' }}>
-            <ReactFlow
-              nodes={nodes}
-              edges={edges}
-              nodeTypes={nodeTypes}
-              edgeTypes={edgeTypes}
-              onNodesChange={onNodesChange}
-              onEdgesChange={onEdgesChange}
-              connectionLineComponent={FloatingConnectionLine}
-              fitView 
-            >
-              <Background />
-              <Controls />
-              <MiniMap />
-            </ReactFlow>
-          </div>
-          <NodesContext.Provider value={{nodes: nodes, setNodes: setNodes}}>
-            <SidebarFilterList />
-          </NodesContext.Provider>
-          
-        </ReactFlowProvider>
-
-      </div>
-
-    </>
-
+    <div style={{ height: '85vh', width: '100%', display: 'flex' }}>
+      <ReactFlow
+        nodes={nodes}
+        edges={edges}
+        nodeTypes={nodeTypes}
+        edgeTypes={edgeTypes}
+        onNodesChange={onNodesChange}
+        onEdgesChange={onEdgesChange}
+        connectionLineComponent={FloatingConnectionLine}
+        fitView
+      >
+        <Background />
+        <Controls />
+        <MiniMap />
+      </ReactFlow>
+      <NodesContext.Provider value={{ nodes: nodes, setNodes: setNodes }}>
+        <SidebarFilterList />
+      </NodesContext.Provider>
+    </div >
   );
 }
