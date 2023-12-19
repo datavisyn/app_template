@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import { useAutocomplete } from './store/store';
 import { GeneGraph } from './GeneGraph';
 import { ReactFlowProvider } from 'reactflow';
+import { Height } from '@mui/icons-material';
 
 export function App() {
   const [selectedValues, setSelectedValues] = useState([]);
@@ -30,7 +31,7 @@ export function App() {
   }
 
   return (
-    <>
+    <div style={{height:"95%"}}>
       <MultiSelect
         data={symbolsList || []}
         searchable
@@ -47,7 +48,7 @@ export function App() {
       <ReactFlowProvider>
         <GeneGraph geneID={selectedIds} setIds={setIds} />
       </ReactFlowProvider>
-    </>
+    </div>
   );
 }
 /* just for testing: */
