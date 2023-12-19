@@ -1,11 +1,15 @@
-import { Tabs, Text, Button, HoverCard, Flex, Space, ScrollArea } from '@mantine/core';
+import { Tabs, Text, Button, Flex, Space, ScrollArea, Popover } from '@mantine/core';
 import React, { useState } from "react"
 import { Handle, Position, useNodeId, useReactFlow } from "reactflow";
 import { useGetTraitInfo } from './store/store';
 import { useEffect } from 'react';
-import { IconInfoCircle, IconReportSearch, IconTopologyFull, IconSearch } from '@tabler/icons-react';
 import { onNodesVisibilityChange } from './onNodesVisibilityChange';
 import MolViewer from './MolViewer';
+import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
+import PlagiarismOutlinedIcon from '@mui/icons-material/PlagiarismOutlined';
+import InsightsIcon from '@mui/icons-material/Insights';
+import SearchIcon from '@mui/icons-material/Search';
+import CloseIcon from '@mui/icons-material/Close';
 
 
 var color = {   
@@ -65,29 +69,41 @@ function DefaultCustomNode({ data, selected }) {
         right: '-8px',
     };
 
+    const [popoverOpen, setPopoverOpen] = useState(false);
+
+    const openPopover = () => {
+        setPopoverOpen(prev => !prev);
+      };
+  
+    const closePopover = () => {
+      setPopoverOpen(false);
+    };
+
     const label = data?.isRoot ? <b>{data?.displayProps.label}</b> : data?.displayProps.label
 
     return (
-        <HoverCard shadow="md" width={'25vw'} withinPortal={true} >
-            <HoverCard.Target>
-                <div style={nodeStyle}>
+        <Popover trapFocus shadow="md" width={390} opened={popoverOpen} position="bottom" withinPortal >
+            <Popover.Target>
+                <div style={nodeStyle} onClick={openPopover} >
                     <Handle type="source" position={Position.Top} style={{ visibility: "hidden" }} />
                     {label}
                     <Handle type="target" position={Position.Right} style={{ visibility: "hidden" }} />
-                    {data?.isRoot && <div style={symbolStyle}> <IconSearch size={24} style={{fill:'rgba(255, 255, 255, 0.8)'}}/></div>}
+                    {data?.isRoot && <div style={symbolStyle}> <SearchIcon  style={{fill: "black" , borderRadius: 100}} /> </div>}
                 </div>
-            </HoverCard.Target>
-            <HoverCard.Dropdown>
+            </Popover.Target>
+            <Popover.Dropdown>
                 <Flex justify="center" gap="md">
                     <Button variant="filled" color="gray" fullWidth onClick={onExpandCollapse}> {data?.isRoot ? "Collapse" : "Expand"}</Button>
                     <Button variant="filled" color="gray" fullWidth onClick={() => onNodesVisibilityChange(reactflow, [nodes[nodeIndex]], !nodes[nodeIndex].hidden)}>Hide</Button>
+                    <Button onClick={closePopover} color='red'  ><CloseIcon /></Button>
                 </Flex>
+        
                 <Space h="md" />
                 <Tabs color="gray" variant="outline" defaultValue="details"> 
                     <Tabs.List>
-                        <Tabs.Tab rightSection={<IconInfoCircle />} value="details" > Details</Tabs.Tab>
-                        {data?.displayProps.summary != "nan" ? <Tabs.Tab rightSection={<IconReportSearch />} value="summary">Summary</Tabs.Tab> : <></>}
-                        <Tabs.Tab rightSection={<IconTopologyFull />} value="structure">Structure</Tabs.Tab>
+                        <Tabs.Tab rightSection={<InfoOutlinedIcon fontSize='small' />} value="details" > Details</Tabs.Tab>
+                        {data?.displayProps.summary != "nan" ? <Tabs.Tab rightSection={<PlagiarismOutlinedIcon fontSize='small'/>} value="summary">Summary</Tabs.Tab> : <></>}
+                        <Tabs.Tab rightSection={<InsightsIcon fontSize='small'/>} value="structure">Structure</Tabs.Tab>
                     </Tabs.List>
                     <Tabs.Panel value="details" >
                         <ScrollArea>
@@ -124,9 +140,7 @@ function DefaultCustomNode({ data, selected }) {
                                 <Text size="sm">{data?.displayProps.summary}</Text>
                             </div>
                         </ScrollArea>
-
                     </Tabs.Panel>
-
                     <Tabs.Panel value="structure">
                         <ScrollArea>
                             <div style={{ height: '30vh' }}>
@@ -135,8 +149,8 @@ function DefaultCustomNode({ data, selected }) {
                         </ScrollArea>
                     </Tabs.Panel>
                 </Tabs>
-            </HoverCard.Dropdown>
-        </HoverCard>
+            </Popover.Dropdown>
+        </Popover>
     );
 }
 

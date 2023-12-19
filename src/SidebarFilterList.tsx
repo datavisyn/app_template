@@ -92,14 +92,34 @@ export function SidebarFilterList() {
         const nodeLists = [geneNodes, diseaseNodes, drugNodes];
         const types = ["genes", "diseases", "drugs"];
 
+        const [expanded, setExpanded] = React.useState(() => {
+            // Versuche, den gespeicherten Zustand aus localStorage zu laden
+            const saved = localStorage.getItem('expandedState');
+            return saved ? JSON.parse(saved) : []; // Standardwert ist ein leerer Array, falls nichts in localStorage gespeichert ist
+        });
+        
+        // useEffect-Hook, um den expanded-Zustand in localStorage zu speichern, wenn er sich ändert
+        React.useEffect(() => {
+            localStorage.setItem('expandedState', JSON.stringify(expanded));
+        }, [expanded]);
+
+        const handleExpand = (type) => {
+            if (expanded.includes(type)) {
+                setExpanded(expanded.filter((item) => item !== type));
+                console.log("after remove ", expanded);
+            } else {
+                setExpanded([...expanded, type]);
+                console.log("after add ", expanded);
+            }
+        }
+
         useEffect(() => {
             setNodes(reactflow.getNodes());
         }, [reactflow]);
 
-
         return (
             <ThemeProvider theme={theme}>
-                <TreeView>
+                <TreeView expanded={expanded}>
                     {nodeLists.map((list, index) => {
                         if (list.length > 0) return (
                             <TreeItem
@@ -107,6 +127,7 @@ export function SidebarFilterList() {
                                 nodeId={'listNode_' + index + "_" + types[index]}
                                 label={types[index]}
                                 onDoubleClick={() => toggleNodeCategory(types[index])}
+                                onClick={() => handleExpand('listNode_' + index + "_" + types[index])}
                                 expandIcon={<ChevronRightIcon />}
                                 collapseIcon={<ExpandMoreIcon />}
                             >
