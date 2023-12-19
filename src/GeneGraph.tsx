@@ -93,8 +93,7 @@ export function GeneGraph(props: GeneGraphProps) {
   const { getNodes, fitView, getEdges } = useReactFlow();
 
   useMemo(() => {
-    console.log(getNodes())
-    if (getNodes() != null && getNodes()?.length != curNodes && getNodes()[0]["width"] != null) {
+    if (getNodes().length !==0 && getEdges().length !==0 && getNodes()?.length != curNodes && getNodes()[0]["width"] != null) {
         setCurNodes(getNodes().length);
         getLayoutedElements();
     }
