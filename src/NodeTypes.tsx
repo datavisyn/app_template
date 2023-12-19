@@ -5,6 +5,7 @@ import { useGetTraitInfo } from './store/store';
 import { useEffect } from 'react';
 import { IconInfoCircle, IconReportSearch, IconTopologyFull, IconSearch } from '@tabler/icons-react';
 import { onNodesVisibilityChange } from './onNodesVisibilityChange';
+import MolViewer from './MolViewer';
 
 
 var color = {   
@@ -19,7 +20,7 @@ function DefaultCustomNode({ data, selected }) {
     const reactflow = useReactFlow();
     const nodes = reactflow.getNodes();
     const nodeId = useNodeId();
-    const [collapsed, setCollapsed] = useState(true);
+    const [collapsed, setCollapsed] = useState(!data?.isRoot);
 
     const [nodeData, setNodeData] = useState(data?.displayProps);
 
@@ -38,10 +39,12 @@ function DefaultCustomNode({ data, selected }) {
     function onExpandCollapse(){
         if(collapsed){
             data?.onExpand(nodeId)
-            setCollapsed(false);
+            setCollapsed(false)
         }
         else{
-
+            var realChildren = (data?.children).filter(childId => !data?.parents.includes(childId))
+            data?.onCollapse(nodeId, realChildren)
+            setCollapsed(true)
         }
     }
     
@@ -125,9 +128,11 @@ function DefaultCustomNode({ data, selected }) {
                     </Tabs.Panel>
 
                     <Tabs.Panel value="structure">
-                        <div style={{ height: '30vh' }}>
-                            <Text>MolStar Structure</Text>
-                        </div>
+                        <ScrollArea>
+                            <div style={{ height: '30vh' }}>
+                                <MolViewer entrez_id={nodeId} options={{ layoutShowControls: false }} />
+                            </div>
+                        </ScrollArea>
                     </Tabs.Panel>
                 </Tabs>
             </HoverCard.Dropdown>

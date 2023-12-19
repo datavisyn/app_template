@@ -1,4 +1,4 @@
-import React, { useState, useEffect, } from 'react'
+import React, { useEffect, useState, useMemo } from 'react'
 import { useReactFlow, useOnSelectionChange } from "reactflow";
 import { Card, ScrollArea, Group, Divider, MultiSelect } from "@mantine/core"
 import { onNodesVisibilityChange } from './onNodesVisibilityChange';
@@ -9,6 +9,11 @@ import { ThemeProvider, createTheme } from '@mui/material/styles';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import { onNodesSelectionChange } from './onNodesSelectionChange';
+import VisibilityIcon from '@mui/icons-material/Visibility';
+import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
+import { filter } from 'd3';
+
+
 
 const theme = createTheme({
     components: {
@@ -26,6 +31,9 @@ const theme = createTheme({
 
 // component for sidebar with filter area and list of nodes
 export function SidebarFilterList() {
+    // full height list:
+    
+
 
     // get state of nodes from parent component
     const reactflow = useReactFlow();
@@ -44,14 +52,54 @@ export function SidebarFilterList() {
 
 
     const NodeTree = () => {
+        const [nodes, setNodes] = useState([]);
+        var globalBool = false;
 
-        const geneNodeLabels = nodes.filter(node => node.data.type === 'gene').map(node => node.data.displayProps.label);
+        // toogle tree Node Categorie -> call hide for all nodes in list
+        const toggleNodeCategory = (type) => {
+            var newType = type.slice(0, -1);
 
-        const diseaseNodeLabels = nodes.filter(node => node.data.type === 'disease').map(node => {
-            return node.data.displayProps.label;
-        });
+            const updatedNodes = nodes.map(node => {
+                if (node.data.type === newType) {
+                    globalBool = !node.hidden;
+                    return { ...node, hidden: !node.hidden };
+                }
+                return node;
+            });
+            
+     
+            setNodes(updatedNodes);
 
-        const drugNodeLabels = nodes.filter(node => node.data.type === 'drug').map(node => node.data.displayProps.label);
+            onNodesVisibilityChange(reactflow, updatedNodes.filter(node => node.data.type === newType), globalBool);
+        };
+
+
+
+        // toogle Hidden Nodes
+        const toggleNodeVisibility = (nodeId) => {
+            let currentHidden;
+            let updatedNode;
+
+            const updatedNodes = nodes.map(node => {
+                if (node.id === nodeId) {
+                    currentHidden = !node.hidden;
+                    updatedNode = { ...node, hidden: currentHidden };
+                    return updatedNode;
+                }
+                return node;
+            });
+
+
+
+
+            setNodes(updatedNodes);
+            onNodesVisibilityChange(reactflow, [updatedNode], currentHidden);
+        };
+
+        // Übergeben Sie das gesamte Node-Objekt, nicht nur das Label
+        const geneNodeLabels = nodes.filter(node => node.data.type === 'gene');
+        const diseaseNodeLabels = nodes.filter(node => node.data.type === 'disease');
+        const drugNodeLabels = nodes.filter(node => node.data.type === 'drug');
 
         const nodeLists = [geneNodeLabels, diseaseNodeLabels, drugNodeLabels]
         const types = ["genes", "diseases", "drugs"]
@@ -89,17 +137,34 @@ export function SidebarFilterList() {
                     {
                         nodeLists.map((list, index) => {
                             if (list.length > 0) return (
-                                <TreeItem nodeId={types[index]} label={types[index]}>
+                                <TreeItem 
+                                key={'listNode_' + index + "_" + types[index]} // Unique Key -> Prevent Error
+                                onDoubleClick={() => toggleNodeCategory(types[index])}
+                                expandIcon={<ChevronRightIcon />}
+                                collapseIcon={<ExpandMoreIcon />}
+                                nodeId={types[index]} 
+                                label={types[index]}>
                                     {list.map((label) => {
-                                        return <TreeItem nodeId={label} label={label} />
+                                        return <TreeItem 
+                                        nodeId={label} 
+                                        label={label} 
+                                        endIcon={label.hidden ? <VisibilityOffIcon /> : <VisibilityIcon />}
+                                        onClick={() => toggleNodeVisibility(node.id)}
+
+                                        />
                                     })}
                                 </TreeItem>)
                         })
                     }
                 </TreeView>
+
             </ThemeProvider>
         )
     }
+
+
+
+
 
     const scrollHeight = document.getElementById('card')?.clientHeight - 100
 

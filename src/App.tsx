@@ -1,5 +1,5 @@
 
-import { Autocomplete, Loader, MultiSelect } from '@mantine/core';
+import { Loader, MultiSelect } from '@mantine/core';
 import React, { useState } from 'react';
 import { useAutocomplete } from './store/store';
 import { GeneGraph } from './GeneGraph';
@@ -15,7 +15,6 @@ export function App() {
   
   // handels the change of selected values (these in the box)
   const handleSelectedChange = (values) => {
-    console.log(values);
     const ids = values.map(value => symbolToIdMap.get(value));
     setSelectedValues(values); // Contains also already selected values
     setSelectedIds(ids); // update ids
@@ -26,7 +25,7 @@ export function App() {
     setSearch(values);
   };
   const setIds = (ids: string[]) =>{
-    setSelectedIds([...selectedIds, ids])
+    setSelectedIds(ids)
   }
 
   return (
@@ -42,7 +41,7 @@ export function App() {
         rightSection={isFetching ? <Loader size="sm" /> : null}
       />
 
-      <GeneGraph geneID={selectedIds} addID={setIds}/>
+      <GeneGraph geneID={selectedIds} setIds={setIds}/>
     </>
   );
 }
