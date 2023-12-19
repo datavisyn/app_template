@@ -138,11 +138,10 @@ export function GeneGraph(props: GeneGraphProps) {
             onExpand: exp,
             onCollapse: coll
           },
-          type: "node"
-        }
-      }));
-
-
+          type: "node",
+          selected: true,
+        }}));
+      
       setEdges(
         graph?.edges.map((edge) => ({
           id: edge.id,

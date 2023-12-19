@@ -1,27 +1,33 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState, useMemo } from 'react'
 import { useReactFlow } from "reactflow";
-import { Card, ScrollArea, Group, Select, Divider } from "@mantine/core"
+import { Card, ScrollArea, Group, Divider, MultiSelect } from "@mantine/core"
 import { onNodesVisibilityChange } from './onNodesVisibilityChange';
-
 import { TreeView } from '@mui/x-tree-view';
 import { TreeItem } from '@mui/x-tree-view';
-import type {} from '@mui/x-tree-view/themeAugmentation';
+import type { } from '@mui/x-tree-view/themeAugmentation';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
+import { onNodesSelectionChange } from './onNodesSelectionChange';
+import VisibilityIcon from '@mui/icons-material/Visibility';
+import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
+import { filter } from 'd3';
+
+
 
 const theme = createTheme({
     components: {
-      MuiTreeView: {
-        styleOverrides: {
-          root: {
-            backgroundColor: 'white',
-            height: '100%'
-          },
+        MuiTreeView: {
+            styleOverrides: {
+                root: {
+                    backgroundColor: 'white',
+                },
+            },
         },
-      },
     },
-  });
+});
+
+
 
 // component for sidebar with filter area and list of nodes
 export function SidebarFilterList() {
@@ -33,112 +39,131 @@ export function SidebarFilterList() {
     const reactflow = useReactFlow()
     const nodes = reactflow.getNodes()
 
-    // states for filter area
-    const [genesShown, setGenesShown] = useState(true)
-    const [diseasesShown, setDiseasesShown] = useState(true)
-    const [drugsShown, setDrugsShown] = useState(true)
+    const NodeTree = () => {
+        const [nodes, setNodes] = useState([]);
+        var globalBool = false;
 
-    const handleOptionChange = (e) => {
+        // toogle tree Node Categorie -> call hide for all nodes in list
+        const toggleNodeCategory = (type) => {
+            var newType = type.slice(0, -1);
 
-        const currentlyHandledType = e.target.id === "boxGenesFilter" ? "gene"
-            : e.target.id === "boxDiseasesFilter" ? "disease"
-                : e.target.id === "boxDrugsFilter" ? "drug"
-                    : ""
+            const updatedNodes = nodes.map(node => {
+                if (node.data.type === newType) {
+                    globalBool = !node.hidden;
+                    return { ...node, hidden: !node.hidden };
+                }
+                return node;
+            });
+            
+     
+            setNodes(updatedNodes);
 
-        const nodeList = []
+            onNodesVisibilityChange(reactflow, updatedNodes.filter(node => node.data.type === newType), globalBool);
+        };
 
-        nodes.forEach(node => {
-            if (node.type === currentlyHandledType) {
-                nodeList.push(node)
-            }
 
-        });
 
-        if (e.target.id === "boxGenesFilter") {
-            setGenesShown(!genesShown)
-            onNodesVisibilityChange(reactflow, nodeList, genesShown)
-        } else if (e.target.id === "boxDiseasesFilter") {
-            setDiseasesShown(!diseasesShown)
-            onNodesVisibilityChange(reactflow, nodeList, diseasesShown)
-        } else {
-            setDrugsShown(!drugsShown)
-            onNodesVisibilityChange(reactflow, nodeList, drugsShown)
-        }
+        // toogle Hidden Nodes
+        const toggleNodeVisibility = (nodeId) => {
+            let currentHidden;
+            let updatedNode;
 
-    }
+            const updatedNodes = nodes.map(node => {
+                if (node.id === nodeId) {
+                    currentHidden = !node.hidden;
+                    updatedNode = { ...node, hidden: currentHidden };
+                    return updatedNode;
+                }
+                return node;
+            });
 
-    const loadData = () => {
 
-        const labels = nodes.map((node) => {
-            return node.data?.label;
-        })
 
-        return (
-            <Select
-                id='searchbarNodes' 
-                variant='filled' 
-                size='xs' 
-                radius='xl' 
-                placeholder='search for node' 
-                data={labels} 
-                searchable 
-            />
-        )
-    }
 
-    const renderNodeTree = () => {
+            setNodes(updatedNodes);
+            onNodesVisibilityChange(reactflow, [updatedNode], currentHidden);
+        };
 
-        const geneNodeLabels = nodes.map((node) => {
-            if (node.data.type === 'gene') {
-                return node.data.displayProps.label
-            }
-        })
+        // Übergeben Sie das gesamte Node-Objekt, nicht nur das Label
+        const geneNodes = nodes.filter(node => node.data.type === 'gene');
+        const diseaseNodes = nodes.filter(node => node.data.type === 'disease');
+        const drugNodes = nodes.filter(node => node.data.type === 'drug');
 
-        const diseaseNodeLabels = nodes.map((node) => {
-            if (node.data.type === 'disease') {
-                return node.data.displayProps.label
-            }
-        })
+        const nodeLists = [geneNodes, diseaseNodes, drugNodes];
+        const types = ["genes", "diseases", "drugs"];
 
-        const drugNodeLabels = nodes.map((node) => {
-            if (node.data.type === 'drug') {
-                return node.data.displayProps.label
-            }
-        })
+        useEffect(() => {
+            setNodes(reactflow.getNodes());
+        }, [reactflow]);
+
 
         return (
             <ThemeProvider theme={theme}>
-                <TreeView aria-aria-label='node tree' defaultCollapseIcon={<ExpandMoreIcon />} defaultExpandIcon={<ChevronRightIcon />}>
-                    <TreeItem nodeId='listNodeGene' label='genes'>
-                        {geneNodeLabels.map((label) => {
-                            return <TreeItem nodeId={label + "_treeItem"} label={label}/>
-                        })}
-                    </TreeItem>
-                    <TreeItem nodeId='listNodeDisease' label='diseases'>
-                        {diseaseNodeLabels.map((label) => {
-                            return <TreeItem nodeId={label + "_treeItem"} label={label}/>
-                        })}
-                    </TreeItem>
-                    <TreeItem nodeId='listNodeDrug' label='drugs'>
-                        {drugNodeLabels.map((label) => {
-                            return <TreeItem nodeId={label + "_treeItem"} label={label}/>
-                        })}
-                    </TreeItem>
+                <TreeView>
+                    {nodeLists.map((list, index) => {
+                        if (list.length > 0) return (
+                            <TreeItem
+                                key={'listNode_' + index + "_" + types[index]} // Unique Key -> Prevent Error
+                                nodeId={'listNode_' + index + "_" + types[index]}
+                                label={types[index]}
+                                onDoubleClick={() => toggleNodeCategory(types[index])}
+                                expandIcon={<ChevronRightIcon />}
+                                collapseIcon={<ExpandMoreIcon />}
+                            >
+                                {list.map((node) => (
+                                    <TreeItem
+                                        key={node.id} // Unique Key -> Prevent Error
+                                        nodeId={node.data.displayProps.label + "_" + index + "_treeItem"}
+                                        label={node.data.displayProps.label}
+                                        endIcon={node.hidden ? <VisibilityOffIcon /> : <VisibilityIcon />}
+                                        onClick={() => toggleNodeVisibility(node.id)}
+
+                                    />
+                                ))}
+                            </TreeItem>
+                        )
+                    })}
                 </TreeView>
+
             </ThemeProvider>
         )
     }
 
+
+
+
+
+    const scrollHeight = document.getElementById('card')?.clientHeight - 100
+
+    const handleSelectedChange = (values) => {
+        var selected = nodes.filter(node => values.includes(node.data?.label))
+        onNodesSelectionChange(reactflow, selected)
+    }
+
     return (
-        <div style={{ height: '90vh', width: '23%', padding: '10px' }}>
-            <Card withBorder shadow='sm' radius="lg" style={{ width: '100%', height: '100%' }}>
+        <div style={{ width: '23%', padding: '10px' }}>
+            <Card id='card' withBorder shadow='sm' radius="lg" style={{ height: '100%' }}>
                 <Group position="apart" style={{ padding: '6px 4px' }} >
                     <div>Nodes</div>
-                    {loadData()}
+                    <MultiSelect
+                        data={nodes.map((node) => {
+                            return node.data?.label;
+                        })}
+                        searchable
+                        clearable
+                        onChange={handleSelectedChange}
+                        placeholder="search node..."
+                        nothingFound="No nodes found"
+                        id='searchbarNodes'
+                        variant='filled'
+                        size='xs'
+                        radius='xl'
+                    />
+
                 </Group>
                 <Divider />
-                <ScrollArea style={{ height: 'calc(100% - 60px)' }} offsetScrollbars scrollbarSize={2}>
-                    {renderNodeTree()}
+                <ScrollArea h={scrollHeight} offsetScrollbars scrollbarSize={2}>
+                    <NodeTree />
                 </ScrollArea>
             </Card>
         </div>
