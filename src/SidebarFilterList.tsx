@@ -31,13 +31,10 @@ const theme = createTheme({
 
 // component for sidebar with filter area and list of nodes
 export function SidebarFilterList() {
-
-
     // get state of nodes from parent component
     const reactflow = useReactFlow();
     const nodes = reactflow.getNodes();
     const [nodesSelected, setNodesSelected] = useState(nodes.filter(node => node.selected));
-
     const [selectionNodes, setSelectionNodes] = useState(nodes.filter(node => node.selected));
 
     useOnSelectionChange({
@@ -51,7 +48,6 @@ export function SidebarFilterList() {
 
     const NodeTree = () => {
         const [nodes, setNodes] = useState([]);
-
 
         useEffect(() => {
             setNodes(reactflow.getNodes());
@@ -71,14 +67,9 @@ export function SidebarFilterList() {
                 return node;
             });
 
-
             setNodes(updatedNodes);
-
             onNodesVisibilityChange(reactflow, updatedNodes.filter(node => node.data.type === newType), globalBool);
         };
-
-
-
 
         // toogle Hidden Nodes
         const toggleNodeVisibility = (nodeId) => {
@@ -98,9 +89,6 @@ export function SidebarFilterList() {
             onNodesVisibilityChange(reactflow, [updatedNode], currentHidden);
         };
 
-        // Übergeben Sie das gesamte Node-Objekt, nicht nur das Label
-
-        console.log(nodes)
         const geneNodeLabels = nodes.filter(node => node.data.type === 'gene');
         const diseaseNodeLabels = nodes.filter(node => node.data.type === 'disease');
         const drugNodeLabels = nodes.filter(node => node.data.type === 'drug');
@@ -163,10 +151,6 @@ export function SidebarFilterList() {
             </ThemeProvider>
         )
     }
-
-
-
-
 
     const scrollHeight = document.getElementById('card')?.clientHeight - 100
 
