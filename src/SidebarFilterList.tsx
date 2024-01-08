@@ -34,6 +34,7 @@ export function SidebarFilterList() {
     // get state of nodes from parent component
     const reactflow = useReactFlow();
     const nodes = reactflow.getNodes();
+
     const [nodesSelected, setNodesSelected] = useState(nodes.filter(node => node.selected));
     const [selectionNodes, setSelectionNodes] = useState(nodes.filter(node => node.selected));
 
@@ -55,7 +56,7 @@ export function SidebarFilterList() {
 
         var globalBool = false;
 
-        // toogle tree Node Categorie -> call hide for all nodes in list
+        // toogle tree Node Category -> call hide for all nodes in list
         const toggleNodeCategory = (type) => {
             var newType = type.slice(0, -1);
 
@@ -110,7 +111,6 @@ export function SidebarFilterList() {
             if (selected.length > 0) {
                 onNodesSelectionChange(reactflow, selected)
             }
-
         }
 
         return (
@@ -121,7 +121,7 @@ export function SidebarFilterList() {
                     defaultExpandIcon={<ChevronRightIcon />}
                     selected={treeViewSelection}
                     onNodeSelect={handleNodeSelect}
-                // expanded={treeViewExpanded}
+                    // expanded={treeViewExpanded}
                 >
                     {
                         nodeLists.map((list, index) => {
