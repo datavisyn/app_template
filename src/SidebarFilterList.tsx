@@ -98,11 +98,19 @@ export function SidebarFilterList() {
         const types = ["genes", "diseases", "drugs"]
 
         const [treeViewSelection, setTreeViewSelection] = useState(nodesSelected.map(node => node.data?.label + "_treeItem"));
-        const [treeViewExpanded, setTreeViewExpanded] = useState([])
+        const [treeViewExpanded, setTreeViewExpanded] = useState(() => {
+            // load from local stroage after rerender
+            return JSON.parse(localStorage.getItem('expandedNodes') || '[]');
+        });
 
         useEffect(() => {
             setTreeViewSelection(nodesSelected.map(node => node.data?.label))
         }, [nodesSelected])
+
+        const handleNodeToggle = (event, nodes) => {
+            setTreeViewExpanded(nodes);
+            localStorage.setItem('expandedNodes', JSON.stringify(nodes));
+        };
 
         const handleNodeSelect = (event, value) => {
             // setTreeViewExpanded(value)
@@ -121,7 +129,8 @@ export function SidebarFilterList() {
                     defaultExpandIcon={<ChevronRightIcon />}
                     selected={treeViewSelection}
                     onNodeSelect={handleNodeSelect}
-                    // expanded={treeViewExpanded}
+                    onNodeToggle={handleNodeToggle}
+                    expanded={treeViewExpanded}
                 >
                     {
                         nodeLists.map((list, index) => {
