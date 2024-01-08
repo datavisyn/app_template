@@ -41,7 +41,7 @@ export const onNodesVisibilityChange = (reactflow, nodes, visible)=> {
                     return {...edge, hidden: false}
                 }
             } else {
-                return {...edge, hidden: false}
+                return {...edge, hidden: true}
             }
         }
 
