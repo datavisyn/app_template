@@ -1,6 +1,5 @@
 import shownIcon from './images/eye.png'
 import hiddenIcon from './images/eye-closed.png'
-import { ForkLeftRounded } from '@mui/icons-material'
 
 export const onNodesVisibilityChange = (reactflow, nodes, visible)=> {
 
@@ -48,6 +47,14 @@ export const onNodesVisibilityChange = (reactflow, nodes, visible)=> {
 
         return edge
     })
+
+    // get updated images for each nodes that should be hidden
+    updatedNodes.forEach(node => {
+        
+        const image = node.hidden ? hiddenIcon : shownIcon
+
+        //document.getElementById(node.id + "_icon").setAttribute('src', image)
+    });
 
     reactflow.setNodes(updatedNodes)
     reactflow.setEdges(updatedEdges)
