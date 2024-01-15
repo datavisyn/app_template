@@ -49,10 +49,6 @@
     "webpack:prod": "visyn_scripts build --mode production --env workspace_mode=single"
   },
   "dependencies": {
-    "@mantine/core": "^5.5.5",
-    "@mantine/form": "^5.5.5",
-    "@mantine/hooks": "^5.5.5",
-    "@mantine/notifications": "^5.5.5",
     "@reduxjs/toolkit": "^1.8.2",
     "react-redux": "^8.0.2",
     "visyn_core": "git+ssh://git@github.com:datavisyn/visyn_core#develop",
@@ -66,7 +62,8 @@
     "@types/react": "~18.2.0",
     "@types/react-dom": "~18.2.0",
     "react": "~18.2.0",
-    "react-dom": "~18.2.0"
+    "react-dom": "~18.2.0",
+    "visyn_core": "git+ssh://git@github.com:datavisyn/visyn_core#mantine7"
   },
   "visyn": {
     "entries": {
