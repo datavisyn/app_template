@@ -2,13 +2,13 @@ import asyncio
 import contextlib
 import json
 import logging
-from weakref import WeakSet
-from fastapi import APIRouter, FastAPI, Request
-from datetime import datetime
-import logging
 import uuid
-from sqlmodel import SQLModel, create_engine, Field
+from datetime import datetime
+from weakref import WeakSet
+
+from fastapi import APIRouter, Request
 from sqlalchemy.orm import sessionmaker
+from sqlmodel import Field, SQLModel, create_engine
 from sse_starlette.sse import EventSourceResponse
 
 _log = logging.getLogger(__name__)
@@ -16,6 +16,7 @@ app_router = APIRouter(tags=["app_template"])
 
 
 _log = logging.getLogger(__name__)
+
 
 class CampaignBase(SQLModel):
     name: str
@@ -40,8 +41,6 @@ class CampaignCreate(CampaignBase):
     pass
 
 
-
-
 # Create all tables and stuff (use in development only)
 engine = create_engine("sqlite:///:memory:", echo=True, connect_args={"check_same_thread": False})
 SQLModel.metadata.drop_all(engine)
@@ -49,6 +48,7 @@ SQLModel.metadata.create_all(engine)
 
 
 create_session = sessionmaker(engine)
+
 
 class StreamQueue:
     def __init__(self) -> None:
@@ -80,6 +80,7 @@ class StreamQueue:
         for queue in self.queues:
             await queue.put(message)
 
+
 stream_queue = StreamQueue()
 
 
@@ -94,7 +95,7 @@ async def get_campaigns() -> list[CampaignRead]:
     with create_session() as session:
         campaigns: list[Campaign] = session.query(Campaign).all()
         return campaigns
-    
+
 
 @app_router.post("/campaign")
 async def create_campaign(campaign: CampaignCreate) -> CampaignRead:
@@ -105,7 +106,7 @@ async def create_campaign(campaign: CampaignCreate) -> CampaignRead:
         session.refresh(campaign)
         await stream_queue.publish({"type": "campaign_created", "message": str(campaign.id)})
         return campaign
-    
+
 
 @app_router.delete("/campaign/{campaign_id}")
 async def delete_campaign(campaign_id: uuid.UUID) -> CampaignRead:
@@ -115,7 +116,6 @@ async def delete_campaign(campaign_id: uuid.UUID) -> CampaignRead:
         session.commit()
         await stream_queue.publish({"message": "campaign deleted"})
         return campaign
-
 
 
 @app_router.get("/subscribe")
