@@ -55,8 +55,8 @@
     "@mantine/notifications": "^5.5.5",
     "@reduxjs/toolkit": "^1.8.2",
     "react-redux": "^8.0.2",
-    "visyn_core": "git+ssh://git@github.com:datavisyn/visyn_core#develop",
-    "visyn_scripts": "git+ssh://git@github.com/datavisyn/visyn_scripts#develop"
+    "visyn_core": "^7.0.1",
+    "visyn_scripts": "^7.0.1"
   },
   "devDependencies": {
     "@rtk-query/codegen-openapi": "^1.0.0",
