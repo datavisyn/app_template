@@ -30,6 +30,7 @@ node_modules/
 *.css
 
 # yarn
+yarn.lock
 .pnp.*
 .yarn/*
 !.yarn/patches

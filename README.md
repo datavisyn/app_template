@@ -22,7 +22,7 @@ yarn 3 is used as package manager, such that you can simply install the frontend
 
 ### Development
 
-The application has many package.json scripts available, with one of them being `yarn start`. This will start the webpack dev-server.
+The application has many package.json scripts available, with one of them being `yarn start`. This will start the dev-server.
 
 ### Linting
 
@@ -34,7 +34,7 @@ Jest is used for unit-tests via `yarn run test`, and Cypress is used for e2e and
 
 ### Building
 
-For generating a production build of the application (i.e. for deployment to Github Pages), simply run `yarn run webpack:prod` and the bundle will be in the `bundles/` folder.
+For generating a production build of the application (i.e. for deployment to Github Pages), simply run `yarn run bundle:prod` and the bundle will be in the `bundles/` folder.
 
 **Note:** The CI will automatically run the lint, build and test jobs, such that it makes sense to run them before committing. `yarn run all` runs all the relevant tasks.
 
