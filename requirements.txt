@@ -1,4 +1,4 @@
-visyn_core>=7.0.1,<8.0.0
 pandas==2.0.1
 sqlmodel==0.0.8
 sse-starlette==1.6.1
+visyn_core>=10.0.3,<11.0.0

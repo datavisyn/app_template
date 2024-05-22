@@ -3,19 +3,23 @@ name: build
 on:
   workflow_dispatch:
     inputs:
-      cypress:
-        description: 'Run cypress'
+      playwright:
+        description: 'Run playwright'
         required: false
         type: boolean
         default: false
+      playwright_spec_param:
+        type: string
+        description: "Run specific test(s). Example: `landing-page.spec.ts`"
+        required: false
   push:
-  schedule:
-    - cron: '15 1 * * *'
 
 jobs:
   build:
     uses: datavisyn/github-workflows/.github/workflows/build-node-python.yml@main
     secrets: inherit
     with:
-      cypress_enable: true
-      cypress_run_because_flag: ${{ inputs.cypress == true }}
+      cypress_enable: false
+      playwright_enable: true
+      playwright_run_because_flag: ${{ inputs.playwright == true }}
+      playwright_spec_param: ${{ inputs.playwright_spec_param }}

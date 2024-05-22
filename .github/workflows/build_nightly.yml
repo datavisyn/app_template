@@ -1,0 +1,22 @@
+name: build nightly
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '15 1 * * *'
+
+jobs:
+  build-main:
+    uses: datavisyn/github-workflows/.github/workflows/build-node-python.yml@main
+    secrets: inherit
+    with:
+      playwright_enable: true
+      playwright_run_because_flag: true
+      branch: main
+  build-develop:
+    uses: datavisyn/github-workflows/.github/workflows/build-node-python.yml@main
+    secrets: inherit
+    with:
+      playwright_enable: true
+      playwright_run_because_flag: true
+      branch: develop

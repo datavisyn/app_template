@@ -66,7 +66,7 @@ export function App() {
         <Stack style={{ overflowY: 'auto' }} m="md">
           {campaigns?.map((c) => (
             <Card key={c.id} withBorder shadow="sm">
-              <Group position="apart">
+              <Group justify="apart">
                 {c.name}
 
                 <Button

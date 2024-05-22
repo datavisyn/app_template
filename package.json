@@ -35,32 +35,29 @@
     "compile:watch": "visyn_scripts compile --watch",
     "compile": "visyn_scripts compile",
     "copy": "visyn_scripts copy",
-    "cy:open": "cypress open",
-    "cy:run": "cypress run --e2e && cypress run --component",
     "delete-dependencies": "visyn_scripts clean node_modules",
     "dist": "mkdir lib && cd dist && tar cvzf ../lib/app_template.tar.gz *",
     "docs": "visyn_scripts docs",
     "lint:fix": "visyn_scripts lint --fix",
     "lint": "visyn_scripts lint",
+    "pw:open": "playwright test --ui",
+    "pw:run": "playwright test",
     "predist": "yarn run lint && yarn run test && yarn run build",
     "start": "visyn_scripts start --env workspace_mode=single",
     "test": "visyn_scripts test",
-    "webpack:dev": "visyn_scripts build --mode development --env workspace_mode=single",
-    "webpack:prod": "visyn_scripts build --mode production --env workspace_mode=single"
+    "bundle:dev": "visyn_scripts bundle --mode development --env workspace_mode=single",
+    "bundle:prod": "visyn_scripts bundle --mode production --env workspace_mode=single"
   },
   "dependencies": {
-    "@mantine/core": "^5.5.5",
-    "@mantine/form": "^5.5.5",
-    "@mantine/hooks": "^5.5.5",
-    "@mantine/notifications": "^5.5.5",
     "@reduxjs/toolkit": "^1.8.2",
     "react-redux": "^8.0.2",
-    "visyn_core": "^7.0.1",
-    "visyn_scripts": "^7.0.1"
+    "visyn_core": "^10.0.3",
+    "visyn_scripts": "v9.0.0"
   },
   "devDependencies": {
-    "@rtk-query/codegen-openapi": "^1.0.0",
-    "cypress": "^12.0.1"
+    "@playwright/test": "^1.44.0",
+    "@rtk-query/codegen-openapi": "^1.2.0",
+    "playwright": "^1.44.0"
   },
   "resolutions": {
     "@types/react": "~18.2.0",
@@ -77,5 +74,5 @@
       }
     }
   },
-  "packageManager": "yarn@3.2.2"
+  "packageManager": "yarn@4.2.2"
 }
