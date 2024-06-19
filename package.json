@@ -51,7 +51,7 @@
   "dependencies": {
     "@reduxjs/toolkit": "^1.8.2",
     "react-redux": "^8.0.2",
-    "visyn_core": "^10.0.3",
+    "visyn_core": "^11.0.0",
     "visyn_scripts": "v9.0.0"
   },
   "devDependencies": {
