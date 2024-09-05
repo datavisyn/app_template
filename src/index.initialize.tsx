@@ -8,7 +8,7 @@ import { App } from './App';
 createRoot(document.getElementById('root')).render(
   <React.StrictMode>
     <Provider store={store}>
-      <VisynAppProvider appName="App Template">
+      <VisynAppProvider appName="App Template" disableMantine6>
         <App />
       </VisynAppProvider>
     </Provider>
